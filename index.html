@@ -3,541 +3,582 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>تومانگ | آرشیو تخصصی</title>
+  <title>تومانگ | مرجع تخصصی مانگا و مانهوا</title>
+  <meta name="description" content="بهترین مرجع دانلود و خواندن مانگا و مانهوا با ترجمه فارسی">
 
+  <!-- Fonts & Libs -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Vazir', 'sans-serif'] },
+          colors: {
+            bg: '#02000a',
+            glass: 'rgba(255, 255, 255, 0.03)',
+            glassBorder: 'rgba(255, 255, 255, 0.08)',
+            accent: '#7c3aed', // Violet-600
+            accentHover: '#6d28d9',
+            glow: '#a78bfa'
+          },
+          animation: {
+            'float': 'float 8s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+          },
+          keyframes: {
+            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    :root { --glass-bg: rgba(10,8,15,0.56); --glass-border: rgba(255,255,255,0.06); --accent:#7c3aed; --accent-glow: #a78bfa; }
-    html,body { height:100%; }
-    body { background: linear-gradient(180deg, #02000a 0%, #050014 60%); color:#e6eef8; overflow-x:hidden; -webkit-tap-highlight-color:transparent; font-size:15px; }
-    ::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#2b2b3a,#1b1530);border-radius:18px}
-    .glass-panel{background:var(--glass-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--glass-border)}
-    .ambient-glow{position:fixed;inset:0;z-index:-1;background:
-      radial-gradient(600px 240px at 10% 10%, rgba(124,58,237,0.12), transparent 12%),
-      radial-gradient(800px 300px at 90% 80%, rgba(236,72,153,0.06), transparent 18%);}    
+    body { 
+      background-color: #02000a;
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.08), transparent 25%), 
+        radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.08), transparent 25%);
+      color: #e2e8f0; 
+      overflow-x: hidden; 
+      -webkit-tap-highlight-color: transparent; 
+    }
 
-    /* slider */
-    .slider-container{position:relative;width:100%;aspect-ratio:16/7;min-height:320px;max-height:720px;overflow:hidden;border-radius:1.5rem}
-    .slide{position:absolute;inset:0;opacity:0;transition:opacity .8s ease-in-out;display:flex;align-items:flex-end}
-    .slide.active{opacity:1;z-index:10}
-    .slide-overlay{position:absolute;inset:0;background:linear-gradient(180deg, rgba(3,0,20,0.2), rgba(3,0,20,0.62));pointer-events:none}
-    .animate-slide-content{animation:slideInUp .6s ease-out forwards}
-    @keyframes slideInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-    .line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    /* Glassmorphism Classes */
+    .glass-panel {
+      background: rgba(15, 15, 20, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .nav-glass {
+      background: rgba(2, 0, 10, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
-    /* image modes */
-    .slide img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 18%;background-color:#06060a}
-    .slide img.portrait{object-fit:contain !important;object-position:center center !important;background:linear-gradient(180deg, rgba(4,4,8,0.85), rgba(6,6,10,0.95));}
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #02000a; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #7c3aed; }
 
-    /* card */
-    .card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.04); border-radius:16px; overflow:hidden; transition:transform .28s ease, box-shadow .28s ease; }
-    .card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(124,58,237,0.12); }
-    .status-pill { font-size:10px; padding:4px 6px; border-radius:8px; font-weight:800 }
-    .type-pill { font-size:10px; padding:4px 6px; border-radius:8px; font-weight:900 }
+    /* Slider */
+    .slider-wrap { mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
+    .slide-enter { animation: fadeScale 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+    @keyframes fadeScale { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
 
-    @media (min-width:1024px){ .grid-cols-custom { grid-template-columns: repeat(5, minmax(0,1fr)); } }
-    @media (min-width:1280px){ .grid-cols-custom { grid-template-columns: repeat(6, minmax(0,1fr)); } }
-
-    .premium-overlay { position: absolute; inset:0; display:flex;align-items:center;justify-content:center; background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.6)); z-index:40; padding:20px }
-    .auth-input { background: rgba(10,10,12,0.7); border:1px solid rgba(255,255,255,0.04); padding:12px; border-radius:12px; color:#e7ecff }
-
-    /* cleaner footer */
-    footer { border-top:1px solid rgba(255,255,255,0.03); background: linear-gradient(180deg, rgba(2,1,6,0.3), rgba(2,1,6,0.45)); }
-    .footer-inner{max-width:1400px;margin:0 auto;padding:28px 32px;display:flex;flex-direction:column;gap:18px}
-    .footer-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    .footer-brand{font-weight:900;font-size:20px}
-    .footer-links a{margin-left:12px}
-    .footer-bottom{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.03);padding-top:14px;font-size:12px;color:#9aa2b8}
-
-    main { padding-top: calc(var(--nav-height, 72px) + 24px); transition: padding-top 160ms ease; }
-
-    .days-badge{background:linear-gradient(90deg,var(--accent),var(--accent-glow));padding:4px 8px;border-radius:999px;color:#fff;font-weight:800;font-size:12px;margin-right:8px}
-
-    .genre-tag.bg-accent{background:linear-gradient(90deg,var(--accent),var(--accent-glow));color:#fff;border-color:rgba(255,255,255,0.06)}
-    .status-tag.bg-accent{background:linear-gradient(90deg,var(--accent),var(--accent-glow));color:#fff;border-color:rgba(255,255,255,0.06)}
-
+    /* Cards */
+    .manga-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .manga-card:hover { transform: translateY(-6px); box-shadow: 0 10px 40px -10px rgba(124, 58, 237, 0.3); z-index: 10; }
+    .manga-card:hover .cover-img { transform: scale(1.05); }
+    
+    /* Interactive Elements */
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover { box-shadow: 0 0 30px rgba(124, 58, 237, 0.5); transform: translateY(-2px); }
   </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col" oncontextmenu="return false;">
+<body class="min-h-screen flex flex-col">
 
-  <!-- DATA INJECTION -->
+  <!-- Backend Data Injection (SEO & Initial State) -->
   <script id="DATA_SOURCE" type="application/json">[{"chapter": "83", "cover": "https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg", "genres": ["\u0639\u0627\u0634\u0642\u0627\u0646\u0647", "\u0645\u062b\u0644\u062b \u0639\u0634\u0642\u06cc"], "slug": "Domestic-Girlfriend-1234", "status": "\u062f\u0631 \u062d\u0627\u0644 \u0627\u0646\u062a\u0634\u0627\u0631", "summary": "\u0646\u0645\u06cc \u062f\u0627\u0646\u0645", "titleEn": "Domestic Girlfriend", "titleFa": "\u062f\u0648\u0633\u062a \u062f\u062e\u062a\u0631\u062e\u0627\u0646\u06af\u06cc", "type": "Manga", "updatedAt": "2024-05-18"}]</script>
   <script id="CONFIG_SOURCE" type="application/json">{"apiBase": "http://localhost:5001", "authUrl": "/auth", "coverThreshold": 0.65, "faqPage": "/faq.html", "footer": {"aboutTeam": "\u062a\u0648\u0645\u0627\u0646\u06af\u061b \u0645\u0631\u062c\u0639 \u062a\u062e\u0635\u0635\u06cc \u0648 \u0622\u0631\u0634\u06cc\u0648 \u0628\u06cc\u200c\u0646\u0638\u06cc\u0631 \u0645\u0627\u0646\u06af\u0627 \u0648 \u0645\u0627\u0646\u0647\u0648\u0627. \u0645\u0627 \u062f\u0627\u0633\u062a\u0627\u0646\u200c\u0647\u0627 \u0631\u0627 \u0632\u0646\u062f\u0647 \u0645\u06cc\u200c\u06a9\u0646\u06cc\u0645.", "copyright": "\u00a9 2026 Twomang. All rights reserved.", "madeBy": "Designed \u0026 Developed by im_abi for Saino TM"}, "panelUrl": "/panel", "purchasePhysical": "https://example.com/shop", "siteNameEn": "Twomang", "siteNameFa": "\u062a\u0648\u0645\u0627\u0646\u06af", "subscribeTextFa": "\u062f\u0633\u062a\u0631\u0633\u06cc \u0646\u0627\u0645\u062d\u062f\u0648\u062f \u0628\u0627 \u0627\u0634\u062a\u0631\u0627\u06a9 \u0648\u06cc\u0698\u0647", "supportContact": "https://t.me/im_abi", "telegramChannel": "https://t.me/saino_tm"}</script>
 
-  <div class="ambient-glow"></div>
+  <!-- Navbar -->
+  <nav class="fixed top-0 inset-x-0 z-50 nav-glass h-20 transition-all duration-300" id="navbar">
+    <div class="max-w-[1600px] mx-auto px-6 h-full flex items-center justify-between">
+      
+      <!-- Logo & Links -->
+      <div class="flex items-center gap-8">
+        <a href="/" class="group flex items-center gap-2">
+          <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center font-black text-xl text-white shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform">
+            TM
+          </div>
+          <span class="hidden md:block text-2xl font-black tracking-tight text-white group-hover:text-violet-300 transition-colors">
+            Twomang
+          </span>
+        </a>
 
-  <!-- NAV -->
-  <nav class="fixed top-4 w-full z-[150] px-4">
-    <div class="glass-panel rounded-2xl max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between shadow-2xl">
-      <div class="flex items-center gap-6">
-        <a href="#" class="text-2xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-accent to-secondary">تومانگ</a>
-        <div class="hidden lg:flex items-center p-1 bg-white/5 rounded-xl border border-white/5 gap-1">
-          <button data-type="all" class="type-filter-btn px-4 py-2 rounded-lg text-xs font-bold transition-all bg-accent text-white">همه</button>
-          <button data-type="Manhwa" class="type-filter-btn px-4 py-2 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white">مانهوا</button>
-          <button data-type="Manga" class="type-filter-btn px-4 py-2 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white">مانگا</button>
+        <!-- Desktop Menu -->
+        <div class="hidden lg:flex items-center p-1 bg-white/5 rounded-2xl border border-white/5 backdrop-blur-md">
+          <button onclick="App.setType('all')" data-type="all" class="nav-filter px-5 py-2 rounded-xl text-sm font-bold text-gray-300 transition-all hover:text-white hover:bg-white/5 bg-white/10 text-white shadow-inner">همه</button>
+          <button onclick="App.setType('Manhwa')" data-type="Manhwa" class="nav-filter px-5 py-2 rounded-xl text-sm font-bold text-gray-400 transition-all hover:text-white hover:bg-white/5">مانهوا</button>
+          <button onclick="App.setType('Manga')" data-type="Manga" class="nav-filter px-5 py-2 rounded-xl text-sm font-bold text-gray-400 transition-all hover:text-white hover:bg-white/5">مانگا</button>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <div class="relative hidden md:block nav-search">
-          <input type="text" id="mainSearch" placeholder="جستجو در بین آثار و خلاصه..." class="auth-input text-sm rounded-xl pr-12 pl-4 py-2.5 w-64 transform transition-transform duration-200 ease-out focus:scale-105 outline-none placeholder-gray-400">
-          <i data-lucide="search" class="absolute right-4 top-3 w-4 h-4 text-gray-400"></i>
+      <!-- Search & Auth -->
+      <div class="flex items-center gap-4">
+        <!-- Search Bar -->
+        <div class="relative hidden md:block group">
+          <input type="text" id="mainSearch" placeholder="جستجو (نام، ژانر)..." 
+            class="bg-black/40 border border-white/10 rounded-2xl px-5 py-3 pr-12 w-64 focus:w-80 focus:border-accent focus:bg-black/60 focus:ring-1 focus:ring-accent transition-all outline-none text-sm font-medium text-white placeholder-gray-500">
+          <i data-lucide="search" class="absolute right-4 top-3.5 w-4 h-4 text-gray-500 group-focus-within:text-accent transition-colors"></i>
         </div>
-        <button id="sidebarToggle" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition relative group"><i data-lucide="filter" class="w-5 h-5 text-gray-300 group-hover:text-accent"></i></button>
-        <button id="authBtn" class="px-3 py-2 rounded-xl border border-white/10 text-sm font-bold">ورود / ثبت‌نام</button>
+
+        <!-- Auth Button (Dynamic) -->
+        <div id="auth-container">
+           <!-- Loaded via JS -->
+           <div class="animate-pulse w-32 h-10 bg-white/5 rounded-2xl"></div>
+        </div>
       </div>
     </div>
   </nav>
 
-  <main class="max-w-[1400px] mx-auto px-4 pt-36 pb-20 flex-grow w-full">
-
-    <section id="heroSlider" class="slider-container mb-10 shadow-2xl border border-white/5">
-      <div id="sliderWrapper" class="h-full w-full"></div>
-      <div class="absolute bottom-6 left-6 z-30 flex gap-2">
-        <button id="prevSlide" class="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-accent transition"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
-        <button id="nextSlide" class="p-3 rounded-full bg-white/5 border border-white/10 hover:bg-accent transition"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-      </div>
+  <!-- Main Content -->
+  <main class="flex-grow pt-24 pb-20 px-4 md:px-8 max-w-[1600px] mx-auto w-full">
+    
+    <!-- Hero Slider -->
+    <section id="hero-slider" class="relative h-[400px] md:h-[500px] rounded-[2.5rem] overflow-hidden mb-16 glass-panel border-0 shadow-2xl shadow-black/50 slider-wrap group">
+        <div id="slides-container" class="w-full h-full relative">
+            <!-- Slides injected via JS -->
+        </div>
+        
+        <!-- Slider Controls -->
+        <div class="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-black via-black/60 to-transparent z-20 flex items-end justify-between p-8 md:p-12">
+            <div id="slider-dots" class="flex gap-2"></div>
+            <a href="#grid" class="hidden md:flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white transition-colors">
+                مشاهده آرشیو <i data-lucide="arrow-down" class="w-4 h-4 animate-bounce"></i>
+            </a>
+        </div>
     </section>
 
-    <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-6 gap-4">
-      <div>
-        <h1 class="text-3xl md:text-5xl font-black text-white mb-2 tracking-tight flex items-center gap-4">آرشیو آثار <span id="countDisplay" class="text-xl font-mono text-accent bg-accent/8 px-3 py-1 rounded-lg">0</span></h1>
-        <p class="text-gray-400 text-sm font-medium">کاوش در دنیای بی‌پایان داستان‌ها</p>
-      </div>
+    <div class="flex flex-col xl:flex-row gap-8 relative">
+      
+      <!-- Sidebar (Filters) -->
+      <aside class="w-full xl:w-72 shrink-0 space-y-6">
+        <div class="glass-panel p-6 rounded-3xl sticky top-24">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="flex items-center gap-2 text-white font-black text-lg">
+                    <i data-lucide="filter" class="w-5 h-5 text-accent"></i> فیلترها
+                </h3>
+                <button onclick="App.reset()" class="text-xs text-red-400 hover:text-red-300 font-bold transition">حذف همه</button>
+            </div>
 
-      <div class="w-full md:hidden">
-        <div class="glass-panel rounded-xl p-2 flex items-center border-white/10">
-          <i data-lucide="search" class="w-4 h-4 text-gray-400 mx-3"></i>
-          <input type="text" id="mobileSearch" class="bg-transparent w-full py-2 text-sm text-white outline-none placeholder-gray-500" placeholder="جستجو...">
+            <!-- Sort -->
+            <div class="mb-6">
+                <label class="text-xs font-bold text-gray-500 mb-3 block uppercase tracking-wider">مرتب‌سازی</label>
+                <div class="relative">
+                    <select id="sortBy" onchange="App.setSort(this.value)" class="w-full appearance-none bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white font-bold outline-none focus:border-accent transition cursor-pointer">
+                        <option value="newest">🔥 جدیدترین بروزرسانی</option>
+                        <option value="chapters">📚 بیشترین چپتر</option>
+                        <option value="alpha">🅰 حروف الفبا</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="absolute left-4 top-3.5 w-4 h-4 text-gray-500 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <!-- Status -->
+            <div class="mb-6">
+                <label class="text-xs font-bold text-gray-500 mb-3 block uppercase tracking-wider">وضعیت انتشار</label>
+                <div id="status-list" class="space-y-2"></div>
+            </div>
+
+            <!-- Genres -->
+            <div>
+                <label class="text-xs font-bold text-gray-500 mb-3 block uppercase tracking-wider">ژانرها</label>
+                <div id="genres-list" class="flex flex-wrap gap-2"></div>
+            </div>
         </div>
+      </aside>
+
+      <!-- Grid Content -->
+      <div class="flex-1 min-h-[500px]">
+        <div class="flex items-center justify-between mb-8 px-2">
+            <div>
+                <h2 class="text-2xl font-black text-white mb-1">آخرین عناوین</h2>
+                <p class="text-xs text-gray-400 font-medium">نمایش <span id="count" class="text-accent font-bold">0</span> اثر از آرشیو</p>
+            </div>
+            <!-- Mobile Search Toggle could go here -->
+        </div>
+
+        <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
+            <!-- Grid Items -->
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="mt-16 flex justify-center items-center gap-2"></div>
       </div>
+
     </div>
-
-    <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 grid-cols-custom"></div>
-    <div id="pagination" class="mt-10 flex items-center justify-center gap-2 flex-wrap"></div>
-
-    <div id="emptyState" class="hidden flex-col items-center justify-center py-32 opacity-60">
-      <div class="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 border border-white/10"><i data-lucide="search-x" class="w-10 h-10 text-gray-400"></i></div>
-      <p class="text-xl font-bold text-gray-300">نتیجه‌ای یافت نشد</p>
-      <button onclick="App.clearFilters()" class="mt-4 text-accent hover:text-secondary underline underline-offset-8 transition">پاکسازی فیلترها</button>
-    </div>
-
   </main>
 
-  <!-- sidebar filter -->
-  <div id="sidebarBackdrop" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[220] hidden transition-opacity opacity-0"></div>
-  <aside id="sidebar" class="fixed top-0 right-0 h-full w-full max-w-[420px] bg-[#050505] border-l border-white/10 z-[230] transform translate-x-full transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] flex flex-col">
-    <div class="p-6 border-b border-white/5 flex justify-between items-center">
-      <div class="flex items-center gap-3"><i data-lucide="sliders" class="w-5 h-5 text-accent"></i><span class="font-black text-lg">فیلترهای پیشرفته</span></div>
-      <button id="closeSidebar" class="p-2 hover:bg-red-500/20 hover:text-red-400 rounded-xl transition"><i data-lucide="x" class="w-6 h-6"></i></button>
-    </div>
-    <div class="flex-1 overflow-y-auto p-6 space-y-6">
-      <div>
-        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">ژانرها</h4>
-        <div id="genreContainer" class="flex flex-wrap gap-2"></div>
-      </div>
-      <div>
-        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">وضعیت انتشار</h4>
-        <div class="grid grid-cols-1 gap-3" id="statusContainer"></div>
-      </div>
-
-      <div>
-        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-4">مرتب‌سازی</h4>
-        <select id="sortBy" class="w-full auth-input rounded-xl p-3">
-          <option value="relevance">مرتبط‌ترین</option>
-          <option value="newest">جدیدترین به قدیمی</option>
-          <option value="oldest">قدیمی‌ترها</option>
-          <option value="chapterDesc">بیشترین چپتر</option>
-        </select>
-      </div>
-    </div>
-    <div class="p-6 border-t border-white/5 bg-black/20">
-      <button id="applyFilters" class="w-full py-4 rounded-2xl bg-gradient-to-r from-accent to-accentGlow font-black text-white shadow-neon hover:shadow-neon-hover transition-all active:scale-95">تایید و اعمال فیلترها</button>
-    </div>
-  </aside>
-
-  <!-- MODALS: Premium + Auth prompt (redirect to external /auth) -->
-  <div id="premiumModal" class="fixed inset-0 z-[350] hidden items-center justify-center bg-black/70 px-4">
-    <div class="w-full max-w-lg p-6 rounded-2xl glass-panel text-center">
-      <h3 class="font-black text-2xl mb-3">محتوای پرمیوم</h3>
-      <p class="text-gray-300 mb-6">برای دسترسی به این بخش، باید اشتراک داشته باشید یا وارد شوید.</p>
-      <div id="premiumInfo" class="text-sm text-gray-200 mb-4"></div>
-      <div class="flex gap-3 justify-center">
-        <button id="goToPanelBtn" class="px-6 py-3 rounded-xl bg-accent font-black text-white">رفتن به پنل</button>
-        <button id="goAuth" class="px-6 py-3 rounded-xl border border-white/10 text-white">ورود / ثبت‌نام</button>
-        <a id="supportLinkModal" class="px-6 py-3 rounded-xl border border-white/10 text-white" target="_blank">پشتیبانی</a>
-      </div>
-    </div>
-  </div>
-
-  <footer class="mt-auto">
-    <div class="footer-inner">
-      <div class="footer-top">
-        <div>
-          <div class="footer-brand">Twomang</div>
-          <div class="text-xs text-gray-400 max-w-sm leading-loose">تومانگ؛ مرجع تخصصی و آرشیو بی‌نظیر مانگا و مانهوا. ما داستان‌ها را زنده می‌کنیم.</div>
+  <footer class="border-t border-white/5 bg-[#010105] mt-auto">
+    <div class="max-w-[1600px] mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="text-center md:text-right">
+            <h4 class="font-black text-2xl text-white mb-2">Twomang</h4>
+            <p class="text-xs text-gray-500 max-w-sm">تومانگ؛ مرجع تخصصی و آرشیو بی‌نظیر مانگا و مانهوا. ما داستان‌ها را زنده می‌کنیم.</p>
         </div>
-        <div class="footer-links text-sm font-bold text-gray-400 items-center">
-          <a href="https://t.me/saino_tm" target="_blank" class="hover:text-accent transition flex items-center gap-2"><i data-lucide="send" class="w-4 h-4"></i>تلگرام</a>
-          <a href="https://t.me/im_abi" target="_blank" class="hover:text-accent transition flex items-center gap-2"><i data-lucide="help-circle" class="w-4 h-4"></i>پشتیبانی</a>
-          <a href="/faq.html" class="hover:text-accent transition flex items-center gap-2"><i data-lucide="info" class="w-4 h-4"></i>سوالات متداول</a>
+        <div class="text-[10px] text-gray-600 font-mono" dir="ltr">
+            Designed &amp; Developed by im_abi for Saino TM | Protected by Secure API
         </div>
-      </div>
-      <div class="footer-bottom">
-        <div>Designed &amp; Developed by im_abi for Saino TM</div>
-        <div class="text-gray-500">تمامی حقوق محفوظ است.</div>
-      </div>
     </div>
   </footer>
 
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-8 left-8 transform translate-y-20 opacity-0 transition-all duration-300 z-[100] bg-zinc-900 border border-l-4 border-l-accent border-white/10 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-4">
+    <div class="bg-accent/20 p-2 rounded-full"><i data-lucide="bell" class="w-5 h-5 text-accent"></i></div>
+    <span id="toast-msg" class="text-sm font-bold"></span>
+  </div>
+
   <script>
-  (function(){
-    // CONFIG & DATA
-    const items = JSON.parse(document.getElementById('DATA_SOURCE').textContent || '[]');
-    const config = JSON.parse(document.getElementById('CONFIG_SOURCE').textContent || '{}');
+    // --- APP CORE ---
+    const App = (() => {
+      // Data Load
+      const ITEMS = JSON.parse(document.getElementById('DATA_SOURCE').textContent || '[]');
+      const CONFIG = JSON.parse(document.getElementById('CONFIG_SOURCE').textContent || '{}');
+      
+      // API Settings
+      const API_BASE = "https://two-api-iksq.onrender.com";
+      const API_ME = `${API_BASE}/auth/me`;
 
-    // IMPORTANT: COVER_THRESHOLD controls switch from cover -> contain
-    const COVER_THRESHOLD = typeof config.coverThreshold !== 'undefined' ? config.coverThreshold : 0.65;
+      // State
+      let state = {
+        filtered: [],
+        user: null,
+        isAuthChecked: false,
+        params: { type: 'all', q: '', genres: [], status: [], sort: 'newest', page: 1, limit: 20 }
+      };
 
-    // APP STATE
-    let state = { type: 'all', search: '', genres: [], status: [], page: 1, perPage: 20, sortBy: 'relevance' };
-
-    // FUSE setup
-    const fuseOptions = {
-      includeScore: true,
-      shouldSort: true,
-      threshold: 0.38,
-      distance: 150,
-      ignoreLocation: true,
-      useExtendedSearch: true,
-      keys: [ { name: 'titleFa', weight: 0.45 }, { name: 'titleEn', weight: 0.35 }, { name: 'summary', weight: 0.35 }, { name: 'genres', weight: 0.25 }, { name: 'type', weight: 0.15 } ]
-    };
-    const fuse = new Fuse(items, fuseOptions);
-
-    // Helpers
-    const qs = s => document.querySelector(s);
-    const qsa = s => Array.from(document.querySelectorAll(s));
-    const escapeHTML = s => { const p=document.createElement('p'); p.textContent = s; return p.innerHTML; };
-
-    // AUTH: external auth system (/auth)
-    // Auth token stored in localStorage key 'at' if your external auth writes it.
-
-    // Global fetch wrapper: attaches Bearer and handles 401 centrally
-    async function fetchWithAuth(path, opts = {}){
-      const api = (config.apiBase || '').replace(/\/+$/, '');
-      if(!api) throw new Error('api base not configured');
-      const url = path.startsWith('http') ? path : (api + (path.startsWith('/') ? path : '/' + path));
-      const token = localStorage.getItem('at');
-      const headers = Object.assign({}, opts.headers || {});
-      if(token) headers['Authorization'] = `Bearer ${token}`;
-      try{
-        const res = await fetch(url, Object.assign({}, opts, { headers }));
-        if(res.status === 401){
-          // clear token and redirect to auth preserving hash
-          localStorage.removeItem('at');
-          _currentUser = null;
-          updateAuthUI();
-          requireAuthRedirect();
-          const err = new Error('unauthorized'); err._res = res; throw err;
-        }
-        return res;
-      }catch(e){ throw e; }
-    }
-
-    // fetch full user profile (prefer /auth/me if backend provides it)
-    async function fetchUserStatus(token){
-      if(!token) return null;
-      try{
-        const res = await fetchWithAuth('/auth/me', { method: 'GET' });
-        if(!res.ok) return null;
-        return await res.json();
-      }catch(e){ console.warn('user fetch failed', e); return null; }
-    }
-
-    // get current user quickly (cached for this session)
-    let _currentUser = null;
-    async function checkAuth(){
-      const token = localStorage.getItem('at');
-      if(!token){ _currentUser = null; updateAuthUI(); return; }
-      const data = await fetchUserStatus(token);
-      _currentUser = data || null;
-      updateAuthUI();
-    }
-
-    function updateAuthUI(){
-      const btn = qs('#authBtn');
-      if(_currentUser && _currentUser.username){
-        const days = Number(_currentUser.days_left || 0);
-        btn.innerHTML = `${escapeHTML(_currentUser.username)}${days>0?('<span class="days-badge">'+days+' روز</span>'):''}`;
-        btn.classList.add('bg-white/5');
-      } else {
-        btn.textContent = 'ورود / ثبت‌نام';
-        btn.classList.remove('bg-white/5');
-      }
-    }
-
-    function requireAuthRedirect(){
-      // redirect to external /auth preserving return URL hash
-      const ret = encodeURIComponent(location.hash || '#');
-      const authUrl = (config.authUrl || '/auth') + `?return=${ret}`;
-      location.href = authUrl;
-    }
-
-    // HASH parsing & sync (important '# capability' — state & detail routes live in hash)
-    function parseHash(){
-      const raw = (location.hash || '').replace(/^#/, '');
-      const parts = raw.split('?');
-      const path = parts[0] || '';
-      const params = new URLSearchParams(parts[1] || '');
-
-      // parse route-like hashes: '', 'page=2&search=..', or '/detail/slug'
-      if(path.startsWith('/detail/')){ state.route = 'detail'; state.slug = path.replace('/detail/', ''); }
-      else { state.route = 'list'; state.slug = null; }
-
-      state.page = parseInt(params.get('page')) || 1;
-      state.search = params.get('search') || '';
-      state.type = params.get('type') || 'all';
-      state.genres = params.get('genre') ? params.get('genre').split(',').map(d => decodeURIComponent(d)).filter(Boolean) : [];
-      state.status = params.get('status') ? params.get('status').split(',').map(d => decodeURIComponent(d)).filter(Boolean) : [];
-      state.sortBy = params.get('sort') || 'relevance';
-    }
-
-    function updateHash(){
-      const parts = [];
-      const params = new URLSearchParams();
-      if(state.page && state.page > 1) params.set('page', state.page);
-      if(state.search) params.set('search', state.search);
-      if(state.type && state.type !== 'all') params.set('type', state.type);
-      if(state.genres && state.genres.length) params.set('genre', state.genres.map(d => d).join(','));
-      if(state.status && state.status.length) params.set('status', state.status.map(d => d).join(','));
-      if(state.sortBy) params.set('sort', state.sortBy);
-      const q = params.toString();
-      location.hash = (state.route === 'detail' && state.slug) ? `/detail/${state.slug}` : (q ? `?${q}` : '');
-    }
-
-    /* HERO SLIDER */
-    function initHeroSlider(){
-      const wrap = qs('#sliderWrapper');
-      const sample = [...items].slice(0, Math.min(8, items.length));
-      if(!sample.length) return;
-
-      wrap.innerHTML = sample.map((it, idx) => `
-        <div class="slide ${idx===0?'active':''}" data-index="${idx}" data-slug="${escapeHTML(it.slug)}">
-          <img src="${escapeHTML(it.cover)}" alt="${escapeHTML(it.titleFa)}">
-          <div class="slide-overlay"></div>
-          <div class="relative z-20 p-8 md:p-16 w-full md:w-2/3 animate-slide-content">
-            <div class="flex gap-2 mb-4">${(it.genres||[]).slice(0,3).map(g=>`<span class="px-3 py-1 rounded-full bg-accent/20 border border-accent/30 text-[10px] font-bold text-accent">${escapeHTML(g)}</span>`).join('')}</div>
-            <h2 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">${escapeHTML(it.titleFa)}</h2>
-            <p class="text-gray-300 text-sm md:text-base mb-8 line-clamp-2 max-w-xl leading-relaxed">${escapeHTML(it.summary || '')}</p>
-            <a data-slug="${escapeHTML(it.slug)}" href="#/detail/${escapeHTML(it.slug)}" class="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-white text-black font-black hover:bg-accent hover:text-white transition-all">مشاهده جزئیات <i data-lucide="arrow-left" class="w-4 h-4"></i></a>
-          </div>
-        </div>
-      `).join('');
-
-      lucide.createIcons();
-
-      // adapt images: use COVER_THRESHOLD to decide contain vs cover
-      const imgs = wrap.querySelectorAll('img');
-      imgs.forEach(img => {
-        function handle(){
-          try{
-            const w = img.naturalWidth || 1; const h = img.naturalHeight || 1; const ratio = w / h;
-            if(ratio < COVER_THRESHOLD) img.classList.add('portrait'); else img.classList.remove('portrait');
-          }catch(e){}
-        }
-        if(img.complete) handle(); else img.addEventListener('load', handle);
+      // Search Engine
+      const fuse = new Fuse(ITEMS, {
+        keys: ['titleFa', 'titleEn', 'summary', 'genres'],
+        threshold: 0.3,
+        useExtendedSearch: true
       });
 
-      // slider controls
-      let current = 0; let slides = qsa('.slide');
-      let interval = setInterval(()=> moveSlide(1), 7000);
-      function refresh(){ slides = qsa('.slide'); }
-      window.moveSlide = (dir) => { refresh(); if(!slides.length) return; slides[current].classList.remove('active'); current = (current + dir + slides.length) % slides.length; slides[current].classList.add('active'); };
-      qs('#prevSlide') && qs('#prevSlide').addEventListener('click', ()=>{ moveSlide(-1); reset(); });
-      qs('#nextSlide') && qs('#nextSlide').addEventListener('click', ()=>{ moveSlide(1); reset(); });
-      wrap.addEventListener('mouseenter', ()=> { clearInterval(interval); });
-      wrap.addEventListener('mouseleave', ()=> { reset(); });
-      function reset(){ clearInterval(interval); interval = setInterval(()=> moveSlide(1), 7000); }
+      // --- AUTH SYSTEM ---
+      async function initAuth() {
+        const token = localStorage.getItem('at');
+        const container = document.getElementById('auth-container');
+        
+        if (!token) {
+            renderAuthButton(false);
+            state.isAuthChecked = true;
+            return;
+        }
 
-      // slide CTA click -> navigate detail route (hash)
-      wrap.addEventListener('click', (e)=>{ const a = e.target.closest('a[data-slug]'); if(!a) return; e.preventDefault(); state.route='detail'; state.slug = a.dataset.slug; updateHash(); render(); });
-    }
+        try {
+            const res = await fetch(API_ME, { 
+                headers: { 'Authorization': `Bearer ${token}` } 
+            });
+            
+            if (res.ok) {
+                state.user = await res.json();
+                renderAuthButton(true);
+            } else {
+                // Token invalid
+                localStorage.removeItem('at');
+                renderAuthButton(false);
+            }
+        } catch (e) {
+            console.error("Auth Error:", e);
+            renderAuthButton(false); // Fallback to login
+        } finally {
+            state.isAuthChecked = true;
+        }
+      }
 
-    /* FILTERS */
-    function initFilters(){
-      const allGenres = [...new Set(items.flatMap(i=>i.genres||[]))].sort((a,b)=>a.localeCompare(b));
-      qs('#genreContainer').innerHTML = allGenres.map(g=>`<button data-genre="${escapeHTML(g)}" class="genre-tag px-4 py-2 rounded-xl text-xs font-medium bg-white/5 border border-white/5 text-gray-300 hover:border-accent/50 transition">${escapeHTML(g)}</button>`).join('');
+      function renderAuthButton(isLoggedIn) {
+        const container = document.getElementById('auth-container');
+        if (isLoggedIn) {
+            const isPremium = state.user.days_left > 0;
+            container.innerHTML = `
+                <a href="/panel" class="btn-primary px-5 py-2.5 rounded-xl flex items-center gap-2 text-white font-bold text-sm group">
+                    <span class="truncate max-w-[100px]">${state.user.username}</span>
+                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                </a>
+            `;
+        } else {
+            container.innerHTML = `
+                <a href="/auth" class="bg-white/10 hover:bg-white/20 border border-white/10 text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all">
+                    ورود / عضویت
+                    <i data-lucide="log-in" class="w-4 h-4"></i>
+                </a>
+            `;
+        }
+        lucide.createIcons();
+      }
 
-      const allStatus = [...new Set(items.map(i=>i.status))];
-      qs('#statusContainer').innerHTML = allStatus.map(s=>`<button data-status="${escapeHTML(s)}" class="status-tag w-full text-right px-4 py-3 rounded-xl text-xs font-bold bg-white/5 border border-white/5 text-gray-300 hover:border-accent/50 transition flex justify-between items-center">${escapeHTML(s)}<div class="w-2 h-2 rounded-full bg-white/20 circle-indicator"></div></button>`).join('');
+      // --- LOGIC ---
+      function applyFilters() {
+        let result = ITEMS;
 
-      // restore visual selection after parseHash
-      state.genres.forEach(g => { const btn = qs(`#genreContainer [data-genre="${CSS.escape(g)}"]`); if(btn) btn.classList.add('bg-accent','text-white','border-accent'); });
-      state.status.forEach(s => { const b = qs(`#statusContainer [data-status="${CSS.escape(s)}"]`); if(b){ b.classList.add('bg-accent','text-white'); const ind = b.querySelector('.circle-indicator'); if(ind) ind.classList.replace('bg-white/20','bg-accent'); }});
-    }
+        // 1. Type
+        if (state.params.type !== 'all') {
+            result = result.filter(i => i.type.toLowerCase() === state.params.type.toLowerCase());
+        }
 
-    /* GET FILTERED LIST */
-    function getFiltered(){
-      let list = items.slice();
-      if(state.type && state.type !== 'all') list = list.filter(i => i.type === state.type);
-      if(state.genres && state.genres.length) list = list.filter(i => state.genres.every(g => (i.genres||[]).includes(g)));
-      if(state.status && state.status.length) list = list.filter(i => state.status.includes(i.status));
-      if(state.search && state.search.trim().length){ const res = fuse.search(state.search.trim()); list = res.map(r => r.item); }
-      if(state.sortBy === 'newest') list.sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt));
-      else if(state.sortBy === 'oldest') list.sort((a,b)=> new Date(a.updatedAt) - new Date(b.updatedAt));
-      else if(state.sortBy === 'chapterDesc') list.sort((a,b)=> (parseInt(b.chapter)||0) - (parseInt(a.chapter)||0));
-      return list;
-    }
+        // 2. Search (Fuse)
+        if (state.params.q) {
+            const fuseResult = fuse.search(state.params.q);
+            result = fuseResult.map(r => r.item);
+        }
 
-    /* RENDER GRID */
-    function render(){
-      // if detail route, handle separately (could open a modal or navigate to detail page)
-      if(state.route === 'detail' && state.slug){ openDetail(state.slug); return; }
+        // 3. Genres (AND logic)
+        if (state.params.genres.length > 0) {
+            result = result.filter(item => 
+                state.params.genres.every(g => item.genres.includes(g))
+            );
+        }
 
-      updateHash();
-      const grid = qs('#grid'); const empty = qs('#emptyState'); const count = qs('#countDisplay');
-      const all = getFiltered(); count.textContent = all.length;
-      const totalPages = Math.max(1, Math.ceil(all.length / state.perPage));
-      if(state.page > totalPages) state.page = totalPages; if(state.page < 1) state.page = 1;
+        // 4. Status
+        if (state.params.status.length > 0) {
+            result = result.filter(item => state.params.status.includes(item.status));
+        }
 
-      const start = (state.page - 1) * state.perPage; const end = start + state.perPage; const pageItems = all.slice(start, end);
-      grid.innerHTML = '';
-      if(!pageItems.length){ empty.classList.replace('hidden','flex'); renderPagination(totalPages); return; }
-      empty.classList.replace('flex','hidden');
+        // 5. Sort
+        result = [...result]; // Clone for sort
+        if (state.params.sort === 'newest') {
+            result.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        } else if (state.params.sort === 'chapters') {
+            result.sort((a,b) => (parseInt(b.chapter)||0) - (parseInt(a.chapter)||0));
+        } else if (state.params.sort === 'alpha') {
+            result.sort((a,b) => a.titleFa.localeCompare(b.titleFa));
+        }
 
-      const frag = document.createDocumentFragment();
-      pageItems.forEach(item => {
-        const div = document.createElement('div'); div.className = 'gpu group relative';
-        div.innerHTML = `
-          <a data-slug="${escapeHTML(item.slug)}" data-type="${escapeHTML(item.type)}" href="#/${escapeHTML(item.type)}/${escapeHTML(item.slug)}" class="block card transition-all duration-300">
+        state.filtered = result;
+        renderGrid();
+        updateURL();
+      }
+
+      // --- RENDERERS ---
+      function renderGrid() {
+        const grid = document.getElementById('grid');
+        const start = (state.params.page - 1) * state.params.limit;
+        const pageItems = state.filtered.slice(start, start + state.params.limit);
+        
+        document.getElementById('count').innerText = state.filtered.length;
+
+        if (pageItems.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-50">
+                    <i data-lucide="frown" class="w-16 h-16 mb-4 text-gray-600"></i>
+                    <p class="text-lg font-bold">نتیجه‌ای یافت نشد</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        grid.innerHTML = pageItems.map(item => `
+          <a href="/${item.type.toLowerCase()}/${item.slug}/" class="manga-card relative block bg-white/5 border border-white/5 rounded-2xl overflow-hidden group">
             <div class="relative aspect-[2/3] overflow-hidden">
-              <img src="${escapeHTML(item.cover)}" loading="lazy" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="${escapeHTML(item.titleFa)}">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-90"></div>
-              <div class="absolute top-3 right-3 px-2 py-1 status-pill text-white ${item.status === 'پایان یافته' ? 'bg-rose-500' : item.status === 'متوقف' ? 'bg-amber-500' : 'bg-emerald-500'}">${escapeHTML(item.status||'')}</div>
-              <div class="absolute top-3 left-3 type-pill text-accent bg-black/60 border border-white/10">${escapeHTML((item.type||'').toUpperCase())}</div>
-            </div>
-            <div class="p-4">
-              <h3 class="text-sm font-black text-white truncate mb-2 group-hover:text-accent transition">${escapeHTML(item.titleFa)}</h3>
-              <div class="flex items-center justify-between text-[11px] text-gray-400 font-mono">
-                <span>CH.${escapeHTML(String(item.chapter||''))}</span>
-                <span>${escapeHTML(item.updatedAt||'')}</span>
-              </div>
+                <img src="${item.cover}" alt="${item.titleFa}" loading="lazy" class="cover-img w-full h-full object-cover transition-transform duration-500">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-80"></div>
+                
+                <!-- Badges -->
+                <div class="absolute top-2 right-2 flex flex-col gap-1 items-end">
+                     ${item.status.includes('پایان') 
+                        ? '<span class="px-2 py-1 bg-emerald-500/80 backdrop-blur text-white text-[9px] font-black rounded-md">کامل شده</span>' 
+                        : '<span class="px-2 py-1 bg-accent/80 backdrop-blur text-white text-[9px] font-black rounded-md">در حال پخش</span>'}
+                </div>
+
+                <div class="absolute bottom-0 inset-x-0 p-3">
+                    <span class="inline-block text-[10px] font-black bg-white text-black px-1.5 py-0.5 rounded mb-1">CH ${item.chapter}</span>
+                    <h3 class="text-sm font-black text-white leading-tight truncate">${item.titleFa}</h3>
+                    <p class="text-[10px] text-gray-400 font-medium truncate mt-0.5">${item.titleEn}</p>
+                </div>
             </div>
           </a>
-        `;
+        `).join('');
+        
+        renderPagination();
+        lucide.createIcons();
+      }
 
-        // intercept click
-        const a = div.querySelector('a');
-        a.addEventListener('click', function(ev){
-          const slug = a.dataset.slug;
-          if(item.premium){
-            ev.preventDefault();
-            // if not logged in -> auth
-            if(!(_currentUser && _currentUser.username)){
-              requireAuthRedirect(); return;
-            }
-            // if logged in but no days left -> send to panel
-            if(!(_currentUser.days_left && _currentUser.days_left>0)){
-              window.location.href = (config.panelUrl || '/panel'); return;
-            }
-            // otherwise allow navigation
-          }
-          // otherwise navigate via hash
-          state.route='detail'; state.slug = slug; updateHash(); render();
+      function renderPagination() {
+        const totalPages = Math.ceil(state.filtered.length / state.params.limit);
+        const container = document.getElementById('pagination');
+        container.innerHTML = '';
+        
+        if (totalPages <= 1) return;
+
+        // Simple Prev
+        if (state.params.page > 1) {
+             container.innerHTML += `<button onclick="App.setPage(${state.params.page - 1})" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition"><i data-lucide="chevron-right" class="w-4"></i></button>`;
+        }
+
+        // Pages
+        let startPage = Math.max(1, state.params.page - 2);
+        let endPage = Math.min(totalPages, state.params.page + 2);
+
+        for (let i = startPage; i <= endPage; i++) {
+            const isActive = i === state.params.page;
+            container.innerHTML += `
+                <button onclick="App.setPage(${i})" 
+                    class="w-10 h-10 rounded-xl font-bold text-sm transition-all ${isActive ? 'bg-accent text-white shadow-lg shadow-accent/40 scale-110' : 'bg-white/5 text-gray-400 hover:bg-white/10'}">
+                    ${i}
+                </button>`;
+        }
+
+        // Simple Next
+        if (state.params.page < totalPages) {
+             container.innerHTML += `<button onclick="App.setPage(${state.params.page + 1})" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition"><i data-lucide="chevron-left" class="w-4"></i></button>`;
+        }
+      }
+
+      // --- URL STATE ---
+      function updateURL() {
+        const p = new URLSearchParams();
+        if(state.params.q) p.set('q', state.params.q);
+        if(state.params.type !== 'all') p.set('type', state.params.type);
+        if(state.params.genres.length) p.set('genres', state.params.genres.join(','));
+        if(state.params.status.length) p.set('status', state.params.status.join(','));
+        history.replaceState(null, '', '#' + p.toString());
+      }
+
+      function loadFromURL() {
+        const p = new URLSearchParams(window.location.hash.slice(1));
+        if(p.get('q')) { state.params.q = p.get('q'); document.getElementById('mainSearch').value = state.params.q; }
+        if(p.get('type')) { state.params.type = p.get('type'); updateNavTypeUI(state.params.type); }
+        if(p.get('genres')) state.params.genres = p.get('genres').split(',');
+        if(p.get('status')) state.params.status = p.get('status').split(',');
+      }
+
+      function updateNavTypeUI(type) {
+        document.querySelectorAll('.nav-filter').forEach(btn => {
+            const isTarget = btn.dataset.type === type;
+            btn.className = isTarget 
+                ? 'nav-filter px-5 py-2 rounded-xl text-sm font-bold bg-white/10 text-white shadow-inner transition-all'
+                : 'nav-filter px-5 py-2 rounded-xl text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all';
         });
+      }
 
-        frag.appendChild(div);
-      });
-      grid.appendChild(frag);
-      renderPagination(totalPages);
+      // --- INITIALIZER ---
+      return {
+        init: () => {
+          initAuth();
+          loadFromURL();
+          
+          // Populate Filters
+          const allGenres = [...new Set(ITEMS.flatMap(i => i.genres))].sort();
+          document.getElementById('genres-list').innerHTML = allGenres.map(g => `
+            <button onclick="App.toggleFilter('genres', '${g}', this)" class="px-3 py-1.5 rounded-lg border border-white/10 text-[11px] font-bold text-gray-400 hover:border-accent hover:text-accent transition-all ${state.params.genres.includes(g) ? 'bg-accent text-white border-accent' : 'bg-transparent'}">
+                ${g}
+            </button>
+          `).join('');
 
-      // adapt card images: similar cover logic for grid images (to keep cinematic feel)
-      qsa('#grid img').forEach(img => {
-        function handle(){ try{ const w = img.naturalWidth||1, h = img.naturalHeight||1; const ratio = w/h; if(ratio < COVER_THRESHOLD) img.classList.add('portrait'); else img.classList.remove('portrait'); }catch(e){} }
-        if(img.complete) handle(); else img.addEventListener('load', handle);
-      });
+          const allStatus = [...new Set(ITEMS.map(i => i.status))];
+          document.getElementById('status-list').innerHTML = allStatus.map(s => `
+            <button onclick="App.toggleFilter('status', '${s}', this)" class="w-full text-right px-4 py-2 rounded-xl border border-white/5 text-xs font-bold text-gray-300 hover:bg-white/5 flex justify-between items-center transition-all ${state.params.status.includes(s) ? 'bg-white/10 text-white border-l-2 border-l-accent' : ''}">
+                ${s}
+                <div class="w-1.5 h-1.5 rounded-full ${state.params.status.includes(s) ? 'bg-accent' : 'bg-gray-600'}"></div>
+            </button>
+          `).join('');
 
-      lucide.createIcons();
-    }
+          // Events
+          document.getElementById('mainSearch').addEventListener('input', (e) => {
+             state.params.q = e.target.value;
+             state.params.page = 1;
+             applyFilters();
+          });
 
-    /* PAGINATION */
-    function renderPagination(totalPages){
-      const container = qs('#pagination'); container.innerHTML = '';
-      const makeBtn = (label, page, icon=null, isActive=false) => {
-        const b = document.createElement('button'); b.className = 'pagination-btn text-sm'; b.dataset.page = page; b.innerHTML = icon ? `<i data-lucide="${icon}" class="w-4 h-4"></i><span class="hidden md:inline">${label}</span>` : label; if(isActive){ b.classList.add('bg-accent','text-black','font-black'); } b.addEventListener('click', ()=>{ state.page = page; render(); window.scrollTo({top:180,behavior:'smooth'}); }); return b; };
+          // Start Slider
+          Slider.init(ITEMS);
+          
+          // Initial Render
+          applyFilters();
+        },
+        setType: (t) => {
+            state.params.type = t;
+            state.params.page = 1;
+            updateNavTypeUI(t);
+            applyFilters();
+        },
+        toggleFilter: (key, val, el) => {
+            const idx = state.params[key].indexOf(val);
+            if(idx > -1) state.params[key].splice(idx, 1);
+            else state.params[key].push(val);
+            
+            // Re-render filters area to update active states (simplified)
+            // Ideally toggle class only, but re-render is safer for sync
+            el.classList.toggle('bg-accent');
+            el.classList.toggle('text-white');
+            
+            state.params.page = 1;
+            applyFilters();
+        },
+        setSort: (val) => {
+            state.params.sort = val;
+            applyFilters();
+        },
+        setPage: (p) => {
+            state.params.page = p;
+            document.getElementById('grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            renderGrid();
+        },
+        reset: () => {
+            window.location.hash = '';
+            window.location.reload();
+        }
+      };
+    })();
 
-      container.appendChild(makeBtn('‹', Math.max(1, state.page-1), 'chevrons-right'));
-      const maxVisible = 9; let start = Math.max(1, state.page - Math.floor(maxVisible/2)); let end = Math.min(totalPages, start + maxVisible - 1); if(end - start < maxVisible - 1) start = Math.max(1, end - maxVisible + 1);
-      if(start > 1){ container.appendChild(makeBtn('1',1)); if(start > 2) container.appendChild(Object.assign(document.createElement('span'),{textContent:'...',className:'px-2 text-gray-400'})); }
-      for(let p = start; p <= end; p++) container.appendChild(makeBtn(p, p, null, p === state.page));
-      if(end < totalPages){ if(end < totalPages - 1) container.appendChild(Object.assign(document.createElement('span'),{textContent:'...',className:'px-2 text-gray-400'})); container.appendChild(makeBtn(totalPages, totalPages)); }
-      container.appendChild(makeBtn('›', Math.min(totalPages, state.page+1), 'chevrons-left'));
-      lucide.createIcons();
-    }
+    const Slider = {
+        cur: 0,
+        init(items) {
+            const featured = items.filter(i => i.cover).sort(() => 0.5 - Math.random()).slice(0, 5);
+            const container = document.getElementById('slides-container');
+            
+            container.innerHTML = featured.map((item, idx) => `
+                <div class="absolute inset-0 transition-opacity duration-1000 ${idx===0 ? 'opacity-100 z-10' : 'opacity-0 z-0'} slide-item">
+                    <img src="${item.cover}" class="w-full h-full object-cover object-center opacity-60">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent"></div>
+                    <div class="absolute inset-y-0 right-0 w-full md:w-2/3 p-8 md:p-16 flex flex-col justify-center items-start">
+                        <span class="px-3 py-1 bg-accent/20 border border-accent/50 text-accent rounded-lg text-[10px] font-black tracking-widest uppercase mb-4 backdrop-blur-md animate-pulse">پیشنهاد سردبیر</span>
+                        <h2 class="text-4xl md:text-6xl font-black text-white mb-4 leading-tight drop-shadow-lg">${item.titleFa}</h2>
+                        <p class="text-gray-300 text-sm md:text-base line-clamp-2 md:line-clamp-3 max-w-lg mb-8 leading-7 opacity-90">${item.summary || ''}</p>
+                        <a href="/${item.type.toLowerCase()}/${item.slug}/" class="btn-primary px-8 py-3.5 rounded-xl font-bold text-white flex items-center gap-2 group">
+                            شروع مطالعه
+                            <i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+            `).join('');
 
-    /* DETAIL route handler (simple behavior: navigate to detail page or open modal) */
-    function openDetail(slug){
-      // If you want an in-page modal instead, implement it here. For now do a navigation preserving hash params.
-      const params = new URLSearchParams(); if(state.page && state.page>1) params.set('page', state.page); if(state.search) params.set('search', state.search); location.href = `#/${encodeURIComponent(state.type)}/${encodeURIComponent(slug)}${params.toString() ? ('?' + params.toString()) : ''}`;
-    }
+            const dots = document.getElementById('slider-dots');
+            dots.innerHTML = featured.map((_, i) => `
+                <button onclick="Slider.goto(${i})" class="h-1.5 rounded-full transition-all duration-300 ${i===0 ? 'w-8 bg-accent' : 'w-2 bg-white/30 hover:bg-white'}"></button>
+            `).join('');
 
-    /* PREMIUM modal open/close */
-    function openPremiumModal(item){
-      qs('#premiumModal').classList.remove('hidden'); qs('#premiumModal').classList.add('flex'); qs('#supportLinkModal').href = config.supportContact || '#';
-      const info = qs('#premiumInfo');
-      if(_currentUser && (_currentUser.days_left>0)) info.textContent = `شما ${_currentUser.days_left} روز تا پایان اشتراک دارید.`;
-      else if(_currentUser) info.textContent = `اشتراک فعال نیست. برای تمدید به پنل بروید.`;
-      else info.textContent = `برای دسترسی باید وارد شوید.`;
-    }
-    function closePremiumModal(){ qs('#premiumModal').classList.add('hidden'); qs('#premiumModal').classList.remove('flex'); }
+            this.interval = setInterval(() => this.next(), 6000);
+        },
+        next() {
+            const slides = document.querySelectorAll('.slide-item');
+            if(!slides.length) return;
+            this.goto((this.cur + 1) % slides.length);
+        },
+        goto(idx) {
+            const slides = document.querySelectorAll('.slide-item');
+            const dots = document.querySelectorAll('#slider-dots button');
+            
+            slides[this.cur].classList.replace('opacity-100', 'opacity-0');
+            slides[this.cur].classList.replace('z-10', 'z-0');
+            dots[this.cur].className = 'h-1.5 w-2 bg-white/30 rounded-full transition-all duration-300 hover:bg-white';
 
-    /* UI EVENTS */
-    function initEvents(){
-      const debounce = (fn, wait) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; };
-      qs('#mainSearch').addEventListener('input', debounce((e)=>{ state.search = e.target.value.trim(); state.page = 1; updateHash(); render(); }, 300));
-      qs('#mobileSearch').addEventListener('input', debounce((e)=>{ state.search = e.target.value.trim(); state.page = 1; updateHash(); render(); }, 300));
+            this.cur = idx;
 
-      qsa('.type-filter-btn').forEach(btn=> btn.addEventListener('click', ()=>{ qsa('.type-filter-btn').forEach(b=> b.classList.remove('bg-accent','text-white')); btn.classList.add('bg-accent','text-white'); state.type = btn.dataset.type; state.page = 1; render(); }));
+            slides[this.cur].classList.replace('opacity-0', 'opacity-100');
+            slides[this.cur].classList.replace('z-0', 'z-10');
+            slides[this.cur].classList.add('slide-enter'); // Re-trigger scale anim
+            setTimeout(() => slides[this.cur].classList.remove('slide-enter'), 1000);
+            
+            dots[this.cur].className = 'h-1.5 w-8 bg-accent rounded-full transition-all duration-300';
+        }
+    };
 
-      qs('#genreContainer').addEventListener('click', (e)=>{ const btn = e.target.closest('.genre-tag'); if(!btn) return; const g = btn.dataset.genre; if(state.genres.includes(g)){ state.genres = state.genres.filter(x=>x!==g); btn.classList.remove('bg-accent','text-white','border-accent'); } else { state.genres.push(g); btn.classList.add('bg-accent','text-white','border-accent'); } state.page = 1; render(); });
-
-      qs('#statusContainer').addEventListener('click', (e)=>{ const btn = e.target.closest('.status-tag'); if(!btn) return; const s = btn.dataset.status; const ind = btn.querySelector('.circle-indicator'); if(state.status.includes(s)){ state.status = state.status.filter(x=>x!==s); btn.classList.remove('bg-accent','text-white'); if(ind) ind.classList.replace('bg-accent','bg-white/20'); } else { state.status.push(s); btn.classList.add('bg-accent','text-white'); if(ind) ind.classList.replace('bg-white/20','bg-accent'); } state.page = 1; render(); });
-
-      qs('#sortBy').addEventListener('change', (e)=>{ state.sortBy = e.target.value; state.page = 1; render(); });
-
-      function toggleSidebar(open){ const sb = qs('#sidebar'); const bd = qs('#sidebarBackdrop'); if(open){ bd.classList.remove('hidden'); setTimeout(()=>bd.classList.replace('opacity-0','opacity-100'),10); sb.classList.remove('translate-x-full'); } else { sb.classList.add('translate-x-full'); bd.classList.replace('opacity-100','opacity-0'); setTimeout(()=>bd.classList.add('hidden'),500); } }
-      qs('#sidebarToggle').addEventListener('click', ()=> toggleSidebar(true)); qs('#closeSidebar').addEventListener('click', ()=> toggleSidebar(false)); qs('#sidebarBackdrop').addEventListener('click', ()=> toggleSidebar(false)); qs('#applyFilters').addEventListener('click', ()=>{ state.page = 1; render(); updateHash(); toggleSidebar(false); });
-
-      qs('#authBtn').addEventListener('click', ()=> { const token = localStorage.getItem('at'); if(token){ checkAuth(); } else { requireAuthRedirect(); } });
-      qs('#goAuth') && qs('#goAuth').addEventListener('click', ()=> { requireAuthRedirect(); closePremiumModal(); });
-      qs('#goToPanelBtn') && qs('#goToPanelBtn').addEventListener('click', ()=> { window.location.href = (config.panelUrl || '/panel'); });
-      qs('#goBuy') && qs('#goBuy').addEventListener('click', ()=> { window.open(config.purchasePhysical || '#','_blank'); });
-
-      document.body.addEventListener('click', (e)=>{ const b = e.target.closest('button.buy-sub-btn'); if(!b) return; e.preventDefault(); openPremiumModal({ slug: b.dataset.slug }); });
-
-      window.addEventListener('hashchange', ()=>{ parseHash(); syncUIFromState(); render(); initFilters(); });
-      window.addEventListener('resize', syncNavHeight); window.addEventListener('orientationchange', syncNavHeight);
-    }
-
-    function syncUIFromState(){ qs('#mainSearch').value = state.search || ''; qs('#mobileSearch').value = state.search || ''; qsa('.type-filter-btn').forEach(b=> b.classList.toggle('bg-accent', b.dataset.type === state.type)); qs('#sortBy') && (qs('#sortBy').value = state.sortBy || 'relevance'); }
-
-    function clearFilters(){ state = { type:'all', search:'', genres:[], status:[], page:1, perPage:20, sortBy:'relevance' }; qsa('.genre-tag').forEach(b=> b.classList.remove('bg-accent','text-white','border-accent')); qsa('.status-tag').forEach(b=> { b.classList.remove('bg-accent','text-white'); const ind = b.querySelector('.circle-indicator'); if(ind) ind.classList.replace('bg-accent','bg-white/20'); }); qs('#mainSearch').value = ''; updateHash(); render(); }
-
-    function syncNavHeight(){ const nav = document.querySelector('nav'); const main = document.querySelector('main'); if(!nav||!main) return; const h = Math.ceil(nav.getBoundingClientRect().height); document.documentElement.style.setProperty('--nav-height', `${h}px`); main.style.paddingTop = `${h + 24}px`; }
-
-    /* BOOTSTRAP */
-    function init(){ parseHash(); initHeroSlider(); initFilters(); initEvents(); lucide.createIcons(); syncUIFromState(); checkAuth(); render(); syncNavHeight(); window.App = { clearFilters, init }; 
-      // keep auth validated every 5 minutes in background (if token exists)
-      setInterval(()=>{ if(localStorage.getItem('at')) checkAuth(); }, 5*60*1000);
-    }
-    document.addEventListener('DOMContentLoaded', init);
-
-  })();
+    document.addEventListener('DOMContentLoaded', App.init);
   </script>
-
 </body>
 </html>

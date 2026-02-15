@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TWO MANGA | Domestic Girlfriend</title>
+    <title>دوست دخترخانگی | خواندن آنلاین</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet"/>
@@ -11,561 +11,358 @@
     
     <style>
         :root {
-            --bg-deep: #050505;
-            --primary: #a78bfa; /* روشن‌تر شد */
+            --bg-deep: #02000a;
+            --primary: #7c3aed; 
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
         }
         
         body { 
-            font-family: 'Vazirmatn', sans-serif; 
+            font-family: 'Vazir', sans-serif; 
             background-color: var(--bg-deep); 
             color: #f4f4f5; 
             overflow-x: hidden;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .glass-panel { 
-            background: rgba(20, 20, 20, 0.7); 
+        .glass-header { 
+            background: rgba(2, 0, 10, 0.85); 
             backdrop-filter: blur(20px); 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08); 
+            border-bottom: 1px solid var(--border); 
         }
-        
+
         .chapter-row {
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             border: 1px solid transparent;
         }
         .chapter-row:hover {
-            background: rgba(255,255,255,0.03);
-            border-color: rgba(167,139,250,0.28);
+            background: var(--glass);
+            border-color: var(--border);
+            transform: translateX(-4px);
         }
         
-        /* Modern Thin Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--primary); }
-        
-        @media (max-width: 768px) {
-            .mobile-layout-poster {
-                width: 120px;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-                margin-top: -60px;
-            }
-        }
+        /* Scrollbar */
+        .c-scroll::-webkit-scrollbar { width: 4px; }
+        .c-scroll::-webkit-scrollbar-track { background: transparent; }
+        .c-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .c-scroll::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* COVER overlay (شفاف و جلوگیری از درگ/کلیک‌های ناخواسته) */
-        .poster {
+        /* Lock State Styling */
+        .is-locked {
+            opacity: 0.7;
             position: relative;
-            overflow: hidden;
+            cursor: pointer;
         }
-        .poster .cover-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.36)); /* لایهٔ شفاف جلوی کاور */
-            pointer-events: auto; /* لایه همه رو جذب کنه */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            box-sizing: border-box;
+        .is-locked:hover { opacity: 1; background: rgba(255,0,0,0.05); border-color: rgba(255,0,0,0.2); }
+        .is-locked .action-btn { background: #333 !important; color: #888 !important; }
+        
+        /* Background Ambient */
+        .bg-orb {
+            position: fixed; width: 600px; height: 600px; 
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%); 
+            filter: blur(80px); z-index: -1; pointer-events: none;
         }
-        .poster .cover-overlay .lock-badge {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 12px;
-        }
-        .poster img[draggable="false"] { -webkit-user-drag: none; user-drag: none; }
-
-        /* Locked chapter visual */
-        .chapter-locked {
-            opacity: 0.6;
-            cursor: default !important;
-            user-select: none;
-        }
-
-        /* Subscription card */
-        #subscription-card {
-            display: none; /* نمایش داده میشه وقتی کاربر لاگین/اشتراک نداره و سعی به باز کردن کرد */
-            margin: 12px 0;
-        }
-        .sub-card-inner {
-            background: linear-gradient(180deg, rgba(20,18,26,0.6), rgba(10,8,15,0.8));
-            padding: 18px;
-            border-radius: 16px;
-            border: 1px solid rgba(167,139,250,0.12);
-        }
-
-        /* user-area in navbar */
-        #user-area { display:flex; gap:8px; align-items:center; }
-        #user-area .btn { padding:6px 10px; border-radius:8px; font-weight:700; }
-
-        /* Remove any visible link tooltips/popups by using button and no title */
-        button.chapter-btn { all: unset; cursor: pointer; }
-        button.chapter-btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(167,139,250,0.08); border-radius: 8px; }
     </style>
 </head>
-<body class="pb-10 min-h-screen flex flex-col" data-slug="Domestic-Girlfriend-1234">
+<body class="min-h-screen flex flex-col relative" data-slug="Domestic-Girlfriend-1234">
 
-    <!-- Telegram Banner -->
-    <div class="bg-gradient-to-r from-violet-900/90 via-[#0a0a0a] to-violet-900/90 backdrop-blur-md border-b border-white/5 py-2.5 px-4 relative z-[60]">
-        <div class="max-w-7xl mx-auto flex items-center justify-center gap-3 text-[10px] md:text-xs font-bold text-violet-100">
-            <span class="flex h-2 w-2 relative flex-shrink-0">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
-            </span>
-            <span class="truncate">اخبار انیمه و مانگا + کدهای تخفیف در کانال تلگرام</span>
-            <a href="https://t.me/example" target="_blank" class="bg-white/10 hover:bg-white/20 px-3 py-1 rounded-full transition-colors text-white whitespace-nowrap border border-white/5">عضویت</a>
-        </div>
-    </div>
+    <!-- Ambient Background -->
+    <div class="bg-orb top-[-200px] left-[-200px]"></div>
+    <div class="bg-orb bottom-[-200px] right-[-200px]" style="background: radial-gradient(circle, rgba(217, 70, 239, 0.1) 0%, transparent 70%);"></div>
 
     <!-- Navbar -->
-    <nav class="sticky top-0 z-50 glass-panel h-16 flex items-center justify-between px-4 md:px-8">
-        <a href="/" class="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors group" id="back-to-archive">
+    <nav class="sticky top-0 z-50 glass-header h-16 flex items-center justify-between px-4 md:px-8">
+        <a href="/" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
             <i data-lucide="arrow-right" class="w-5 group-hover:-translate-x-1 transition-transform"></i>
-            <span class="text-sm font-bold">بازگشت به آرشیو</span>
+            <span class="text-sm font-bold hidden md:inline">بازگشت به آرشیو</span>
         </a>
-        <div class="font-black italic text-lg tracking-tighter hidden md:block">TWO<span class="text-violet-300">MANG</span></div>
+        
+        <div class="font-black text-lg tracking-tight text-white">
+            <span class="text-accent">TWO</span>MANG
+        </div>
 
-        <!-- user area -->
-        <div id="user-area" class="text-xs text-zinc-200">
-            <!-- populated by JS -->
+        <!-- User Area (Dynamic) -->
+        <div id="user-area" class="min-w-[100px] flex justify-end">
+            <div class="w-20 h-8 bg-white/5 animate-pulse rounded-lg"></div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="relative w-full">
-        <!-- Background -->
-        <div class="absolute inset-0 h-[350px] md:h-[500px] overflow-hidden -z-10">
-            <img src="https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg" 
-                 class="w-full h-full object-cover blur-3xl opacity-20 scale-110" alt="">
-            <div class="absolute inset-0 bg-gradient-to-b from-[#050505]/30 via-[#050505]/90 to-[#050505]"></div>
+    <!-- Header / Info -->
+    <header class="relative w-full pt-8 pb-12">
+        <!-- Blurred Backdrop -->
+        <div class="absolute inset-0 h-[80%] overflow-hidden -z-10 mask-image-b">
+            <img src="https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg" class="w-full h-full object-cover blur-[80px] opacity-30 scale-125">
+            <div class="absolute inset-0 bg-gradient-to-b from-[#02000a]/20 via-[#02000a]/80 to-[#02000a]"></div>
         </div>
 
-        <div class="max-w-6xl mx-auto px-4 md:px-8 pt-10 md:pt-24 pb-8">
-            <div class="flex flex-col md:flex-row gap-6 md:gap-12 items-start">
-                
-                <!-- Poster (Mobile & Desktop Optimized) -->
-                <div class="mobile-layout-poster md:w-[260px] md:aspect-[2/3] md:rounded-2xl overflow-hidden md:shadow-2xl md:shadow-violet-900/10 md:border md:border-white/10 relative flex-shrink-0 z-10 self-center md:self-auto poster">
-                    <img src="https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg" class="w-full h-full object-cover" alt="دوست دخترخانگی" draggable="false">
-                    <div class="cover-overlay">
-                        <div class="lock-badge">قابل مشاهده با اشتراک</div>
-                    </div>
-                    <div class="absolute top-2 right-2 bg-violet-600 text-white text-[10px] font-black px-2 py-1 rounded hidden md:block">Manga</div>
+        <div class="max-w-6xl mx-auto px-4 md:px-8 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
+            <!-- Poster -->
+            <div class="relative w-40 md:w-64 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl shadow-accent/20 border border-white/10 mx-auto md:mx-0 shrink-0 group">
+                <img src="https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg" class="w-full h-full object-cover" alt="دوست دخترخانگی">
+                <div class="absolute top-3 right-3 bg-accent text-white text-[10px] font-black px-2 py-1 rounded shadow-lg">Manga</div>
+            </div>
+
+            <!-- Details -->
+            <div class="flex-1 w-full text-center md:text-right space-y-6">
+                <div>
+                    <h1 class="text-3xl md:text-5xl font-black text-white mb-2 leading-tight">دوست دخترخانگی</h1>
+                    <h2 class="text-base text-gray-500 font-bold uppercase tracking-wider">Domestic Girlfriend</h2>
                 </div>
 
-                <!-- Info -->
-                <div class="flex-1 w-full space-y-5 md:space-y-6 text-center md:text-right">
+                <!-- Stats -->
+                <div class="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 border-y border-white/5 py-5">
+                    <div class="text-center md:text-right">
+                        <span class="block text-[10px] text-gray-500 font-bold mb-1">وضعیت</span>
+                        <span class="text-sm font-black text-emerald-400">دردست انتشار...</span>
+                    </div>
+                    <div class="w-px bg-white/10"></div>
+                    <div class="text-center md:text-right">
+                        <span class="block text-[10px] text-gray-500 font-bold mb-1">نویسنده</span>
+                        <span class="text-sm font-black text-white">Chugong</span>
+                    </div>
+                    <div class="w-px bg-white/10"></div>
+                    <div class="text-center md:text-right">
+                        <span class="block text-[10px] text-gray-500 font-bold mb-1">تعداد چپتر</span>
+                        <span class="text-sm font-black text-white">1</span>
+                    </div>
+                </div>
+
+                <!-- Genres -->
+                <div class="flex flex-wrap justify-center md:justify-start gap-2">
                     
-                    <!-- Title -->
-                    <div class="space-y-1">
-                        <h1 class="text-2xl md:text-5xl font-black text-white leading-tight">دوست دخترخانگی</h1>
-                        <h2 class="text-xs md:text-lg text-zinc-500 font-bold tracking-widest uppercase">Domestic Girlfriend</h2>
-                    </div>
+                    <a href="/#genres=مثلث عشقی" class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:border-accent hover:text-accent text-[11px] font-bold text-gray-400 transition-colors">
+                        مثلث عشقی
+                    </a>
+                    
+                    <a href="/#genres=عاشقانه" class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:border-accent hover:text-accent text-[11px] font-bold text-gray-400 transition-colors">
+                        عاشقانه
+                    </a>
+                    
+                </div>
 
-                    <!-- Genre Links (Functional) -->
-                    <div class="flex flex-wrap justify-center md:justify-start gap-2">
-                        
-                        <a href="/#genre=مثلث عشقی" class="px-3 py-1.5 bg-zinc-900/80 border border-white/10 hover:border-violet-500 hover:text-violet-400 rounded-lg text-[10px] md:text-xs font-bold text-zinc-300 transition-all">مثلث عشقی</a>
-                        
-                        <a href="/#genre=عاشقانه" class="px-3 py-1.5 bg-zinc-900/80 border border-white/10 hover:border-violet-500 hover:text-violet-400 rounded-lg text-[10px] md:text-xs font-bold text-zinc-300 transition-all">عاشقانه</a>
-                        
-                    </div>
+                <!-- Summary -->
+                <p class="text-sm text-gray-400 leading-7 max-w-3xl mx-auto md:mx-0 text-justify bg-white/5 p-4 rounded-xl border border-white/5">
+                    نمی دانم
+                </p>
 
-                    <!-- Clean Metadata Row -->
-                    <div class="flex items-center justify-center md:justify-start gap-8 border-y border-white/5 py-4">
-                        <div>
-                            <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-1">وضعیت</span>
-                            <span class="text-xs font-black text-emerald-400">دردست انتشار...</span>
-                        </div>
-                        <div class="w-px h-8 bg-white/5"></div>
-                        <div>
-                            <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-1">نویسنده</span>
-                            <span class="text-xs font-black text-white">Chugong</span>
-                        </div>
-                        <div class="w-px h-8 bg-white/5"></div>
-                        <div>
-                            <span class="text-[9px] text-zinc-500 font-bold block uppercase tracking-wider mb-1">سال انتشار</span>
-                            <span class="text-xs font-black text-white">2018</span>
-                        </div>
-                    </div>
-
-                    <!-- Primary Action -->
-                    <div class="flex justify-center md:justify-start pt-2">
-                        <button id="start-reading" class="w-full md:w-auto bg-violet-600 hover:bg-violet-500 text-white px-10 py-3.5 rounded-xl font-black text-sm transition-all shadow-lg shadow-[rgba(167,139,250,0.12)] flex items-center justify-center gap-2 group">
-                            <i data-lucide="book-open" class="w-4 group-hover:scale-110 transition-transform"></i> شروع مطالعه از چپتر 83
-                        </button>
-                    </div>
-
-                    <!-- Summary -->
-                    <p class="text-xs md:text-sm leading-7 text-zinc-400 text-justify md:max-w-3xl">
-                        نمی دانم
-                    </p>
-
+                <!-- Main CTA -->
+                <div class="pt-2">
+                    <button id="main-cta" onclick="Logic.handleReadClick(1)" class="w-full md:w-auto bg-white text-black hover:bg-gray-200 px-8 py-3.5 rounded-xl font-black text-sm transition-all shadow-lg flex items-center justify-center gap-2">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        شروع مطالعه (چپتر ۱)
+                    </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Content Area -->
-    <main class="max-w-5xl mx-auto px-4 md:px-8 mt-4 flex-grow w-full">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6 sticky top-16 z-30 bg-[#050505]/95 backdrop-blur py-4 border-b border-white/5">
+    <!-- Chapter List Section -->
+    <main class="max-w-6xl mx-auto px-4 md:px-8 pb-20 w-full">
+        <div class="flex items-center justify-between mb-6 sticky top-20 z-30 bg-[#02000a]/90 backdrop-blur py-3 border-b border-white/5">
             <h3 class="text-lg font-black text-white flex items-center gap-2">
-                <i data-lucide="layers" class="w-5" style="color:var(--primary)"></i> لیست چپترها
+                <i data-lucide="list" class="w-5 text-accent"></i> لیست چپترها
             </h3>
-            
-            <div class="relative w-full md:w-64">
-                <input type="text" id="chapterSearch" placeholder="جستجو شماره چپتر..." 
-                       class="w-full bg-zinc-900/80 border border-white/10 rounded-xl pr-10 pl-4 py-2.5 text-xs font-bold focus:border-violet-500 outline-none transition-all">
-                <i data-lucide="search" class="absolute right-3 top-2.5 w-4 text-zinc-600"></i>
+            <div class="relative w-48">
+                <input type="text" id="chapterSearch" placeholder="جستجو..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:border-accent outline-none">
             </div>
         </div>
 
-        <!-- Subscription card (برای کاربران بدون اشتراک) -->
-        <div id="subscription-card" class="max-w-5xl mx-auto px-4 md:px-8">
-            <div class="sub-card-inner">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="text-right">
-                        <h4 class="text-white font-black">برای خواندن این اثر نیاز به اشتراک است</h4>
-                        <p class="text-zinc-400 text-sm mt-2">
-                            برای خواندن این اثر نیازه است اشتراک تهیه کنید. لطفا از صفحهٔ اصلی بخش بالا دکمهٔ «خرید اشتراک» را بزنید و اشتراک تهیه کنید.
-                        </p>
+        <!-- Render Container -->
+        <div id="chapters-list" class="grid gap-2">
+            <!-- Server Side Rendered Structure -->
+            
+            <div class="chapter-row flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 cursor-pointer group"
+                 data-num="83"
+                 data-limit="83">
+                
+                <div class="flex items-center gap-4">
+                    <span class="w-10 h-10 rounded-lg bg-black/40 flex items-center justify-center text-xs font-black text-gray-500 group-hover:text-accent transition-colors">
+                        #83
+                    </span>
+                    <div>
+                        <span class="block text-sm font-bold text-gray-200 group-hover:text-white">چپتر 83</span>
+                        <span class="text-[10px] text-gray-600">20 تصویر</span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <button id="go-to-home" class="py-2 px-4 rounded-lg bg-zinc-900/80 border border-white/10 font-bold">رفتن به صفحه اصلی</button>
-                        <button id="open-sub-modal" class="py-2 px-4 rounded-lg bg-amber-500 font-black">خرید اشتراک</button>
+                </div>
+
+                <div class="status-icon">
+                    <!-- Icon handled by JS -->
+                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                        <i data-lucide="loader" class="w-4 h-4 animate-spin text-gray-500"></i>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Chapter List -->
-        <div class="bg-zinc-900/20 border border-white/5 rounded-2xl overflow-hidden min-h-[400px] mt-6">
-            <div id="chapter-container" class="max-h-[800px] overflow-y-auto custom-scrollbar p-2 space-y-1">
-                <!-- JS Generated -->
-            </div>
+            
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-12 border-t border-white/5 bg-[#080808] py-8 text-center">
-        <p class="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Twomang &copy; 2024</p>
-    </footer>
-
-    <!-- Subscription Modal (همان مودال قبلی) -->
-    <div id="sub-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-[#111] border border-white/10 w-full max-w-md rounded-3xl overflow-hidden relative transform scale-95 transition-transform duration-300" id="sub-modal-content">
-            <button onclick="toggleSubModal(false)" class="absolute top-4 right-4 text-zinc-500 hover:text-white"><i data-lucide="x"></i></button>
-            
-            <div class="h-32 bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <i data-lucide="lock" class="w-12 h-12 text-white drop-shadow-lg relative z-10"></i>
+    <!-- Subscription Modal -->
+    <div id="sub-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+        <div class="bg-[#0f0f13] border border-accent/20 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl shadow-accent/10 transform scale-95 opacity-0 transition-all duration-300" id="sub-content">
+            <div class="h-32 bg-gradient-to-br from-accent to-purple-800 flex items-center justify-center">
+                <i data-lucide="lock" class="w-12 h-12 text-white/90"></i>
             </div>
-            
-            <div class="p-8 text-center space-y-6">
-                <div>
-                    <h3 class="text-xl font-black text-white mb-2">قفل اشتراک ویژه</h3>
-                    <p class="text-xs text-zinc-400 leading-relaxed">برای حمایت از تیم ترجمه و دسترسی به تمام چپترها، لطفا اشتراک خود را تمدید کنید.</p>
+            <div class="p-8 text-center">
+                <h3 class="text-xl font-black text-white mb-2">محتوای ویژه</h3>
+                <p class="text-xs text-gray-400 mb-8 leading-6">
+                    برای دسترسی به این چپتر و حمایت از تیم ترجمه، لطفا اشتراک تهیه کنید.
+                </p>
+                <div class="space-y-3">
+                    <a href="/panel" class="block w-full py-3.5 bg-accent hover:bg-accentHover text-white font-bold rounded-xl transition shadow-lg shadow-accent/20">
+                        خرید اشتراک / ورود به پنل
+                    </a>
+                    <button onclick="Logic.closeModal()" class="block w-full py-3.5 text-gray-500 hover:text-white font-bold text-xs">
+                        بعداً
+                    </button>
                 </div>
-                
-                <button onclick="activateSub()" class="w-full py-4 bg-amber-500 hover:bg-amber-400 text-black font-black rounded-xl transition-all shadow-lg shadow-amber-500/20 text-sm">
-                    خرید اشتراک (تست: فعالسازی رایگان)
-                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- DATA injected from JSON (rendered by Python) ---
-        const DATA = {"slug": "Domestic-Girlfriend-1234", "titleFa": "دوست دخترخانگی", "titleEn": "Domestic Girlfriend", "cover": "https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg", "type": "Manga", "status": "دردست انتشار...", "releaseYear": "2018", "author": "Chugong", "unlock_limit": 83, "genres": ["مثلث عشقی", "عاشقانه"], "summary": "نمی دانم", "chapters": [{"number": 83, "image_count": 20}]};
+        // --- LOGIC CORE ---
+        const Logic = (() => {
+            const API_BASE = "https://two-api-iksq.onrender.com";
+            const UNLOCK_LIMIT = 83;
+            let userState = { loggedIn: false, premium: false, data: null };
+            let rows = document.querySelectorAll('.chapter-row');
 
-        const TOTAL_CHAPTERS = DATA.chapters.length;
-        const UNLOCK_LIMIT = DATA.unlock_limit || 0;
-
-        let readChapters = JSON.parse(localStorage.getItem(DATA.slug + '_read')) || [];
-
-        // AUTH state
-        let USER = null; // will hold /auth/me response
-        let IS_PREMIUM = false;
-
-        // Helper: token management
-        function getToken() {
-            return localStorage.getItem('at');
-        }
-        function removeToken() {
-            localStorage.removeItem('at');
-        }
-
-        // global fetch wrapper that handles 401 -> cleanup + redirect to auth
-        async function apiFetch(path, opts = {}) {
-            const token = getToken();
-            const headers = opts.headers || {};
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-            headers['Accept'] = headers['Accept'] || 'application/json';
-            opts.headers = headers;
-
-            try {
-                const res = await fetch(path, opts);
-                if (res.status === 401) {
-                    // token expired/invalid -> cleanup and redirect to auth
-                    removeToken();
-                    // small delay to ensure storage cleared before redirect
-                    window.location.href = '/auth';
-                    return res; // for completeness
-                }
-                return res;
-            } catch (e) {
-                console.error('apiFetch error', e);
-                throw e;
-            }
-        }
-
-        // Check /auth/me and update UI
-        async function checkAuth(nowRedirectIfMissing = true) {
-            const token = getToken();
-            const userArea = document.getElementById('user-area');
-            if (!token) {
-                // no token -> either redirect to auth or show 'ورود' button
-                if (nowRedirectIfMissing) {
-                    removeToken();
-                    window.location.href = '/auth';
-                    return;
-                } else {
-                    userArea.innerHTML = `<a href="/auth" class="btn bg-violet-600 text-white rounded-lg px-3 py-1">ورود</a>`;
-                    return;
-                }
-            }
-
-            try {
-                const res = await fetch('/auth/me', { headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' } });
-                if (res.status === 200) {
-                    const j = await res.json();
-                    USER = j;
-                    IS_PREMIUM = !!j.is_premium;
-                    renderUserArea();
-                    return j;
-                }
-                if (res.status === 401) {
-                    removeToken();
-                    window.location.href = '/auth';
-                    return;
-                }
-                // other statuses: treat as not logged in
-                removeToken();
-                window.location.href = '/auth';
-            } catch (e) {
-                console.error('checkAuth failed', e);
-                // network error -> show login fallback
-                removeToken();
-                window.location.href = '/auth';
-            }
-        }
-
-        function renderUserArea() {
-            const userArea = document.getElementById('user-area');
-            if (!USER) {
-                userArea.innerHTML = `<a href="/auth" class="btn bg-violet-600 text-white rounded-lg px-3 py-1">ورود</a>`;
-                return;
-            }
-            const days = USER.days_left || 0;
-            const username = USER.username || '';
-            // show username, remaining days, panel button
-            userArea.innerHTML = `
-                <div class="hidden md:flex items-center gap-3">
-                    <div class="text-right">
-                        <div class="text-[12px] font-black">${username}</div>
-                        <div class="text-[11px] text-zinc-400">${days > 0 ? `${days} روز مانده` : 'اشتراک ندارد'}</div>
-                    </div>
-                    <button id="go-to-panel" class="btn bg-zinc-900/80 border border-white/10 text-xs text-zinc-200">پنل</button>
-                </div>
-                <div class="md:hidden">
-                    <button id="go-to-panel-mobile" class="btn bg-zinc-900/80 border border-white/10 text-xs text-zinc-200">پنل</button>
-                </div>
-            `;
-            const btn = document.getElementById('go-to-panel');
-            const btn2 = document.getElementById('go-to-panel-mobile');
-            if (btn) btn.addEventListener('click', () => { window.location.href = '/panel'; });
-            if (btn2) btn2.addEventListener('click', () => { window.location.href = '/panel'; });
-        }
-
-        // --- SUBSCRIPTION CHECKER (بدون alert، با ریدایرکت به پنل) ---
-        async function checkSubscription(chapterNum) {
-            const token = getToken();
-            if (!token) {
-                removeToken();
-                window.location.href = '/auth';
-                return;
-            }
-
-            // If we already know user's premium state, use it
-            if (USER) {
-                if (!IS_PREMIUM) {
-                    // user logged in but no subscription -> send to panel
-                    window.location.href = '/panel';
-                    return;
-                }
-                // has subscription -> go to reader
-                window.location.href = `reader/#ch-${chapterNum}`;
-                return;
-            }
-
-            // fallback: query /auth/me quickly
-            try {
-                const me = await checkAuth(false);
-                if (!me) return; // checkAuth will have redirected if necessary
-                if (!me.is_premium) {
-                    window.location.href = '/panel';
-                    return;
-                }
-                window.location.href = `reader/#ch-${chapterNum}`;
-            } catch (e) {
-                console.error('checkSubscription fallback failed', e);
-                // network or other -> redirect to auth
-                removeToken();
-                window.location.href = '/auth';
-            }
-        }
-
-        function showSubscriptionCard() {
-            // kept for compatibility if you still want to show the card in some flows
-            document.getElementById('subscription-card').style.display = 'block';
-            document.getElementById('subscription-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function hideSubscriptionCard() {
-            document.getElementById('subscription-card').style.display = 'none';
-        }
-
-        function activateSub() {
-            localStorage.setItem('user_has_sub', 'true');
-            toggleSubModal(false);
-            hideSubscriptionCard();
-        }
-
-        function toggleSubModal(show) {
-            const modal = document.getElementById('sub-modal');
-            const content = document.getElementById('sub-modal-content');
-            if(show) {
-                modal.classList.remove('hidden');
-                setTimeout(() => {
-                    modal.classList.remove('opacity-0');
-                    content.classList.remove('scale-95');
-                    content.classList.add('scale-100');
-                }, 10);
-            } else {
-                modal.classList.add('opacity-0');
-                content.classList.remove('scale-100');
-                content.classList.add('scale-95');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-            }
-        }
-
-        // --- RENDER ---
-        function renderChapters(filter = '') {
-            const container = document.getElementById('chapter-container');
-            container.innerHTML = '';
-            const fragment = document.createDocumentFragment();
-
-            // Only create buttons for chapters up to UNLOCK_LIMIT.
-            for(let i = DATA.chapters.length - 1; i >= 0; i--) {
-                const ch = DATA.chapters[i];
-                const num = ch.number;
-
-                if (num > UNLOCK_LIMIT) {
-                    // Skip creating DOM for chapters beyond unlock limit (کاملاً تولید نشود)
-                    continue;
-                }
-
-                if(filter && !num.toString().includes(filter)) continue;
-
-                const isRead = readChapters.includes(num);
-                const div = document.createElement('div');
-                div.className = `chapter-row flex items-center justify-between p-3 md:p-4 rounded-xl select-none ${isRead ? 'opacity-50 grayscale' : 'opacity-100'}`;
+            async function init() {
+                lucide.createIcons();
+                await checkAuth();
+                updateUI();
                 
-                const left = document.createElement('div');
-                left.className = 'flex items-center gap-4';
-                const badge = document.createElement('span');
-                badge.className = 'w-10 h-10 rounded-lg bg-zinc-900 border border-white/5 flex items-center justify-center text-xs font-black text-zinc-500';
-                badge.textContent = `#${num}`;
-
-                const meta = document.createElement('div');
-                meta.className = 'flex flex-col';
-                const title = document.createElement('span');
-                title.className = 'text-sm font-bold text-zinc-200';
-                title.textContent = `چپتر ${num}`;
-                const dateSpan = document.createElement('span');
-                dateSpan.className = 'text-[10px] text-zinc-600';
-                dateSpan.textContent = (ch.image_count ? `${ch.image_count} صفحه` : '') ;
-
-                meta.appendChild(title);
-                meta.appendChild(dateSpan);
-                left.appendChild(badge);
-                left.appendChild(meta);
-
-                const right = document.createElement('div');
-                right.className = 'flex items-center gap-3';
-
-                const btn = document.createElement('button');
-                btn.className = 'chapter-btn py-2 px-3 rounded-xl font-bold bg-zinc-900/70 border border-white/5';
-                btn.textContent = isRead ? 'ادامه' : 'خواندن';
-                // Bind click to checkSubscription
-                btn.onclick = (ev) => { ev.stopPropagation(); checkSubscription(num); };
-
-                // Make row clickable too (همان رفتار)
-                div.onclick = () => checkSubscription(num);
-
-                right.appendChild(btn);
-
-                div.appendChild(left);
-                div.appendChild(right);
-
-                fragment.appendChild(div);
+                // Search Event
+                document.getElementById('chapterSearch').addEventListener('input', (e) => {
+                    const val = e.target.value;
+                    rows.forEach(r => {
+                        const num = r.dataset.num;
+                        r.style.display = num.includes(val) ? 'flex' : 'none';
+                    });
+                });
             }
 
-            if(fragment.children.length === 0) {
-                container.innerHTML = `<div class="p-10 text-center text-zinc-500 text-xs font-bold">چپتری یافت نشد یا قفل است</div>`;
-            } else {
-                container.appendChild(fragment);
+            async function checkAuth() {
+                const token = localStorage.getItem('at');
+                const userArea = document.getElementById('user-area');
+                
+                if (!token) {
+                    userArea.innerHTML = `<a href="/auth" class="bg-white/10 hover:bg-white/20 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white transition">ورود</a>`;
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`${API_BASE}/auth/me`, { 
+                        headers: { 'Authorization': `Bearer ${token}` } 
+                    });
+                    
+                    if (res.ok) {
+                        const data = await res.json();
+                        userState.loggedIn = true;
+                        userState.premium = data.days_left > 0;
+                        userState.data = data;
+
+                        userArea.innerHTML = `
+                            <a href="/panel" class="flex items-center gap-2 bg-accent/10 border border-accent/20 hover:bg-accent/20 px-4 py-2 rounded-xl text-xs font-bold text-accent transition">
+                                <span class="max-w-[80px] truncate">${data.username}</span>
+                                <i data-lucide="user" class="w-3 h-3"></i>
+                            </a>
+                        `;
+                    } else {
+                        localStorage.removeItem('at');
+                        userArea.innerHTML = `<a href="/auth" class="bg-white/10 px-4 py-2 rounded-xl text-xs font-bold text-white">ورود</a>`;
+                    }
+                } catch (e) {
+                    console.error("Auth check failed", e);
+                    userArea.innerHTML = `<a href="/auth" class="text-red-500 text-xs font-bold">خطای اتصال</a>`;
+                }
             }
-            lucide.createIcons();
-        }
 
-        // Events: جستجو و دکمه ها
-        document.getElementById('chapterSearch').addEventListener('input', (e) => {
-            renderChapters(e.target.value);
-        });
-
-        document.getElementById('start-reading').addEventListener('click', () => {
-            const firstAvailable = DATA.chapters.length ? DATA.chapters[0].number : 1;
-            const target = Math.min(firstAvailable, UNLOCK_LIMIT || firstAvailable);
-            checkSubscription(target);
-        });
-
-        document.getElementById('open-sub-modal').addEventListener('click', () => toggleSubModal(true));
-        document.getElementById('go-to-home').addEventListener('click', () => { window.location.href = '/'; });
-
-        // periodic token check (to avoid stale 'logged in' UI) every 4 minutes
-        let authCheckInterval = null;
-
-        window.onload = async () => {
-            lucide.createIcons();
-            // enforce auth check: if no token or invalid -> redirect to /auth
-            await checkAuth(true);
-
-            // after auth confirmed, render chapters normally
-            renderChapters();
-
-            // start periodic check
-            if (!authCheckInterval) {
-                authCheckInterval = setInterval(() => {
-                    checkAuth(false).catch(()=>{});
-                }, 4 * 60 * 1000);
+            function updateUI() {
+                rows.forEach(row => {
+                    const num = parseInt(row.dataset.num);
+                    const iconBox = row.querySelector('.status-icon');
+                    
+                    // Logic: Locked if (num > unlock_limit) AND (not premium)
+                    // Note: If unlock_limit is 0, everything is locked except for premium
+                    // Let's assume unlock_limit = N means first N chapters are free.
+                    const isFree = num <= UNLOCK_LIMIT;
+                    
+                    // New clone to remove old listeners
+                    const newRow = row.cloneNode(true);
+                    row.parentNode.replaceChild(newRow, row);
+                    
+                    if (isFree || userState.premium) {
+                        // Unlocked
+                        newRow.classList.remove('is-locked');
+                        newRow.querySelector('.status-icon').innerHTML = `
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500">
+                                <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+                            </div>`;
+                        newRow.onclick = () => window.location.href = `reader/#ch-${num}`;
+                    } else {
+                        // Locked
+                        newRow.classList.add('is-locked');
+                        newRow.querySelector('.status-icon').innerHTML = `
+                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-500 action-btn">
+                                <i data-lucide="lock" class="w-3 h-3"></i>
+                            </div>`;
+                        newRow.onclick = () => handleLockedClick();
+                    }
+                });
+                
+                // Refresh references for Search
+                rows = document.querySelectorAll('.chapter-row');
+                lucide.createIcons();
             }
-        };
+
+            function handleLockedClick() {
+                if (!userState.loggedIn) {
+                    window.location.href = '/auth'; // Redirect to login
+                } else {
+                    // Logged in but no premium -> Show modal or redirect panel
+                    // User requested: "users without sub should go to panel"
+                    // But a modal is better UX, let's offer both.
+                    openModal();
+                }
+            }
+
+            function handleReadClick(chNum) {
+                // Main CTA Logic
+                const isFree = chNum <= UNLOCK_LIMIT;
+                if (isFree || userState.premium) {
+                    window.location.href = `reader/#ch-${chNum}`;
+                } else {
+                    handleLockedClick();
+                }
+            }
+
+            function openModal() {
+                const m = document.getElementById('sub-modal');
+                const c = document.getElementById('sub-content');
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+                setTimeout(() => {
+                    c.classList.remove('scale-95', 'opacity-0');
+                    c.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+
+            function closeModal() {
+                const m = document.getElementById('sub-modal');
+                const c = document.getElementById('sub-content');
+                c.classList.remove('scale-100', 'opacity-100');
+                c.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    m.classList.remove('flex');
+                    m.classList.add('hidden');
+                }, 300);
+            }
+
+            return { init, handleReadClick, closeModal, openModal };
+        })();
+
+        document.addEventListener('DOMContentLoaded', Logic.init);
     </script>
 </body>
 </html>

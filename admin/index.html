@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>پنل ادمین - Two Manga</title>
+
+  <!-- Tailwind config -->
+  <script>
+    tailwind = window.tailwind || {};
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+          colors: {
+            brand: {
+              dark: '#0f0f13',
+              card: '#18181b',
+              accent: '#8b5cf6',
+              glow: '#d946ef'
+            }
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'spin-slow': 'spin 3s linear infinite',
+            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f0f13; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+    body {
+      background-color: #050505;
+      background-image:
+        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.08) 0%, transparent 25%);
+      color: #f4f4f5;
+      overflow-x: hidden;
+      font-family: Vazirmatn, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    .glass-panel {
+      background: rgba(24, 24, 27, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+    .glass-input {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      transition: all 0.3s ease;
+    }
+    .glass-input:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+      outline: none;
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #e879f9 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hover-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .hover-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -5px rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.3); }
+
+    .plan-card { position: relative; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.03); transition: all 0.3s ease; }
+    .plan-card.active { background: linear-gradient(145deg, rgba(139,92,246,0.2), rgba(0,0,0,0)); border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139,92,246,0.2); }
+    .plan-card.active::before { content: ''; position: absolute; top:0; right:0; width: 4px; height: 100%; background: #8b5cf6; box-shadow: 0 0 10px #8b5cf6; }
+
+    .crypto-btn { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); transition: all 0.2s; }
+    .crypto-btn:hover { background: rgba(255,255,255,0.05); }
+    .crypto-btn.active { border-color: #d946ef; background: rgba(217,70,239,0.1); box-shadow: 0 0 15px rgba(217,70,239,0.15); }
+
+    .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #8b5cf6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+
+    .step-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+    .step-content.active { display: block; opacity: 1; transform: translateY(0); }
+
+    .btn-primary { background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%); background-size: 200% auto; transition: 0.5s; }
+    .btn-primary:hover { background-position: right center; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Helvetica Neue", monospace; }
+  </style>
+</head>
+
+<body class="min-h-screen antialiased">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <header class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-bold text-gradient">پنل ادمین — Two Manga</h1>
+        <p class="text-sm text-gray-400 mt-1">مدیریت تراکنش‌ها، کوپن‌ها و نرخ‌ها</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input id="token" type="text" placeholder="توکن JWT ادمین (می‌توانید لاگین کنید)" class="glass-input px-3 py-2 rounded-md w-80 text-sm" />
+        <button id="loadBtn" class="btn-primary text-sm px-4 py-2 rounded-md shadow hover:scale-[1.01]" onclick="initLoad()">بارگذاری</button>
+        <button class="glass-input text-sm px-3 py-2 rounded-md" onclick="openLoginModal()">ورود</button>
+        <button id="logoutBtn" class="glass-input text-sm px-3 py-2 rounded-md" onclick="logout()">خروج</button>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-12 gap-6">
+      <!-- Sidebar -->
+      <aside class="col-span-3 glass-panel p-4 rounded-lg h-fit">
+        <nav class="space-y-3">
+          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5 active-tab text-sm" data-tab="transactions" onclick="switchTab('transactions')">تراکنش‌ها</button>
+          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5" data-tab="coupons" onclick="switchTab('coupons')">کوپن‌ها</button>
+          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5" data-tab="rates" onclick="switchTab('rates')">نرخ‌ها</button>
+          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5" data-tab="stats" onclick="switchTab('stats')">آمار</button>
+        </nav>
+        <hr class="my-4 border-white/6" />
+        <div class="space-y-2 text-xs text-gray-300">
+          <div>حالت: <span id="statusIndicator" class="mono">انتظار توکن</span></div>
+          <div>کاربر: <span id="meUser" class="mono">—</span></div>
+          <div>API base: <span id="apiBase" class="text-sm text-gray-200 mono">/</span></div>
+          <div class="flex items-center gap-2 mt-2">
+            <input id="apiBaseInput" class="glass-input px-2 py-1 rounded text-xs mono" placeholder="مثال: http://localhost:5001" />
+            <button class="glass-input text-xs px-2 py-1 rounded" onclick="setApiBaseFromInput()">تنظیم API</button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <section class="col-span-9">
+        <!-- Transactions Tab -->
+        <div id="tab-transactions" class="step-content active">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium">تراکنش‌ها</h2>
+            <div class="flex items-center gap-2">
+              <select id="statusFilter" class="glass-input px-3 py-2 rounded text-sm" onchange="loadTransactions()">
+                <option value="">همه</option>
+                <option value="pending">در انتظار</option>
+                <option value="pending_verification">در انتظار تایید بلاکچین</option>
+                <option value="approved">تایید شده</option>
+                <option value="rejected">رد شده</option>
+              </select>
+              <button class="btn-primary px-3 py-2 rounded text-sm" onclick="loadTransactions()">بارگذاری</button>
+            </div>
+          </div>
+
+          <div id="txList" class="space-y-3">
+            <div id="txEmpty" class="text-sm text-gray-400">برای نمایش تراکنش‌ها روی «بارگذاری» کلیک کنید.</div>
+          </div>
+        </div>
+
+        <!-- Coupons Tab -->
+        <div id="tab-coupons" class="step-content">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium">کوپن‌ها</h2>
+            <div class="flex items-center gap-2">
+              <button class="btn-primary px-3 py-2 rounded text-sm" onclick="openCouponModal()">ایجاد کوپن</button>
+              <button class="glass-input px-3 py-2 rounded text-sm" onclick="loadCoupons()">بارگذاری</button>
+            </div>
+          </div>
+
+          <div id="couponsList" class="grid grid-cols-1 gap-3">
+            <div class="text-sm text-gray-400">کوپنی موجود نیست — «بارگذاری» را بزنید.</div>
+          </div>
+        </div>
+
+        <!-- Rates Tab -->
+        <div id="tab-rates" class="step-content">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium">نرخ‌ها</h2>
+            <div class="flex items-center gap-2">
+              <button class="btn-primary px-3 py-2 rounded text-sm" onclick="adminFetchRates()">دریافت نرخ (ادمین)</button>
+              <button class="glass-input px-3 py-2 rounded text-sm" onclick="loadPublicRates()">بارگذاری نرخ عمومی</button>
+            </div>
+          </div>
+
+          <div id="ratesCard" class="glass-panel p-4 rounded-lg">
+            <div id="ratesEmpty" class="text-sm text-gray-400">برای نمایش نرخ‌ها «بارگذاری نرخ عمومی» را بزنید یا ابتدا توکن وارد کنید.</div>
+            <div id="ratesContent" class="hidden">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="p-3 bg-white/3 rounded">
+                  <div class="text-sm text-gray-300">USDT</div>
+                  <div id="rateUSDT" class="text-2xl font-semibold mt-1 mono">—</div>
+                </div>
+                <div class="p-3 bg-white/3 rounded">
+                  <div class="text-sm text-gray-300">TRX</div>
+                  <div id="rateTRX" class="text-2xl font-semibold mt-1 mono">—</div>
+                </div>
+                <div class="p-3 bg-white/3 rounded">
+                  <div class="text-sm text-gray-300">TON</div>
+                  <div id="rateTON" class="text-2xl font-semibold mt-1 mono">—</div>
+                </div>
+                <div class="p-3 bg-white/3 rounded">
+                  <div class="text-sm text-gray-300">SOL</div>
+                  <div id="rateSOL" class="text-2xl font-semibold mt-1 mono">—</div>
+                </div>
+              </div>
+              <div class="text-xs text-gray-400 mt-3">آخرین به‌روزرسانی: <span id="ratesTs">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div id="tab-stats" class="step-content">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium">آمار کلی</h2>
+            <button class="glass-input px-3 py-2 rounded text-sm" onclick="loadStats()">بارگذاری آمار</button>
+          </div>
+
+          <div id="statsGrid" class="grid grid-cols-3 gap-4">
+            <div class="glass-panel p-4 rounded-lg text-center">
+              <div class="text-sm text-gray-300">تعداد تراکنش‌ها</div>
+              <div id="statTx" class="text-3xl font-bold mt-2 mono">—</div>
+            </div>
+            <div class="glass-panel p-4 rounded-lg text-center">
+              <div class="text-sm text-gray-300">تعداد کوپن‌ها</div>
+              <div id="statCoupons" class="text-3xl font-bold mt-2 mono">—</div>
+            </div>
+            <div class="glass-panel p-4 rounded-lg text-center">
+              <div class="text-sm text-gray-300">تعداد کاربران (حدس از users collection)</div>
+              <div id="statUsers" class="text-3xl font-bold mt-2 mono">—</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Coupon Modal -->
+  <div id="couponModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+    <div class="w-full max-w-xl glass-panel p-6 rounded-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium">ایجاد کوپن جدید</h3>
+        <button onclick="closeCouponModal()" class="text-gray-300 hover:text-white">بستن ✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm text-gray-300">کد کوپن</label>
+          <input id="couponCode" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="مثال: WELCOME50" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-sm text-gray-300">روز جایزه</label>
+            <input id="couponDays" type="number" min="1" class="glass-input mt-1 w-full px-3 py-2 rounded" value="30" />
+          </div>
+          <div>
+            <label class="text-sm text-gray-300">حداکثر استفاده (خالی = نامحدود)</label>
+            <input id="couponMax" type="number" min="1" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="مثلا: 100" />
+          </div>
+        </div>
+        <div>
+          <label class="text-sm text-gray-300">تاریخ انقضا (اختیاری، ISO)</label>
+          <input id="couponExpires" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="مثال: 2026-12-31T23:59:59" />
+        </div>
+
+        <div class="flex items-center gap-2 justify-start">
+          <button class="btn-primary px-4 py-2 rounded" onclick="createCoupon()">ایجاد</button>
+          <button class="glass-input px-4 py-2 rounded" onclick="closeCouponModal()">لغو</button>
+        </div>
+
+        <div id="couponMsg" class="text-sm text-red-400"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+    <div class="w-full max-w-md glass-panel p-6 rounded-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium">ورود ادمین</h3>
+        <button onclick="closeLoginModal()" class="text-gray-300 hover:text-white">بستن ✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm text-gray-300">نام کاربری</label>
+          <input id="loginUser" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="username" />
+        </div>
+        <div>
+          <label class="text-sm text-gray-300">رمز عبور</label>
+          <input id="loginPass" type="password" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="password" />
+        </div>
+
+        <div class="flex items-center gap-2 justify-start">
+          <button class="btn-primary px-4 py-2 rounded" onclick="doLogin()">ورود</button>
+          <button class="glass-input px-4 py-2 rounded" onclick="closeLoginModal()">لغو</button>
+        </div>
+
+        <div id="loginMsg" class="text-sm text-red-400"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Small toast -->
+  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-50 hidden">
+    <div class="glass-panel px-4 py-2 rounded shadow text-sm">پیام</div>
+  </div>
+
+  <script>
+    // ---------------- Config ----------------
+    // اگر بک‌اند شما روی دامنه/پورت دیگری است این مقدار را تغییر دهید.
+    // اگر خالی بگذارید فرض می‌شود فایل فرانت روی همان origin اجرا می‌شود.
+    let API_BASE = ""; // default: "" => same origin; to force local dev: "http://localhost:5001"
+    // convenience: اگر صفحه روی localhost باز شده و API_BASE خالی، پیش‌فرض از پورت 5001 استفاده کن
+    if (!API_BASE && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+      API_BASE = `${location.protocol}//${location.hostname}:5001`;
+    }
+    document.getElementById('apiBase').textContent = API_BASE || '/';
+
+    // Token storage (access + refresh)
+    let cachedToken = localStorage.getItem('two_admin_access') || '';
+    let refreshToken = localStorage.getItem('two_admin_refresh') || '';
+    let currentTab = 'transactions';
+    let cachedTx = [];
+    let cachedCoupons = [];
+    let validatingInterval = null;
+
+    function toast(msg, timeout=3000) {
+      const t = document.getElementById('toast');
+      t.firstElementChild.textContent = msg;
+      t.classList.remove('hidden');
+      clearTimeout(t._to);
+      t._to = setTimeout(()=> t.classList.add('hidden'), timeout);
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+      const el = document.getElementById('tab-' + tab);
+      if (el) el.classList.add('active');
+    }
+
+    // ---------------- API helpers ----------------
+    function setApiBaseFromInput(){
+      const v = (document.getElementById('apiBaseInput').value || '').trim();
+      if (!v) { toast('آدرس API را وارد کنید'); return; }
+      API_BASE = v.replace(/\/+$/,'');
+      document.getElementById('apiBase').textContent = API_BASE;
+      toast('API base تنظیم شد');
+    }
+
+    function saveTokens(access, refresh) {
+      if (access) {
+        cachedToken = access;
+        localStorage.setItem('two_admin_access', access);
+      }
+      if (refresh) {
+        refreshToken = refresh;
+        localStorage.setItem('two_admin_refresh', refresh);
+      }
+      updateTokenInput();
+    }
+
+    function clearTokens() {
+      cachedToken = '';
+      refreshToken = '';
+      localStorage.removeItem('two_admin_access');
+      localStorage.removeItem('two_admin_refresh');
+      updateTokenInput();
+      document.getElementById('statusIndicator').textContent = 'توکن پاک شد';
+      document.getElementById('meUser').textContent = '—';
+    }
+
+    function logout() {
+      if (confirm('خروج از پنل؟')) {
+        clearTokens();
+        toast('خروج انجام شد');
+      }
+    }
+
+    function updateTokenInput(){
+      document.getElementById('token').value = cachedToken || '';
+    }
+
+    // try refresh access token using refreshToken. returns true if refreshed.
+    async function tryRefresh() {
+      if (!refreshToken) return false;
+      try {
+        const res = await fetch(API_BASE + '/auth/refresh', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + refreshToken }
+        });
+        if (!res.ok) {
+          // clear refresh if invalid
+          clearTokens();
+          return false;
+        }
+        const j = await res.json();
+        if (j.access_token) {
+          saveTokens(j.access_token, refreshToken);
+          return true;
+        }
+        return false;
+      } catch (e) {
+        console.error('refresh error', e);
+        return false;
+      }
+    }
+
+    // centralized fetch that attaches access token, attempts refresh on 401, and returns json or throws
+    async function apiFetch(path, opts = {}) {
+      const headers = Object.assign({}, opts.headers || {});
+      if (cachedToken) headers['Authorization'] = 'Bearer ' + cachedToken;
+      if (opts.body && !(opts.body instanceof FormData)) {
+        headers['Content-Type'] = 'application/json';
+      }
+      try {
+        const res = await fetch(API_BASE + path, {...opts, headers});
+        const contentType = res.headers.get('content-type') || '';
+        let json = null;
+        if (contentType.includes('application/json')) json = await res.json().catch(()=>null);
+        if (res.status === 401) {
+          // try refresh once
+          const refreshed = await tryRefresh();
+          if (refreshed) {
+            // retry original request with new token
+            const headers2 = Object.assign({}, opts.headers || {});
+            if (cachedToken) headers2['Authorization'] = 'Bearer ' + cachedToken;
+            if (opts.body && !(opts.body instanceof FormData)) headers2['Content-Type'] = 'application/json';
+            const retry = await fetch(API_BASE + path, {...opts, headers: headers2});
+            const ct2 = retry.headers.get('content-type') || '';
+            let json2 = null;
+            if (ct2.includes('application/json')) json2 = await retry.json().catch(()=>null);
+            if (!retry.ok) throw { status: retry.status, body: json2 };
+            return json2 ?? {};
+          }
+          throw { status: 401, body: json || {msg: 'unauthorized'} };
+        }
+        if (!res.ok) throw { status: res.status, body: json };
+        return json ?? {};
+      } catch (err) {
+        throw err;
+      }
+    }
+
+    // ---------------- Auth flows ----------------
+    function initLoad(){
+      // if user pasted token in input field, use it; otherwise if we have stored token use that.
+      const tokenInputVal = (document.getElementById('token').value || '').trim();
+      if (tokenInputVal) {
+        cachedToken = tokenInputVal;
+        // manual paste: we don't have refresh token; clear stored refresh
+        refreshToken = '';
+        localStorage.removeItem('two_admin_refresh');
+        localStorage.setItem('two_admin_access', cachedToken);
+      } else {
+        // use stored tokens (if any)
+        cachedToken = localStorage.getItem('two_admin_access') || cachedToken;
+        refreshToken = localStorage.getItem('two_admin_refresh') || refreshToken;
+      }
+      updateTokenInput();
+      if (!cachedToken && !refreshToken) {
+        toast('توکنی موجود نیست؛ لاگین کنید یا توکن را پیست کنید');
+        document.getElementById('statusIndicator').textContent = 'بدون توکن';
+        return;
+      }
+      document.getElementById('statusIndicator').textContent = 'توکن تنظیم شد';
+      // load admin data
+      validateToken()
+        .then(()=> {
+          loadTransactions();
+          loadCoupons();
+          loadPublicRates();
+          loadStats();
+        })
+        .catch(()=> {
+          // validateToken already handles messaging
+        });
+      // start periodic validation (every 60s)
+      if (!validatingInterval) validatingInterval = setInterval(() => validateToken().catch(()=>{}), 60 * 1000);
+      toast('توکن ذخیره شد');
+    }
+
+    async function validateToken() {
+      try {
+        const me = await apiFetch('/auth/me', { method: 'GET' });
+        const name = me.username || '—';
+        const role = me.role || 'user';
+        const daysLeft = me.days_left ?? '—';
+        document.getElementById('statusIndicator').textContent = `${role} — ${daysLeft} روز`;
+        document.getElementById('meUser').textContent = name;
+        return true;
+      } catch (err) {
+        console.warn('validateToken failed', err);
+        if (err && err.status === 401) {
+          document.getElementById('statusIndicator').textContent = 'توکن منقضی یا نامعتبر';
+          // try to refresh one more time (apiFetch already tries, but if validate called without token, attempt)
+          const refreshed = await tryRefresh();
+          if (refreshed) {
+            toast('توکن تازه شد');
+            return true;
+          }
+          // clear tokens if couldn't refresh
+          //clearTokens(); // keep token visible for manual action
+          throw err;
+        } else {
+          document.getElementById('statusIndicator').textContent = 'خطا در اعتبارسنجی';
+          throw err;
+        }
+      }
+    }
+
+    // login modal
+    function openLoginModal(){ document.getElementById('loginModal').classList.remove('hidden'); }
+    function closeLoginModal(){ document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginMsg').textContent=''; }
+
+    async function doLogin() {
+      const user = (document.getElementById('loginUser').value || '').trim();
+      const pass = (document.getElementById('loginPass').value || '').trim();
+      if (!user || !pass) { document.getElementById('loginMsg').textContent = 'نام کاربری و رمز را وارد کنید'; return; }
+      document.getElementById('loginMsg').textContent = '';
+      try {
+        const res = await fetch(API_BASE + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        if (!res.ok) {
+          const j = await res.json().catch(()=>({}));
+          document.getElementById('loginMsg').textContent = j.msg || 'خطا در ورود';
+          return;
+        }
+        const j = await res.json();
+        // backend returns access_token and refresh_token
+        saveTokens(j.access_token, j.refresh_token);
+        document.getElementById('loginMsg').textContent = '';
+        closeLoginModal();
+        initLoad();
+        toast('ورود موفق');
+      } catch (e) {
+        console.error(e);
+        document.getElementById('loginMsg').textContent = 'خطا در ارتباط';
+      }
+    }
+
+    // ---------------- Transactions ----------------
+    async function loadTransactions() {
+      const container = document.getElementById('txList');
+      container.innerHTML = '<div class="text-gray-400">در حال بارگذاری...</div>';
+      const status = document.getElementById('statusFilter').value;
+      try {
+        const q = status ? '?status=' + encodeURIComponent(status) : '';
+        const data = await apiFetch('/admin/transactions' + q);
+        cachedTx = data.transactions || [];
+        renderTransactions(cachedTx);
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div class="text-red-400">خطا در بارگذاری تراکنش‌ها.</div>';
+        if (err.body && err.body.msg) toast(err.body.msg, 4000);
+      }
+    }
+
+    function renderTransactions(list) {
+      const container = document.getElementById('txList');
+      container.innerHTML = '';
+      if (!list || !list.length) {
+        container.innerHTML = '<div class="text-gray-400">تراکنشی برای نمایش وجود ندارد.</div>';
+        return;
+      }
+      list.forEach(tx => {
+        const card = document.createElement('div');
+        card.className = 'plan-card p-4 rounded-md hover-card glass-panel flex items-center justify-between';
+        card.innerHTML = `
+          <div class="flex items-start gap-4">
+            <div class="mono text-xs text-gray-300">${tx._id}</div>
+            <div>
+              <div class="font-medium">${tx.username || '—'}</div>
+              <div class="text-sm text-gray-400 mt-1">${tx.tx_hash ? 'hash: ' + tx.tx_hash : ''}</div>
+            </div>
+            <div class="text-sm text-gray-300 mr-4">روزها: <span class="font-semibold">${tx.days || 0}</span></div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-sm text-gray-300">${tx.status}</div>
+            <div class="text-xs text-gray-400">${tx.created_at ? tx.created_at : ''}</div>
+            ${tx.status && tx.status.startsWith('pending') ? `
+              <button class="px-3 py-1 rounded bg-green-600/80 hover:bg-green-500 text-sm" onclick="approveTx('${tx._id}')">تایید</button>
+              <button class="px-3 py-1 rounded bg-red-600/80 hover:bg-red-500 text-sm" onclick="rejectTx('${tx._id}')">رد</button>
+            ` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function approveTx(id) {
+      if (!confirm('آیا مطمئن هستید؟')) return;
+      try {
+        await apiFetch('/admin/transactions/' + encodeURIComponent(id) + '/approve', { method: 'POST' });
+        toast('تراکنش تایید شد');
+        loadTransactions();
+        loadStats();
+      } catch (err) {
+        console.error(err);
+        toast('خطا در تایید');
+      }
+    }
+
+    async function rejectTx(id) {
+      const reason = prompt('دلیل رد تراکنش را وارد کنید:') || '';
+      try {
+        await apiFetch('/admin/transactions/' + encodeURIComponent(id) + '/reject', {
+          method: 'POST',
+          body: JSON.stringify({ reason })
+        });
+        toast('تراکنش رد شد');
+        loadTransactions();
+        loadStats();
+      } catch (err) {
+        console.error(err);
+        toast('خطا در رد تراکنش');
+      }
+    }
+
+    // ---------------- Coupons ----------------
+    function openCouponModal() { document.getElementById('couponModal').classList.remove('hidden'); }
+    function closeCouponModal() { document.getElementById('couponModal').classList.add('hidden'); document.getElementById('couponMsg').textContent = ''; }
+
+    async function createCoupon() {
+      const code = (document.getElementById('couponCode').value || '').trim();
+      const days = parseInt(document.getElementById('couponDays').value || '0', 10);
+      const max_uses_val = document.getElementById('couponMax').value;
+      const max_uses = max_uses_val ? parseInt(max_uses_val, 10) : undefined;
+      const expires_at = (document.getElementById('couponExpires').value || '').trim();
+
+      if (!code || !days) {
+        document.getElementById('couponMsg').textContent = 'کد و روز جایزه ضروری است';
+        return;
+      }
+
+      const payload = { code, bonus_days: days };
+      if (max_uses) payload.max_uses = max_uses;
+      if (expires_at) payload.expires_at = expires_at;
+
+      try {
+        await apiFetch('/admin/coupons', { method: 'POST', body: JSON.stringify(payload) });
+        document.getElementById('couponMsg').textContent = '';
+        toast('کوپن ساخته شد');
+        closeCouponModal();
+        loadCoupons();
+        loadStats();
+      } catch (err) {
+        console.error(err);
+        const msg = (err.body && err.body.msg) ? err.body.msg : 'خطا در ایجاد کوپن';
+        document.getElementById('couponMsg').textContent = msg;
+      }
+    }
+
+    async function loadCoupons() {
+      const container = document.getElementById('couponsList');
+      container.innerHTML = '<div class="text-gray-400">در حال بارگذاری...</div>';
+      try {
+        const data = await apiFetch('/admin/coupons');
+        const cs = data.coupons || [];
+        cachedCoupons = cs;
+        if (!cs.length) {
+          container.innerHTML = '<div class="text-gray-400">کوپنی یافت نشد.</div>';
+          return;
+        }
+        container.innerHTML = '';
+        cs.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'p-3 glass-panel rounded flex items-center justify-between';
+          div.innerHTML = `
+            <div>
+              <div class="font-medium">${c.code}</div>
+              <div class="text-sm text-gray-400">روز جایزه: ${c.bonus_days} — استفاده: ${c.uses || 0}${c.max_uses ? ' / ' + c.max_uses : ''}</div>
+              <div class="text-xs text-gray-400 mt-1">${c.expires_at ? 'انقضا: ' + c.expires_at : ''}</div>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = '<div class="text-red-400">خطا در بارگذاری کوپن‌ها.</div>';
+        if (err.body && err.body.msg) toast(err.body.msg, 4000);
+      }
+    }
+
+    // ---------------- Rates ----------------
+    async function loadPublicRates() {
+      const empty = document.getElementById('ratesEmpty');
+      const content = document.getElementById('ratesContent');
+      empty.classList.remove('hidden'); content.classList.add('hidden');
+      try {
+        const data = await apiFetch('/public/rates');
+        if (!data) throw new Error('no data');
+        document.getElementById('rateUSDT').textContent = data.USDT ?? '—';
+        document.getElementById('rateTRX').textContent = data.TRX ?? '—';
+        document.getElementById('rateTON').textContent = data.TON ?? '—';
+        document.getElementById('rateSOL').textContent = data.SOL ?? '—';
+        document.getElementById('ratesTs').textContent = data.ts ?? '—';
+        empty.classList.add('hidden'); content.classList.remove('hidden');
+        toast('نرخ عمومی بارگذاری شد');
+      } catch (err) {
+        console.error(err);
+        empty.textContent = 'خطا در بارگذاری نرخ عمومی.';
+        toast('خطا در بارگذاری نرخ عمومی');
+      }
+    }
+
+    async function adminFetchRates() {
+      try {
+        await apiFetch('/admin/fetch-rates', { method: 'POST' });
+        toast('درخواست دریافت نرخ ارسال شد');
+        setTimeout(loadPublicRates, 1500);
+      } catch (err) {
+        console.error(err);
+        toast('خطا در درخواست دریافت نرخ');
+      }
+    }
+
+    // ---------------- Stats ----------------
+    async function loadStats() {
+      try {
+        const txData = await apiFetch('/admin/transactions');
+        const couponsData = await apiFetch('/admin/coupons');
+        const txCount = (txData.transactions || []).length;
+        const couponCount = (couponsData.coupons || []).length;
+        let usersCount = '—';
+        try {
+          const uniq = new Set((txData.transactions || []).map(t => t.username).filter(Boolean));
+          usersCount = uniq.size;
+        } catch(e){ usersCount = '—' }
+
+        document.getElementById('statTx').textContent = txCount;
+        document.getElementById('statCoupons').textContent = couponCount;
+        document.getElementById('statUsers').textContent = usersCount;
+        toast('آمار بارگذاری شد');
+      } catch (err) {
+        console.error(err);
+        toast('خطا در بارگذاری آمار');
+      }
+    }
+
+    // initial UI
+    switchTab('transactions');
+    updateTokenInput();
+
+    // if we have stored tokens try validate on load
+    (async function tryInitStored(){
+      cachedToken = localStorage.getItem('two_admin_access') || cachedToken;
+      refreshToken = localStorage.getItem('two_admin_refresh') || refreshToken;
+      updateTokenInput();
+      if (cachedToken || refreshToken) {
+        try {
+          await validateToken();
+          // do not automatically load everything; user might press بارگذاری
+        } catch(e){}
+        if (!validatingInterval) validatingInterval = setInterval(() => validateToken().catch(()=>{}), 60 * 1000);
+      }
+    })();
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ورود به دنیای مانگا | احراز هویت</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+          colors: {
+            bg: '#050507',
+            glass: 'rgba(255,255,255,0.04)',
+            accent: '#8b5cf6', // Violet-500
+            glow: '#d946ef'    // Fuchsia-500
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.6s ease-out forwards',
+            'float': 'float 6s ease-in-out infinite'
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-15px)' } }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background: #020203; color: #fff; overflow-x: hidden; }
+    /* Animated Background */
+    .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4; z-index: -1; animation: float 10s infinite ease-in-out; }
+    .orb-1 { width: 400px; height: 400px; background: #8b5cf6; top: -100px; left: -100px; }
+    .orb-2 { width: 300px; height: 300px; background: #d946ef; bottom: -50px; right: -50px; animation-delay: -5s; }
+    
+    .glass-box {
+      background: rgba(20, 20, 25, 0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+    }
+    
+    .input-field {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #e5e7eb;
+      transition: all 0.3s;
+      direction: ltr; /* English typing */
+      text-align: left;
+    }
+    .input-field:focus { border-color: #8b5cf6; box-shadow: 0 0 15px rgba(139, 92, 246, 0.2); outline: none; }
+    
+    .btn-gradient {
+      background: linear-gradient(90deg, #7c3aed, #d946ef);
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 0 35px rgba(124, 58, 237, 0.6); }
+    .btn-gradient:active { transform: scale(0.98); }
+
+    /* Transitions */
+    .form-section { display: none; opacity: 0; transition: opacity 0.3s ease; }
+    .form-section.active { display: block; opacity: 1; animation: fadeIn 0.4s ease-out; }
+    
+    /* Loading Spinner */
+    .loader { border: 2px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; }
+    @keyframes spin{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen px-4 font-sans relative">
+
+  <!-- Background Blobs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- MAIN CARD -->
+  <main class="w-full max-w-[420px] glass-box rounded-3xl overflow-hidden p-8 animate-fade-in relative z-10">
+    
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <a href="/" class="inline-block text-3xl font-black tracking-tight mb-2 hover:scale-105 transition">
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400">TWO</span>
+        <span class="text-white">MANGA</span>
+      </a>
+      <div class="text-sm text-gray-400 font-medium">پلتفرم تخصصی آرشیو مانگا و مانهوا</div>
+    </header>
+
+    <!-- Switcher (Login/Register) -->
+    <div class="flex p-1 bg-black/40 rounded-xl mb-8 relative border border-white/5">
+      <button onclick="switchMode('login')" id="tab-login" class="flex-1 py-2.5 rounded-lg text-sm font-bold transition-all bg-white/10 text-white shadow-lg">ورود</button>
+      <button onclick="switchMode('register')" id="tab-register" class="flex-1 py-2.5 rounded-lg text-sm font-bold text-gray-400 hover:text-white transition-all">ثبت نام</button>
+    </div>
+
+    <!-- Message Display (Error/Success) -->
+    <div id="sys-msg" class="hidden mb-6 p-4 rounded-xl text-sm font-bold bg-red-500/10 border border-red-500/20 text-red-300 flex items-center gap-3">
+        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+        <span id="msg-text">...</span>
+    </div>
+
+    <!-- FORM WRAPPER -->
+    <div class="relative">
+      
+      <!-- LOGIN FORM -->
+      <form id="form-login" class="form-section active" onsubmit="handleAuth(event, 'login')">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs text-gray-400 mb-2 font-bold pr-1">نام کاربری</label>
+            <div class="relative">
+              <input type="text" name="username" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 placeholder-gray-600 text-sm font-bold" placeholder="username">
+              <i data-lucide="user" class="absolute left-3 top-3.5 w-4 h-4 text-gray-500"></i>
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between items-center mb-2 px-1">
+              <label class="block text-xs text-gray-400 font-bold">رمز عبور</label>
+              <a onclick="gotoSupport()" class="text-[10px] text-violet-400 cursor-pointer hover:text-violet-300 transition">رمز را فراموش کردید؟</a>
+            </div>
+            <div class="relative">
+              <input type="password" name="password" id="login-pass" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 placeholder-gray-600 text-sm font-bold tracking-widest" placeholder="•••••••">
+              <button type="button" onclick="togglePass('login-pass')" class="absolute left-3 top-3.5 text-gray-500 hover:text-white transition">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-login" class="btn-gradient w-full py-4 rounded-xl font-black text-white text-base mt-2 flex justify-center items-center gap-2">
+            <span>ورود به حساب</span>
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="form-register" class="form-section" onsubmit="handleAuth(event, 'register')">
+        <div class="bg-violet-500/10 border border-violet-500/20 p-3 rounded-xl mb-4 text-[10px] text-violet-200 leading-5">
+           نام کاربری و رمز عبور فقط شامل حروف انگلیسی و اعداد باشد. استفاده از فاصله (Space) مجاز نیست.
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs text-gray-400 mb-2 font-bold pr-1">نام کاربری دلخواه</label>
+            <div class="relative">
+              <input type="text" name="username" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 placeholder-gray-600 text-sm font-bold" placeholder="user123">
+              <i data-lucide="user-plus" class="absolute left-3 top-3.5 w-4 h-4 text-gray-500"></i>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-xs text-gray-400 mb-2 font-bold pr-1">رمز عبور (حداقل ۶ کاراکتر)</label>
+            <div class="relative">
+              <input type="password" name="password" id="reg-pass" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 placeholder-gray-600 text-sm font-bold tracking-widest" placeholder="•••••••">
+              <button type="button" onclick="togglePass('reg-pass')" class="absolute left-3 top-3.5 text-gray-500 hover:text-white transition">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-register" class="btn-gradient w-full py-4 rounded-xl font-black text-white text-base mt-2 flex justify-center items-center gap-2">
+            <span>ثبت نام و شروع</span>
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </main>
+
+  <footer class="absolute bottom-6 text-center w-full z-10 opacity-50 text-[10px] text-gray-400 dir-ltr font-mono">
+    SECURE AUTHENTICATION SYSTEM &copy; 2024
+  </footer>
+
+  <!-- DECISION MODAL (After Register/Login) -->
+  <div id="decision-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="/* prevent close */"></div>
+    <div class="relative glass-box w-full max-w-sm rounded-3xl p-6 text-center animate-fade-in border-green-500/30">
+      <div class="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
+        <i data-lucide="check-circle" class="w-8 h-8 text-green-400"></i>
+      </div>
+      <h3 class="text-xl font-black text-white mb-2">عملیات موفق!</h3>
+      <p class="text-sm text-gray-400 mb-8">خوش آمدید. مایلید به کدام بخش بروید؟</p>
+      
+      <div class="flex flex-col gap-3">
+        <a href="/panel" class="w-full py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 font-bold text-white transition shadow-lg shadow-violet-900/40">
+           ورود به پنل کاربری (مدیریت)
+        </a>
+        <a href="/" class="w-full py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/5 font-bold text-white transition">
+           بازگشت به صفحه اصلی سایت
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ---- CONFIG: اینجا تنظیمات را ست کن ---- */
+    const CONFIG = {
+       API_BASE: "https://two-api-iksq.onrender.com",  // <-- CHANGE API URL HERE
+       SUPPORT_URL: "https://t.me/YOUR_SUPPORT_ID"     // <-- CHANGE TELEGRAM ID
+    };
+
+    lucide.createIcons();
+    
+    // Switch between Login and Register tabs
+    function switchMode(mode) {
+      document.getElementById('sys-msg').classList.add('hidden');
+      const forms = document.querySelectorAll('.form-section');
+      forms.forEach(f => f.classList.remove('active'));
+      document.getElementById(`form-${mode}`).classList.add('active');
+
+      const tabs = [document.getElementById('tab-login'), document.getElementById('tab-register')];
+      tabs.forEach(t => {
+        t.classList.remove('bg-white/10','text-white','shadow-lg');
+        t.classList.add('text-gray-400');
+      });
+
+      const activeTab = document.getElementById(`tab-${mode}`);
+      activeTab.classList.remove('text-gray-400');
+      activeTab.classList.add('bg-white/10','text-white','shadow-lg');
+    }
+
+    // Password Toggle
+    function togglePass(id){
+      const el = document.getElementById(id);
+      el.type = el.type === 'password' ? 'text' : 'password';
+    }
+    
+    // Redirect to support
+    function gotoSupport() {
+        window.open(CONFIG.SUPPORT_URL, '_blank');
+    }
+
+    // Validation (Regex)
+    function validateInput(user, pass) {
+      // Allow letters, numbers, standard special chars. No spaces. No Farsi.
+      const regex = /^[A-Za-z0-9!@#$%^&*()\-_+=]+$/;
+      if(!regex.test(user)) return "نام کاربری فقط باید شامل حروف انگلیسی و اعداد باشد.";
+      if(user.length < 3) return "نام کاربری کوتاه است.";
+      if(!regex.test(pass)) return "رمز عبور فقط حروف انگلیسی و کاراکترهای مجاز.";
+      if(pass.length < 6) return "رمز عبور حداقل ۶ کاراکتر باشد.";
+      return null;
+    }
+
+    // API Handling
+    async function handleAuth(e, type) {
+      e.preventDefault();
+      const form = e.target;
+      const user = form.username.value.trim();
+      const pass = form.password.value;
+      const btn = document.getElementById(`btn-${type}`);
+      const msgBox = document.getElementById('sys-msg');
+      const msgTxt = document.getElementById('msg-text');
+      
+      // Client-side validate
+      const err = validateInput(user, pass);
+      if(err) {
+        msgTxt.innerText = err;
+        msgBox.classList.remove('hidden');
+        return;
+      }
+      
+      msgBox.classList.add('hidden');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<div class="loader"></div>';
+      btn.disabled = true;
+
+      try {
+        const url = `${CONFIG.API_BASE}/auth/${type}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass })
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+           // Save Tokens
+           if(data.access_token) {
+             localStorage.setItem('at', data.access_token);
+             if(data.refresh_token) localStorage.setItem('rt', data.refresh_token);
+           }
+           // Show success decision modal
+           document.getElementById('decision-modal').classList.remove('hidden');
+           document.getElementById('decision-modal').classList.add('flex');
+        } else {
+           throw new Error(data.msg || 'خطایی رخ داد');
+        }
+
+      } catch (error) {
+         msgTxt.innerText = error.message === 'Failed to fetch' ? 'خطای اتصال به شبکه' : error.message;
+         msgBox.classList.remove('hidden');
+         btn.innerHTML = originalText;
+         btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

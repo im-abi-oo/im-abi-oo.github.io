@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>پنل ادمین — Two Manga</title>
 
-  <!-- Tailwind config (provided by you) -->
+  <!-- Tailwind config -->
   <script>
     tailwind = window.tailwind || {};
     tailwind.config = {
@@ -314,7 +314,9 @@
     </main>
   </div>
 
-  <!-- access denied overlay will be injected here by JS when needed -->
+  <!-- The JS below hides the app until /auth/me returns a successful admin response.
+       No automatic redirects. Instead an overlay appears with options. -->
+
   <script>
     // Configuration
     const BACKEND = "https://two-api-iksq.onrender.com";
@@ -349,12 +351,47 @@
       if (navBtn) navBtn.classList.add("active");
     }
 
+    // -------------------------
+    // Initial blocking loader
+    // -------------------------
+    const appRootEl = document.getElementById("appRoot");
+    if (appRootEl) {
+      // hide main app until auth check completes
+      appRootEl.style.display = "none";
+    }
+
+    function showInitialLoader() {
+      if (document.getElementById("initialLoader")) return;
+      const overlay = document.createElement("div");
+      overlay.id = "initialLoader";
+      overlay.className = "access-overlay";
+      overlay.innerHTML = `
+        <div class="access-card glass-panel text-center">
+          <div style="display:flex;justify-content:center;align-items:center;height:72px;">
+            <span class="loader" style="width:44px;height:44px;border-width:4px"></span>
+          </div>
+          <div class="mt-2 small-muted">در حال بررسی احراز هویت... لطفاً صبر کنید.</div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    function hideInitialLoader() {
+      const el = document.getElementById("initialLoader");
+      if (el) el.remove();
+      const root = document.getElementById("appRoot");
+      if (root) root.style.display = "block";
+    }
+
     // show an access-denied / auth status overlay instead of auto-redirects
     function showAccessOverlay(message, opts = {}) {
-      // opts: { auth: bool (show login), root: bool (show root), retry: bool (show retry fetch) }
-      // remove existing overlay if any
+      // opts: { auth: bool (show login), root: bool (show root), retry: bool (show retry) }
       const existing = document.getElementById("accessOverlay");
       if (existing) existing.remove();
+
+      // ensure the initial loader (if present) removed so overlay visible
+      const initial = document.getElementById("initialLoader");
+      if (initial) initial.remove();
 
       const overlay = document.createElement("div");
       overlay.id = "accessOverlay";
@@ -394,7 +431,9 @@
       const retryBtn = document.getElementById("accessRetryBtn");
       if (retryBtn) retryBtn.addEventListener("click", () => {
         overlay.remove();
-        bootstrap(); // try again
+        // show the blocking loader again and retry
+        showInitialLoader();
+        bootstrap();
       });
 
       const clearBtn = document.getElementById("accessClearTokenBtn");
@@ -417,7 +456,7 @@
         .replaceAll("'", '&#039;');
     }
 
-    // on logout - keep it explicit (user clicked logout -> go to auth)
+    // on logout - explicit: clear tokens and go to auth page
     document.getElementById("btnLogout").addEventListener("click", () => {
       localStorage.removeItem("access_token");
       localStorage.removeItem("twomanga_access");
@@ -425,49 +464,62 @@
       redirectToAuth();
     });
 
-    // --- authentication & bootstrapping ---
+    // --- authentication & bootstrapping (blocking until auth/me returns ok and admin) ---
     async function bootstrap() {
+      // show blocking loader immediately
+      showInitialLoader();
+
       const token = getStoredToken();
+
+      // If there's no token: do NOT show the app root.
       if (!token) {
-        // no token -> show overlay with choices (no automatic redirect)
-        return showAccessOverlay("هیچ توکن ورود پیدا نشد. اگر می‌خواهید وارد شوید، به صفحهٔ ورود بروید یا به روت سرور بازگردید.", { auth: true, root: true });
+        setTimeout(() => {
+          showAccessOverlay("هیچ توکنی یافت نشد. برای دسترسی admin نیاز به ورود دارید یا می‌توانید به روت بازگردید.", { auth: true, root: true });
+        }, 250);
+        return; // stop bootstrap — do not show app UI
       }
+
       try {
         const res = await fetch(BACKEND + "/auth/me", {
           method: "GET",
           headers: { ...authHeaders(), "Accept": "application/json" }
         });
 
+        // unauthorized or forbidden -> show access overlay and keep app hidden
         if (res.status === 401 || res.status === 403) {
-          // token invalid or session invalid -> show overlay (no auto redirect)
-          return showAccessOverlay("احراز هویت معتبر نیست یا سشن منقضی شده (401/403). می‌توانید وارد شوید یا به روت برگردید.", { auth: true, root: true });
+          showAccessOverlay("احراز هویت نامعتبر یا سشن منقضی شده (401/403). لطفاً وارد شوید یا به روت بازگردید.", { auth: true, root: true });
+          return;
         }
 
         if (!res.ok) {
           const j = await res.json().catch(()=>({}));
-          // if server says role and not admin -> present access denied
           if (j && j.role && j.role !== "admin") {
-            return showAccessOverlay("شما دسترسی ادمین ندارید. با اکانت مناسب وارد شوید یا به روت برگردید.", { root: true });
+            showAccessOverlay("اکانت شما دسترسی admin ندارد. لطفاً با اکانت مناسب وارد شوید یا به روت بازگردید.", { root: true });
+            return;
           }
-          // other errors -> show overlay with option to login
-          return showAccessOverlay("خطا در دریافت اطلاعات حساب. می‌توانید تلاش دوباره کنید یا به صفحهٔ ورود بروید.", { auth: true, retry: true });
+          showAccessOverlay("خطا در دریافت اطلاعات کاربر از سرور. می‌توانید تلاش دوباره کنید یا وارد شوید.", { retry: true, auth: true });
+          return;
         }
 
         const body = await res.json();
-        document.getElementById("adminName").innerText = body.username || "admin";
-        document.getElementById("adminRole").innerText = body.role || "—";
 
-        if (body.role !== "admin") {
-          // not admin -> show access denied overlay (no auto-redirect)
-          return showAccessOverlay("اکانت شما نقش admin ندارد. برای دسترسی لطفاً وارد اکانت admin شوید یا به روت بازگردید.", { root: true });
+        if (!body || body.role !== "admin") {
+          showAccessOverlay("اکانت شما نقش admin ندارد. برای دسترسی لطفاً با اکانت admin وارد شوید یا به روت بازگردید.", { root: true });
+          return;
         }
 
-        // success -> initialize UI
+        // success -> populate UI and show app
+        document.getElementById("adminName").innerText = body.username || "admin";
+        document.getElementById("adminRole").innerText = body.role || "—";
+        hideInitialLoader();
+
+        // init visible UI data
         showTab("dashboard");
         fetchRoot();
+
       } catch (err) {
         console.error("bootstrap error", err);
-        return showAccessOverlay("خطای شبکه هنگام بررسی احراز هویت. می‌توانید تلاش دوباره کنید یا به صفحهٔ ورود بروید.", { auth: true, retry: true });
+        showAccessOverlay("خطای شبکه هنگام بررسی احراز هویت. می‌توانید تلاش دوباره کنید یا به صفحهٔ ورود بروید.", { retry: true, auth: true });
       }
     }
 
@@ -532,7 +584,6 @@
       try {
         const res = await fetch(BACKEND + "/admin/transactions" + qs, { headers: { "Accept": "application/json", ...authHeaders() }});
         if (res.status === 401 || res.status === 403) {
-          // token expired/unauthorized -> show overlay (no auto redirect)
           return showAccessOverlay("احراز هویت نامعتبر یا مجوز کافی ندارید (401/403).", { auth: true, root: true });
         }
         if (!res.ok) {
@@ -717,11 +768,14 @@
 
     // init
     (function init() {
-      // set backend url in UI
-      document.getElementById("backendUrl").innerText = BACKEND;
-      // bootstrap (auth check -> show panel or overlay)
+      // set backend url in UI (even while UI hidden)
+      const be = document.getElementById("backendUrl");
+      if (be) be.innerText = BACKEND;
+
+      // start the auth-check (bootstrap shows loader automatically)
       bootstrap();
-      // keyboard shortcut: R reload root
+
+      // keyboard shortcut still available (will operate while UI hidden)
       window.addEventListener("keydown", (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r") {
           fetchRoot();

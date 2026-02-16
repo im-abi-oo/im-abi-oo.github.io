@@ -281,18 +281,20 @@
   </footer>
 
   <script>
+    // --- API CONFIG ---
+    const API_BASE = "https://two-api-iksq.onrender.com";
+
     const App = (() => {
         // --- DATA LOAD ---
         const RAW_ITEMS = JSON.parse(document.getElementById('DATA_SOURCE').textContent || '[]');
         const CONFIG = JSON.parse(document.getElementById('CONFIG_SOURCE').textContent || '{}');
         
         // --- FUSE.js (ENHANCED SEARCH) ---
-        // Added 'summary', 'genres', 'status' to search keys for deep searching
         const fuse = new Fuse(RAW_ITEMS, { 
             keys: [
                 {name: 'titleFa', weight: 2},
                 {name: 'titleEn', weight: 1.5},
-                {name: 'summary', weight: 0.8}, // Summary is searchable
+                {name: 'summary', weight: 0.8},
                 {name: 'genres', weight: 0.5},
                 {name: 'status', weight: 0.5}
             ], 
@@ -308,17 +310,20 @@
             filter: {
                 type: 'all', 
                 sort: 'newest',
-                genres: [], // Array of strings
+                genres: [],
                 q: '' 
             },
             filtered: [],
             user: null
         };
 
-        // --- AUTH ---
+        // --- AUTH & SUBSCRIPTION (UPDATED) ---
         const checkAuth = async () => {
             const box = document.getElementById('auth-box');
-            const token = localStorage.getItem('tm_token');
+            // Retrieving 'at' (Access Token)
+            const at = localStorage.getItem('at');
+
+            // Render Login Button Helper
             const showLogin = () => {
                 box.innerHTML = `
                     <a href="${CONFIG.routes.login}" class="h-9 px-4 md:h-10 bg-white hover:bg-gray-200 text-black font-bold text-xs rounded-xl flex items-center gap-2 transition shadow-[0_0_15px_rgba(255,255,255,0.1)]">
@@ -326,98 +331,118 @@
                         <span class="md:hidden">ورود</span>
                         <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
                     </a>`;
+                state.user = null;
+                // Re-render grid to apply locks for non-users
+                renderGrid();
             };
-            if(!token) { showLogin(); return; }
-            state.user = { days: 5 }; // Mock User
-            const hasSub = state.user.days > 0;
-            box.innerHTML = `
-                <a href="${CONFIG.routes.panel}" class="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition flex items-center justify-center group overflow-hidden">
-                    <i data-lucide="user" class="w-5 h-5 text-gray-300 group-hover:text-white transition"></i>
-                    <span class="absolute bottom-0 inset-x-0 h-0.5 ${hasSub ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-rose-500'}"></span>
-                </a>
-            `;
+
+            if(!at) { showLogin(); return; }
+
+            // Validate Token and Check Subscription via API
+            try {
+                box.innerHTML = `<div class="w-10 h-10 rounded-xl bg-white/5 animate-pulse"></div>`; // Loading state
+
+                const res = await fetch(`${API_BASE}/auth/me`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${at}` }
+                });
+
+                if (res.status === 200) {
+                    const userData = await res.json();
+                    
+                    // Map API response to local state
+                    // 'days_left' comes from API, mapping it to 'days' for local logic
+                    state.user = { 
+                        username: userData.username,
+                        role: userData.role,
+                        days: userData.days_left, 
+                        expiry: userData.expiry_iso
+                    };
+                    
+                    const hasSub = state.user.days > 0;
+
+                    // Render Profile Button
+                    box.innerHTML = `
+                        <a href="${CONFIG.routes.panel}" class="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition flex items-center justify-center group overflow-hidden">
+                            <i data-lucide="user" class="w-5 h-5 text-gray-300 group-hover:text-white transition"></i>
+                            <span class="absolute bottom-0 inset-x-0 h-0.5 ${hasSub ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-rose-500'}"></span>
+                        </a>
+                    `;
+                    // Update grid to unlock content if subscribed
+                    renderGrid();
+                } else {
+                    // Token expired or invalid
+                    throw new Error("Unauthorized");
+                }
+            } catch (error) {
+                console.warn("Auth check failed:", error);
+                localStorage.removeItem('at');
+                localStorage.removeItem('rt');
+                showLogin();
+            }
         };
 
-        // --- HASH & URL MANAGER (DEEP LINKING FIXED) ---
+        // --- HASH & URL MANAGER ---
         const updateHash = () => {
             const p = new URLSearchParams();
-            
-            // Only add params if they differ from default to keep URL clean
             if (state.filter.type !== 'all') p.set('type', state.filter.type);
             if (state.filter.sort !== 'newest') p.set('sort', state.filter.sort);
             if (state.filter.q) p.set('q', state.filter.q);
             if (state.filter.genres.length > 0) p.set('genres', state.filter.genres.join(','));
-
             const str = p.toString();
-            // Use replaceState to avoid history spam, unless meaningful change
             window.history.replaceState(null, null, str ? '#' + str : window.location.pathname);
-            
-            // Sync UI with new state
             syncUI();
         };
 
         const parseHash = () => {
             const hash = window.location.hash.slice(1);
             const params = new URLSearchParams(hash);
-            
-            // Reset to defaults then apply hash
             let newState = {
                 type: 'all',
                 sort: 'newest',
                 genres: [],
                 q: ''
             };
-
             if (params.has('type')) newState.type = params.get('type');
             if (params.has('sort')) newState.sort = params.get('sort');
             if (params.has('q')) newState.q = params.get('q');
             if (params.has('genres')) newState.genres = params.get('genres').split(',').filter(x => x);
-
             state.filter = newState;
-            
-            // Update input values
             document.getElementById('quickSearch').value = state.filter.q;
             document.getElementById('mobileSearchInput').value = state.filter.q;
-            
             syncUI();
             applyFilters(true);
         };
 
         const syncUI = () => {
-            // 1. Type Tabs (Desktop)
             ['all', 'Manhwa', 'Manga'].forEach(t => {
                 const isActive = state.filter.type === t;
                 const el = document.getElementById(`nav-${t}`);
                 if(el) {
-                    if(isActive) el.className = "nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-black shadow-lg shadow-white/10";
-                    else el.className = "nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-400 hover:text-white hover:bg-white/5";
+                    el.className = isActive 
+                        ? "nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-black shadow-lg shadow-white/10"
+                        : "nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-400 hover:text-white hover:bg-white/5";
                 }
-                
-                // Mobile tabs
                 const mobEl = document.querySelector(`.mob-filter[data-type="${t}"]`);
                 if(mobEl) {
-                     if(isActive) mobEl.className = "mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors bg-accent text-white shadow-lg";
-                     else mobEl.className = "mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors text-gray-400 bg-white/5";
+                     mobEl.className = isActive 
+                        ? "mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors bg-accent text-white shadow-lg"
+                        : "mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors text-gray-400 bg-white/5";
                 }
             });
 
-            // 2. Sort Buttons
             document.querySelectorAll('.sort-btn').forEach(btn => {
                 btn.setAttribute('data-active', btn.dataset.val === state.filter.sort);
             });
 
-            // 3. Genre Buttons
             document.querySelectorAll('#genres-container button').forEach(btn => {
                 const g = btn.dataset.genre;
                 const isSelected = state.filter.genres.includes(g);
-                if (isSelected) {
-                    btn.className = "text-[10px] font-bold border border-accent/50 px-3 py-2 rounded-xl text-white bg-accent shadow-[0_0_10px_var(--accent)] transition scale-105";
-                } else {
-                    btn.className = "text-[10px] font-bold border border-white/10 px-3 py-2 rounded-xl text-gray-400 hover:border-white/30 bg-[#15151a] hover:bg-white/5 transition";
-                }
+                btn.className = isSelected 
+                    ? "text-[10px] font-bold border border-accent/50 px-3 py-2 rounded-xl text-white bg-accent shadow-[0_0_10px_var(--accent)] transition scale-105"
+                    : "text-[10px] font-bold border border-white/10 px-3 py-2 rounded-xl text-gray-400 hover:border-white/30 bg-[#15151a] hover:bg-white/5 transition";
             });
             
-            // 4. Dot Indicator
             const hasFilter = state.filter.genres.length > 0 || state.filter.type !== 'all' || state.filter.sort !== 'newest' || state.filter.q;
             document.getElementById('active-filter-dot').style.display = hasFilter ? 'block' : 'none';
         };
@@ -425,35 +450,22 @@
         // --- FILTER ENGINE ---
         const applyFilters = (resetPage = true) => {
             let res = [...RAW_ITEMS];
-
-            // Filter Type
             if (state.filter.type !== 'all') res = res.filter(x => x.type === state.filter.type);
-
-            // Search (Fuse.js)
             if (state.filter.q) {
                 const searchRes = fuse.search(state.filter.q);
                 res = searchRes.map(r => r.item);
             }
-
-            // Genres (AND Logic: must have ALL selected genres)
             if (state.filter.genres.length > 0) {
-                res = res.filter(item => 
-                    state.filter.genres.every(g => (item.genres || []).includes(g))
-                );
+                res = res.filter(item => state.filter.genres.every(g => (item.genres || []).includes(g)));
             }
-
-            // Sorting
             const s = state.filter.sort;
             res.sort((a, b) => {
                 if (s === 'chapters') return (parseInt(b.chapter)||0) - (parseInt(a.chapter)||0);
                 if (s === 'alpha') return a.titleFa.localeCompare(b.titleFa);
-                // Default: newest
                 return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
             });
-
             state.filtered = res;
             if(resetPage) state.page = 1;
-
             renderGrid();
             document.getElementById('drawer-count').innerText = res.length.toLocaleString('fa-IR');
         };
@@ -480,13 +492,10 @@
             const isSubbed = state.user && state.user.days > 0;
             
             grid.innerHTML = slice.map(item => {
-                // LINK STRUCTURE: type/slug
                 const linkHref = `${item.type}/${item.slug}`;
-                
                 return `
                 <a href="${linkHref}" onclick="App.handleCardClick(event, '${item.type}')" class="manga-card block relative rounded-2xl overflow-hidden bg-[#0e0e12] aspect-[5/7.2] group">
                     <img src="${item.cover}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${item.titleEn}">
-                    
                     <div class="absolute inset-0 bg-gradient-to-t from-[#020005] via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
                     <div class="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
@@ -514,12 +523,9 @@
             const container = document.getElementById('pagination');
             container.innerHTML = '';
             if(totalPages <= 1) return;
-
             const btn = (p, lbl, act) => 
                 `<button onclick="App.goToPage(${p})" class="min-w-[36px] h-9 px-3 rounded-lg text-xs font-bold border transition-all hover:scale-110 active:scale-95 ${act ? 'bg-accent border-accent text-white shadow-[0_0_15px_rgba(124,58,237,0.4)]' : 'border-white/10 bg-white/5 text-gray-400 hover:bg-white/10'}">${lbl}</button>`;
-
             if(state.page > 1) container.innerHTML += btn(state.page - 1, '<', false);
-            
             let pages = [];
             for (let i = 1; i <= totalPages; i++) {
                 if (i === 1 || i === totalPages || (i >= state.page - 1 && i <= state.page + 1)) {
@@ -527,12 +533,10 @@
                 }
             }
             pages = [...new Set(pages)].sort((a,b) => a-b);
-            
             pages.forEach((p, i) => {
                 if (i > 0 && p - pages[i - 1] > 1) container.innerHTML += `<span class="px-2 pt-2 text-gray-600 font-bold">...</span>`;
                 container.innerHTML += btn(p, p.toLocaleString('fa-IR'), p === state.page);
             });
-
             if(state.page < totalPages) container.innerHTML += btn(state.page + 1, '>', false);
         };
 
@@ -541,9 +545,7 @@
             const dotCont = document.getElementById('slider-dots');
             const featured = RAW_ITEMS.slice(0, 5); 
             if(!featured.length) { document.getElementById('hero-slider').style.display='none'; return; }
-
             dotCont.innerHTML = featured.map((_, i) => `<div class="h-1 rounded-full transition-all duration-500 bg-white/30 w-1.5 data-[act=true]:w-8 data-[act=true]:bg-accent" data-id="${i}"></div>`).join('');
-            
             track.innerHTML = featured.map((item, i) => `
                 <div class="slide-item absolute inset-0 transition-opacity duration-1000 flex ${i===0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}">
                      <img src="${item.cover}" class="w-full h-full object-cover select-none">
@@ -553,7 +555,6 @@
                          </div>
                          <h2 class="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-4 text-glow">${item.titleFa}</h2>
                          <p class="hidden md:block text-gray-400 text-xs md:text-sm leading-7 max-w-xl mb-8 line-clamp-3">${item.summary || 'توضیحات خاصی در دسترس نیست...'}</p>
-                         
                          <a href="${item.type}/${item.slug}" onclick="App.handleCardClick(event, '${item.type}')" class="group flex items-center gap-3 bg-white text-black px-6 py-3 rounded-xl font-black text-sm hover:bg-accent hover:text-white hover:scale-105 active:scale-95 transition shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_var(--accent)]">
                              <span>شروع مطالعه</span>
                              <i data-lucide="arrow-left" class="w-4 h-4 transition-transform group-hover:-translate-x-1"></i>
@@ -561,7 +562,6 @@
                      </div>
                 </div>
             `).join('');
-
             let current = 0;
             const cycle = () => {
                 const slides = document.querySelectorAll('.slide-item');
@@ -584,8 +584,7 @@
             init: () => {
                 checkAuth();
                 renderSlider();
-
-                // Dynamic Footer
+                
                 const fDiv = document.getElementById('footer-dynamic-links');
                 if (CONFIG.footerLinks) {
                     CONFIG.footerLinks.forEach(grp => {
@@ -606,23 +605,18 @@
                     });
                 }
 
-                // Render Genres
                 const allG = [...new Set(RAW_ITEMS.flatMap(x=>x.genres))].sort();
                 document.getElementById('genres-container').innerHTML = allG.map(g => 
                     `<button onclick="App.toggleGenre('${g}')" data-genre="${g}" class="text-[10px] font-bold border border-white/10 px-3 py-2 rounded-xl text-gray-400 hover:border-white/30 bg-[#15151a] hover:bg-white/5 transition">${g}</button>`
                 ).join('');
 
-                // Initial Parse
                 parseHash();
-
-                // Events
-                window.addEventListener('hashchange', parseHash); // Listen to manual URL changes
+                window.addEventListener('hashchange', parseHash); 
                 
                 const onSearch = (e) => {
                     state.filter.q = e.target.value;
-                    updateHash(); // Updates URL and triggers filter
+                    updateHash();
                 };
-                // Debounce search input
                 let timeout = null;
                 const debouncedSearch = (e) => {
                     clearTimeout(timeout);
@@ -633,7 +627,6 @@
                 document.getElementById('mobileSearchInput').addEventListener('input', debouncedSearch);
             },
             
-            // Actions
             toggleDrawer: () => {
                 const body = document.body;
                 const isClosed = body.classList.contains('drawer-closed');
@@ -653,38 +646,23 @@
                 if(isHidden) setTimeout(()=>document.getElementById('mobileSearchInput').focus(), 150);
             },
             
-            // Filter Logic Exports
-            setType: (t) => {
-                state.filter.type = t;
-                updateHash();
-            },
-            updateSort: (val) => {
-                state.filter.sort = val;
-                updateHash();
-            },
+            setType: (t) => { state.filter.type = t; updateHash(); },
+            updateSort: (val) => { state.filter.sort = val; updateHash(); },
             toggleGenre: (g) => {
                 const idx = state.filter.genres.indexOf(g);
                 if (idx > -1) state.filter.genres.splice(idx, 1);
                 else state.filter.genres.push(g);
                 updateHash();
             },
-            clearGenres: () => {
-                state.filter.genres = [];
-                updateHash();
-            },
+            clearGenres: () => { state.filter.genres = []; updateHash(); },
             goToPage: (p) => {
                 state.page = p;
                 renderGrid();
                 document.getElementById('main-anchor').scrollIntoView({behavior: 'smooth', block: 'start'});
             },
             
-            // VIP Modal Logic
             handleCardClick: (e, type) => {
-                if (state.user && state.user.days > 0) {
-                     // Allow navigation
-                     return;
-                }
-                // Prevent navigation and show modal
+                if (state.user && state.user.days > 0) return;
                 e.preventDefault();
                 App.toggleVipModal(true);
             },

@@ -215,7 +215,6 @@
             API_BASE: "https://two-api-iksq.onrender.com",
             NOBITEX_API: "https://apiv2.nobitex.ir",
             WALLETS: { TRX: "TCne3Bt8ZohH4E6ZrSoHT7pnw285HE72B3", USDT: "TCne3Bt8ZohH4E6ZrSoHT7pnw285HE72B3", TON: "UQBc8sYVNAPhlqVjaoRlx8HAmVS1xGKD2yMmHHoeMynQtHFM", SOL: "J4VEzqyqMa4BD8VfjicVHjLKwKRG3LyTMHiKTzuTbZrj" },
-            // New prices you provided — interpreted as thousands (i.e. *1000) to get realistic toman values:
             PLANS: [
                 { id: 1, days: 30, priceToman: 70000, label: "نقره", desc: "پلن 1 ماهه" },
                 { id: 2, days: 90, priceToman: 198000, label: "طلا", desc: "پلن 3 ماهه" },
@@ -238,41 +237,124 @@
             return token ? { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
         };
 
+        // ====== جایگزین شده: fetchProfile با کش و محافظت در برابر خطای شبکه/سرور ======
         async function fetchProfile() {
             try {
+                // اگر توکن نیست برو /auth
                 if (!localStorage.getItem('at')) { window.location.href = '/auth'; return; }
+
                 const res = await fetch(`${CONFIG.API_BASE}/auth/me`, { headers: getAuthHeaders() });
-                if (res.status === 401) { logout(); return; }
-                const data = await res.json();
-                if (res.ok) { state.user = data; updateDashboardUI(data); }
+
+                // توکن نامعتبر یا منقضی شده
+                if (res.status === 401) {
+                    logout();
+                    return;
+                }
+
+                // تلاش برای خواندن JSON (ممکنه سرور خطا html یا empty برگردونه)
+                let data = null;
+                try {
+                    data = await res.json();
+                } catch (e) {
+                    console.warn('fetchProfile: response is not json or empty', e);
+                }
+
+                if (res.ok && data) {
+                    // پاسخ سالم: UI را به‌روز کن و کش بزن برای استفادهٔ بعدی
+                    state.user = data;
+                    try { localStorage.setItem('profile_cache', JSON.stringify(data)); } catch (e) { /* ignore storage errors */ }
+                    updateDashboardUI(data);
+                } else {
+                    // وضعیت خطا از سمت سرور یا پاسخ نامعتبر
+                    const serverMsg = data && data.msg ? data.msg : null;
+
+                    // اگر کش محلی داریم — آن را نمایش بده و فقط یک توست خطا نشان بده
+                    const cached = localStorage.getItem('profile_cache');
+                    if (cached) {
+                        try {
+                            const cachedUser = JSON.parse(cached);
+                            state.user = cachedUser;
+                            updateDashboardUI(cachedUser);
+                            showToast(serverMsg || "خطا در ارتباط با سرور — اطلاعات محلی نمایش داده شد", "error");
+                            return;
+                        } catch (e) {
+                            console.warn("failed to parse profile_cache", e);
+                        }
+                    }
+
+                    // هیچ کشی نیست -> نمایش خطا و (اختیاری) تنظیم UI به حالت قابل فهم
+                    showToast(serverMsg || "خطا در ارتباط با سرور", "error");
+                    // با توجه به درخواستت، از تغییر دادن وضعیت فعلی UI خودداری کردم
+                }
             } catch (err) {
-                console.error(err);
+                console.error("fetchProfile network error:", err);
+
+                // خطای شبکه: اگر کش محلی هست از آن استفاده کن، وگرنه فقط پیغام خطا نمایش بده
+                const cached = localStorage.getItem('profile_cache');
+                if (cached) {
+                    try {
+                        const cachedUser = JSON.parse(cached);
+                        state.user = cachedUser;
+                        updateDashboardUI(cachedUser);
+                        showToast("قطع ارتباط با سرور — اطلاعات کش شده نمایش داده شد", "error");
+                        return;
+                    } catch (e) {
+                        console.warn("failed to parse profile_cache", e);
+                    }
+                }
+
                 showToast("خطا در ارتباط با سرور", "error");
+                // توجه: اینجا هم عمداً وضعیت اشتراک را بازنویسی نکردم
             }
         }
 
+        // ====== جایگزین شده: updateDashboardUI با عدم پاک‌سازی غیرضروری UI ======
         function updateDashboardUI(user) {
-            document.getElementById('plan-status').innerText = user.active ? "فعال ✅" : "غیرفعال ❌";
-            const daysLeft = Number(user.days_left ?? 0);
-            document.getElementById('days-left-text').innerText = daysLeft > 0 ? `${daysLeft} روز باقی‌مانده` : "منقضی شده";
-            document.getElementById('user-role').innerText = (user.role === 'admin') ? 'مدیر کل' : 'کاربر عادی';
-            // expiry date: show Persian locale but Latin digits
-            if (user.expiry_iso) {
-                const d = new Date(user.expiry_iso);
-                try {
-                    const fmt = new Intl.DateTimeFormat('fa-IR-u-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric' });
-                    document.getElementById('expiry-date').innerText = fmt.format(d);
-                } catch (e) {
-                    document.getElementById('expiry-date').innerText = d.toLocaleDateString();
+            if (!user) return; // ایمن‌سازی در برابر فراخوانی با مقدار خالی
+
+            // فقط زمانی که فیلد days_left واقعاً در پاسخ وجود دارد آن را اعمال کن
+            if (Object.prototype.hasOwnProperty.call(user, 'days_left')) {
+                const daysLeft = Number(user.days_left ?? 0);
+                const daysEl = document.getElementById('days-left-text');
+                const planStatusEl = document.getElementById('plan-status');
+                const daysBadgeEl = document.getElementById('days-badge');
+
+                if (daysEl) daysEl.innerText = daysLeft > 0 ? `${daysLeft} روز باقی‌مانده` : "منقضی شده";
+                if (planStatusEl) planStatusEl.innerText = daysLeft > 0 ? "فعال ✅" : "غیرفعال ❌";
+                if (daysBadgeEl) {
+                    daysBadgeEl.className = daysLeft > 0
+                        ? "badge mt-2 inline-flex items-center gap-2 bg-green-500/6 text-green-300 border-green-500/20"
+                        : "badge mt-2 inline-flex items-center gap-2 bg-red-500/6 text-red-300 border-red-500/20";
                 }
             } else {
-                document.getElementById('expiry-date').innerText = "-";
+                // اگر اطلاعات days_left نیامده است، وضعیت قبلی را حفظ کن (پاکش نکن)
+                console.debug("updateDashboardUI: days_left not provided — keeping existing UI state");
+            }
+
+            // نقش کاربری (اگر ارسال شده) را آپدیت کن
+            if (Object.prototype.hasOwnProperty.call(user, 'role')) {
+                const roleEl = document.getElementById('user-role');
+                if (roleEl) roleEl.innerText = (user.role === 'admin') ? 'مدیر کل' : 'کاربر عادی';
+            }
+
+            // expiry_iso فقط در صورت وجود فرمت بشه (در صفحه‌ای که expiry-date نباشد، کاری انجام نمی‌شود)
+            if (user.expiry_iso) {
+                const expiryEl = document.getElementById('expiry-date');
+                if (expiryEl) {
+                    const d = new Date(user.expiry_iso);
+                    try {
+                        const fmt = new Intl.DateTimeFormat('fa-IR-u-nu-latn', { year: 'numeric', month: 'numeric', day: 'numeric' });
+                        expiryEl.innerText = fmt.format(d);
+                    } catch (e) {
+                        expiryEl.innerText = d.toLocaleDateString();
+                    }
+                }
             }
         }
 
+        // بقیهٔ اسکریپت بدون تغییر (منطق خرید، کوپن و نوبیتکس)
         function logout() { localStorage.removeItem('at'); localStorage.removeItem('rt'); window.location.href = '/auth'; }
 
-        // Wizard modal control
         function openWizard() {
             document.getElementById('wizard-modal').classList.add('open');
             renderPlans();
@@ -296,7 +378,6 @@
             lucide.createIcons();
         }
 
-        // PLANS rendering (use ASCII digits for price formatting)
         function renderPlans() {
             const container = document.getElementById('plans-container'); container.innerHTML = '';
             CONFIG.PLANS.forEach(plan => {
@@ -320,7 +401,6 @@
             });
         }
 
-        // CRYPTOS rendering
         function renderCryptos() {
             const container = document.getElementById('crypto-container'); container.innerHTML = '';
             CONFIG.CRYPTOS.forEach(c => {
@@ -333,7 +413,6 @@
             });
         }
 
-        // NOBITEX price fetch (returns lastTradePrice in RIAL)
         async function fetchNobitexLastPriceRials(cryptoId) {
             try {
                 const symbol = CONFIG.NOBITEX_SYMBOLS[cryptoId];
@@ -349,11 +428,9 @@
             }
         }
 
-        // preparePayment: compute crypto amount from Toman using Nobitex
         async function preparePayment() {
             const plan = state.selectedPlan; const crypto = state.selectedCrypto;
             if (!plan || !crypto) return;
-            // Toman -> Rial
             const priceRial = Number(plan.priceToman) * 10;
             const lastRial = await fetchNobitexLastPriceRials(crypto.id);
             const finalPriceDisplay = document.getElementById('final-price-display');
@@ -368,8 +445,9 @@
                 finalPriceCrypto.innerText = `قابلیت محاسبه آنلاین در دسترس نیست — از آدرس ${crypto.id} استفاده کنید`;
             }
 
-            document.getElementById('wallet-label').innerText = crypto.name;
-            document.getElementById('wallet-address-display').innerText = CONFIG.WALLETS[crypto.id] || "آدرسی یافت نشد";
+            const wl = document.getElementById('wallet-label'); const wa = document.getElementById('wallet-address-display');
+            if (wl) wl.innerText = crypto.name;
+            if (wa) wa.innerText = CONFIG.WALLETS[crypto.id] || "آدرسی یافت نشد";
         }
 
         function copyWallet() {
@@ -401,7 +479,6 @@
             }
         }
 
-        // GIFT / coupon
         async function submitGift() {
             const code = document.getElementById('gift-input').value.trim();
             if (!code) { showToast("لطفا کد را وارد کنید", "error"); return; }
@@ -416,7 +493,6 @@
                     document.getElementById('gift-input').value = "";
                     fetchProfile();
                 } else {
-                    // example error messages: expired, invalid
                     const errMsg = data && data.msg ? data.msg : "کوپن نامعتبر یا منقضی شده است";
                     showToast(errMsg, "error");
                 }
@@ -427,7 +503,6 @@
             }
         }
 
-        // Toasts: limited message vocabulary as requested
         function showToast(msg, type='info') {
             const toast = document.getElementById('toast'); const icon = document.getElementById('toast-icon'); const text = document.getElementById('toast-msg');
             text.innerText = msg;

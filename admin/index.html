@@ -1,649 +1,585 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>پنل ادمین — Two Manga (Admin)</title>
-
-  <!-- Tailwind + font -->
-  <script>
-    tailwind = window.tailwind || {};
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: { sans: ['Vazirmatn','system-ui','-apple-system','Segoe UI','Roboto','Arial'] },
-          colors: {
-            brand: { dark: '#0f0f13', card: '#18181b', accent: '#8b5cf6', glow: '#d946ef' }
-          },
-          keyframes: {
-            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } }
-          },
-          animation: { float: 'float 6s ease-in-out infinite' }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت | TwoManga</title>
+    
+    <!-- فونت وزیرمتن -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
+                    colors: {
+                        dark: {
+                            bg: '#09090b',       // Zinc-950
+                            card: '#18181b',     // Zinc-900
+                            border: '#27272a',   // Zinc-800
+                        },
+                        brand: {
+                            primary: '#8b5cf6',  // Violet-500
+                            secondary: '#ec4899',// Pink-500
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(10px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-  <style>
-    :root { --bg:#050505; --muted:rgba(255,255,255,0.55); --card:rgba(24,24,27,0.66); --accent1:#7c3aed; --accent2:#d946ef; }
-    html,body{height:100%}
-    body{
-      background:var(--bg);
-      color:#f5f5f7;
-      font-family:Vazirmatn, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:20px;
-    }
-    .glass{ background:var(--card); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.04); border-radius:12px; }
-    .input{ background: rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.04); padding:.6rem .8rem; border-radius:.6rem; color:white; }
-    .btn-primary{ background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:white; padding:.5rem .9rem; border-radius:.6rem; }
-    .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.06); padding:.45rem .7rem; border-radius:.6rem; color:var(--muted) }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; color:#e9e9ec }
-    .small-muted{ color:var(--muted); font-size:.95rem; }
-    .loader{ border:3px solid rgba(255,255,255,0.08); border-left-color:var(--accent1); border-radius:50%; width:18px; height:18px; animation:spin 1s linear infinite; display:inline-block; }
-    @keyframes spin{ to{ transform:rotate(360deg);} }
-    .hidden{ display:none; }
-    /* overlay */
-    .overlay{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:60; padding:16px; }
-    .overlay-card{ width:100%; max-width:760px; padding:18px; border-radius:12px; }
-    .degraded{ background:linear-gradient(90deg,#f59e0b,#f97316); color:#071023; padding:6px 10px; border-radius:999px; font-weight:600; }
-  </style>
+    </script>
+
+    <style>
+        /* استایل‌های پایه برای تم شیشه‌ای و اسکرول بار */
+        body { background-color: #000; background-image: radial-gradient(at top right, #1e1b4b 0%, #000000 60%); color: #e4e4e7; overflow-x: hidden; }
+        .glass { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-hover:hover { background: rgba(39, 39, 42, 0.8); border-color: rgba(139, 92, 246, 0.3); }
+        .input-box { background: rgba(0,0,0,0.3); border: 1px solid #27272a; transition: all 0.3s; }
+        .input-box:focus { outline: none; border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2); }
+        
+        /* اسکرول بار زیبا */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #71717a; }
+        
+        .loader {
+            width: 20px; height: 20px; border: 2px solid #fff;
+            border-bottom-color: transparent; border-radius: 50%;
+            display: inline-block; animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden-force { display: none !important; }
+    </style>
 </head>
-<body>
-  <!-- Top info -->
-  <div id="initialLoader" class="overlay">
-    <div class="overlay-card glass">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="loader" style="width:48px;height:48px;border-width:4px"></div>
-        <div>
-          <div class="text-lg font-semibold">در حال بررسی احراز هویت</div>
-          <div class="small-muted">درخواست به سرور ارسال می‌شود؛ لطفاً صبر کنید یا اگر می‌خواهید عملیات دستی انجام دهید پایین را بررسی کنید.</div>
-        </div>
-      </div>
-    </div>
-  </div>
+<body class="antialiased min-h-screen flex flex-col md:flex-row">
 
-  <div id="accessOverlay" class="overlay hidden"></div>
-
-  <div id="app" class="max-w-7xl mx-auto hidden">
-    <header class="flex items-center justify-between mb-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#d946ef] flex items-center justify-center shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none"><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
-        </div>
-        <div>
-          <div class="text-lg font-semibold">پنل ادمین — Two Manga</div>
-          <div class="small-muted">آدرس بک‌اند: <span id="backendUrl" class="mono"></span></div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div class="text-right">
-          <div id="adminName" class="text-sm small-muted">—</div>
-          <div class="text-xs small-muted">سطح دسترسی: <span id="adminRole">—</span></div>
-        </div>
-        <div id="degradedBadge" class="degraded hidden">حالت تخریب</div>
-        <button id="logoutBtn" class="btn-primary">خروج</button>
-      </div>
-    </header>
-
-    <main class="grid grid-cols-12 gap-6">
-      <!-- left -->
-      <aside class="col-span-3 glass p-4 space-y-4">
-        <div class="flex items-center justify-between">
-          <div class="small-muted">نویگیشن</div>
-          <div class="text-xs small-muted">admin</div>
-        </div>
-
-        <nav class="flex flex-col gap-2">
-          <button class="btn-ghost text-right" data-tab="dashboard" onclick="showTab('dashboard')">داشبورد وضعیت</button>
-          <button class="btn-ghost text-right" data-tab="transactions" onclick="showTab('transactions')">تراکنش‌ها</button>
-          <button class="btn-ghost text-right" data-tab="coupons" onclick="showTab('coupons')">کوپن‌ها</button>
-          <button class="btn-ghost text-right" data-tab="rates" onclick="showTab('rates')">نرخ‌ها</button>
-          <button class="btn-ghost text-right" data-tab="logs" onclick="showTab('logs')">روت / لاگ</button>
-        </nav>
-
-        <div>
-          <div class="small-muted mb-2">توکن دستی (برای تست)</div>
-          <input id="manualToken" class="input w-full mono" placeholder="paste access token (اختیاری)" />
-          <div class="flex gap-2 mt-2">
-            <button id="setTokenBtn" class="btn-ghost w-1/2">ثبت توکن</button>
-            <button id="clearTokenBtn" class="btn-ghost w-1/2">پاک‌سازی توکن</button>
-          </div>
-        </div>
-      </aside>
-
-      <!-- right -->
-      <section class="col-span-9 space-y-6">
-        <!-- dashboard -->
-        <section id="tab-dashboard" class="glass p-6">
-          <div class="flex items-start justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold">داشبورد سلامت</h2>
-              <p class="small-muted mt-1">Ping, DB status و root</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <button id="btnPing" class="btn-primary px-4 py-2" onclick="ping()">
-                بررسی سلامت <span id="pingLoader"></span>
-              </button>
-              <button id="btnDb" class="btn-ghost px-4 py-2" onclick="dbStatus()">وضعیت DB</button>
-            </div>
-          </div>
-
-          <div class="mt-6 grid grid-cols-3 gap-4">
-            <div class="glass p-4">
-              <div class="small-muted">Queue / Root</div>
-              <div id="rootInfo" class="mono mt-2">—</div>
-            </div>
-            <div class="glass p-4">
-              <div class="small-muted">Ping</div>
-              <div id="pingRes" class="mono mt-2">—</div>
-            </div>
-            <div class="glass p-4">
-              <div class="small-muted">DB Status</div>
-              <div id="dbRes" class="mono mt-2">—</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- transactions -->
-        <section id="tab-transactions" class="glass p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold">مدیریت تراکنش‌ها</h2>
-              <p class="small-muted mt-1">عادی: لود — تأیید — رد</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <select id="txFilter" class="input">
-                <option value="">همه</option>
-                <option value="pending">pending</option>
-                <option value="approved">approved</option>
-                <option value="rejected">rejected</option>
-              </select>
-              <button class="btn-primary" onclick="loadTransactions()">بارگذاری</button>
-            </div>
-          </div>
-
-          <div id="txList" class="mt-6 space-y-3 small-muted">برای بارگذاری دکمه را بزن.</div>
-        </section>
-
-        <!-- coupons -->
-        <section id="tab-coupons" class="glass p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold">کوپن‌ها</h2>
-              <p class="small-muted mt-1">ایجاد و مشاهده کوپن‌ها</p>
-            </div>
-            <div>
-              <button class="btn-primary" onclick="toggleCouponCreate()">ایجاد کوپن</button>
-            </div>
-          </div>
-
-          <div id="couponCreate" class="mt-4 hidden">
-            <div class="grid grid-cols-3 gap-3">
-              <input id="c_code" class="input" placeholder="کد" />
-              <input id="c_days" type="number" class="input" placeholder="bonus_days" />
-              <input id="c_max" type="number" class="input" placeholder="max_uses (اختیاری)" />
-            </div>
-            <div class="mt-3 flex gap-2">
-              <input id="c_exp" class="input w-1/2" placeholder="expires_at (ISO)" />
-              <button class="btn-primary" onclick="createCoupon()">ایجاد</button>
-            </div>
-            <div id="c_msg" class="small-muted mt-2"></div>
-          </div>
-
-          <div class="mt-4">
-            <button class="btn-ghost" onclick="listCoupons()">لیست کوپن‌ها</button>
-          </div>
-          <div id="couponList" class="mt-3 small-muted"></div>
-        </section>
-
-        <!-- rates -->
-        <section id="tab-rates" class="glass p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold">نرخ‌ها</h2>
-              <p class="small-muted mt-1">فچ و ذخیره نرخ‌ها</p>
-            </div>
-            <div>
-              <button class="btn-primary" onclick="fetchRates()">فچ نرخ‌ها</button>
-            </div>
-          </div>
-          <div id="ratesMsg" class="mt-3 small-muted">—</div>
-        </section>
-
-        <!-- logs -->
-        <section id="tab-logs" class="glass p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold">روت / لاگ</h2>
-              <p class="small-muted mt-1">اطلاعات root و لاگ‌ها</p>
-            </div>
-            <div>
-              <button class="btn-ghost" onclick="fetchRoot()">رفرش root</button>
-            </div>
-          </div>
-          <pre id="rootDump" class="mono mt-3 small-muted p-3 glass" style="max-height:280px;overflow:auto">—</pre>
-        </section>
-      </section>
-    </main>
-  </div>
-
-<script>
-/* ===========================================================
-   Config: اگر خواستی آدرس بک‌اند رو اینجا عوض کن
-   =========================================================== */
-const BACKEND = "https://two-api-iksq.onrender.com"; // <-- این رو عوض کن اگر بک‌اند فرق داره
-document.getElementById('backendUrl') && (document.getElementById('backendUrl').innerText = BACKEND);
-
-/* =================== Local token helpers =================== */
-function setAccessToken(tok) { if (tok) localStorage.setItem('access_token', tok); }
-function setRefreshToken(tok) { if (tok) localStorage.setItem('refresh_token', tok); }
-function clearAllTokens(){ localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); localStorage.removeItem('me_cache'); }
-function getAccess(){ return localStorage.getItem('access_token'); }
-function getRefresh(){ return localStorage.getItem('refresh_token'); }
-
-/* ================ Small UI helpers ================= */
-function show(el){ el.classList.remove('hidden'); el.style.display=''; }
-function hide(el){ el.classList.add('hidden'); el.style.display='none'; }
-function showApp(){ hide(document.getElementById('initialLoader')); show(document.getElementById('app')); }
-function setDegraded(on){ const d=document.getElementById('degradedBadge'); if(!d) return; if(on) d.classList.remove('hidden'); else d.classList.add('hidden'); }
-
-/* ================= fetchWithAuth =================
-   - ارسال Authorization اگر توکن هست
-   - اگر 401 برگشت: یک‌بار تلاش refresh می‌کنه (درصورت داشتن refresh token)
-   - اگر refresh هم شکست خورد: توکن‌ها رو خودکار پاک نمی‌کنه؛ به‌جاش overlay نشون می‌ده تا کاربر تصمیم بگیره.
-   - در مورد خطاهای شبکه/5xx: توکن‌ها پاک نمیشن و UI اجازهٔ retry یا استفاده از cached profile رو میده.
-*/
-async function fetchWithAuth(url, opts = {}) {
-  opts = Object.assign({ method: 'GET', headers: {}, credentials: 'include' }, opts);
-  const access = getAccess();
-  if (access) opts.headers['Authorization'] = 'Bearer ' + access;
-  opts.headers['Accept'] = opts.headers['Accept'] || 'application/json';
-
-  let res;
-  try {
-    res = await fetch(url, opts);
-  } catch (err) {
-    console.error('[fetchWithAuth] network error', err);
-    throw err;
-  }
-
-  // 401 handling: try refresh once if refresh token exists
-  if (res.status === 401) {
-    const refresh = getRefresh();
-    if (!refresh) {
-      return res; // caller will handle (show overlay)
-    }
-    try {
-      const r = await fetch(BACKEND + '/auth/refresh', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + refresh, 'Accept': 'application/json' },
-        credentials: 'include'
-      });
-      if (!r.ok) {
-        // refresh failed -> do NOT auto-clear tokens; caller will see 401 and show overlay
-        return res;
-      }
-      const jr = await r.json();
-      if (jr && jr.access_token) {
-        setAccessToken(jr.access_token);
-        // retry original
-        opts.headers['Authorization'] = 'Bearer ' + jr.access_token;
-        return await fetch(url, opts);
-      } else {
-        return res;
-      }
-    } catch (e) {
-      console.error('[fetchWithAuth] refresh network error', e);
-      return res;
-    }
-  }
-
-  return res;
-}
-
-/* ================= Access overlay UI ================= */
-function showOverlay(message, opts = {}) {
-  // opts: { auth:bool, root:bool, retry:bool, use_cache:bool, keep_tokens:bool }
-  const container = document.getElementById('accessOverlay');
-  container.innerHTML = '';
-  container.classList.remove('hidden');
-  container.style.display = 'flex';
-
-  const card = document.createElement('div');
-  card.className = 'overlay-card glass';
-  let html = `<div style="display:flex;justify-content:space-between;align-items:flex-start">
+    <!-- Auth Modal (Login) -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity hidden-force">
+        <div class="glass p-8 rounded-2xl w-full max-w-md relative overflow-hidden animation-slide-up">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-primary/20 blur-[50px] rounded-full -mr-10 -mt-10"></div>
+            
+            <h2 class="text-2xl font-bold mb-6 text-white text-center">ورود به پنل مدیریت</h2>
+            
+            <form id="loginForm" class="space-y-4">
                 <div>
-                  <h3 style="font-weight:700;margin-bottom:6px">دسترسی / احراز هویت</h3>
-                  <div class="small-muted" id="overlayMsg">${escapeHtml(message)}</div>
+                    <label class="block text-sm text-gray-400 mb-1">نام کاربری</label>
+                    <input type="text" id="username" class="w-full input-box p-3 rounded-lg text-white" placeholder="admin" required>
                 </div>
-                <div><button id="overlayClose" class="btn-ghost">بستن</button></div>
-              </div>
-              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">`;
-  if (opts.root) html += `<button id="optRoot" class="btn-primary">بازگشت به روت</button>`;
-  if (opts.auth) html += `<button id="optLogin" class="btn-ghost">صفحهٔ ورود</button>`;
-  if (opts.retry) html += `<button id="optRetry" class="btn-ghost">تلاش دوباره</button>`;
-  if (opts.use_cache) html += `<button id="optUseCache" class="btn-ghost">استفاده از جلسهٔ کش‌شده</button>`;
-  html += `<button id="optClear" class="btn-ghost">پاک‌سازی توکن‌ها</button>`;
-  html += `</div><div class="small-muted" style="margin-top:10px">اگر می‌خواهید کلاینت را نگه دارید، از گزینهٔ «استفاده از جلسهٔ کش‌شده» استفاده کنید.</div>`;
-  card.innerHTML = html;
-  container.appendChild(card);
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">رمز عبور</label>
+                    <input type="password" id="password" class="w-full input-box p-3 rounded-lg text-white" required>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-3 rounded-lg shadow-lg shadow-purple-900/20 hover:scale-[1.02] transition-transform">
+                    <span id="loginText">ورود امن</span>
+                    <span id="loginLoader" class="loader ml-2 hidden-force"></span>
+                </button>
+            </form>
+            <p id="loginError" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+        </div>
+    </div>
 
-  document.getElementById('overlayClose').addEventListener('click', ()=>{ container.classList.add('hidden'); container.style.display='none'; });
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="w-full md:w-72 md:h-screen glass flex flex-col justify-between sticky top-0 z-40 transition-transform -translate-x-full md:translate-x-0 hidden md:flex border-l-0 border-r border-dark-border">
+        <div class="p-6">
+            <div class="flex items-center gap-3 mb-10">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-xl">TM</div>
+                <div>
+                    <h1 class="font-bold text-lg text-white">TwoManga</h1>
+                    <span class="text-xs text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-full">Admin Pro</span>
+                </div>
+            </div>
 
-  const elRoot = document.getElementById('optRoot');
-  if (elRoot) elRoot.addEventListener('click', ()=> window.location.href = BACKEND + '/');
+            <nav class="space-y-2">
+                <button onclick="router('dashboard')" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all group active-nav">
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    داشبورد
+                </button>
+                <button onclick="router('transactions')" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all group">
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    تراکنش‌ها
+                </button>
+                <button onclick="router('coupons')" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all group">
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                    کوپن تخفیف
+                </button>
+            </nav>
+        </div>
+        <div class="p-6 border-t border-white/5">
+            <button onclick="App.logout()" class="w-full flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                خروج از سیستم
+            </button>
+        </div>
+    </aside>
 
-  const elLogin = document.getElementById('optLogin');
-  if (elLogin) elLogin.addEventListener('click', ()=> window.location.href = "https://im-abi-oo.github.io/auth");
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 h-screen overflow-y-auto">
+        <!-- Header (Mobile Toggle & Title) -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="md:hidden p-2 rounded bg-dark-card border border-dark-border" onclick="toggleSidebar()">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </div>
+            <div class="hidden md:block">
+                <h2 id="pageTitle" class="text-2xl font-bold text-white animation-slide-up">نمای کلی</h2>
+                <p id="pageSubtitle" class="text-sm text-gray-500">خوش آمدید، <span id="currentUserDisplay" class="text-brand-primary">Admin</span></p>
+            </div>
+            <!-- Backend Status Pulse -->
+            <div class="flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                <span class="relative flex h-3 w-3">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span class="text-xs text-green-400 font-mono">Backend Active</span>
+            </div>
+        </header>
 
-  const elRetry = document.getElementById('optRetry');
-  if (elRetry) elRetry.addEventListener('click', ()=> { container.classList.add('hidden'); bootstrap(); });
+        <!-- Pages Container -->
+        <div id="contentArea" class="space-y-6">
+            
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section animation-fade-in">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl -mr-5 -mt-5 transition-all group-hover:bg-blue-500/20"></div>
+                        <h3 class="text-gray-400 text-sm">وضعیت سرور</h3>
+                        <p id="dashService" class="text-2xl font-bold text-white mt-2">Loading...</p>
+                        <p class="text-xs text-blue-400 mt-1">Backend Connection</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl -mr-5 -mt-5 transition-all group-hover:bg-purple-500/20"></div>
+                        <h3 class="text-gray-400 text-sm">حالت سیستم</h3>
+                        <p id="dashMode" class="text-2xl font-bold text-white mt-2">Loading...</p>
+                        <p class="text-xs text-purple-400 mt-1">Queue & Threading</p>
+                    </div>
+                    <div class="glass p-6 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-20 h-20 bg-pink-500/10 rounded-full blur-2xl -mr-5 -mt-5 transition-all group-hover:bg-pink-500/20"></div>
+                        <h3 class="text-gray-400 text-sm">تعداد ورکرها</h3>
+                        <p id="dashWorkers" class="text-2xl font-bold text-white mt-2">-</p>
+                        <p class="text-xs text-pink-400 mt-1">Active Consumers</p>
+                    </div>
+                </div>
+            </div>
 
-  const elUse = document.getElementById('optUseCache');
-  if (elUse) elUse.addEventListener('click', ()=> {
-    const cached = localStorage.getItem('me_cache');
-    if (!cached) { alert('جلسهٔ کش‌شده موجود نیست'); return; }
-    try {
-      const me = JSON.parse(cached);
-      if (!me || !me.username) { alert('کش نامعتبر است'); return; }
-      document.getElementById('adminName').innerText = me.username || 'admin';
-      document.getElementById('adminRole').innerText = me.role || 'user';
-      setDegraded(true);
-      container.classList.add('hidden');
-      showApp();
-    } catch (e) { console.error(e); alert('خطا در بارگذاری کش'); }
-  });
+            <!-- Transactions View -->
+            <div id="view-transactions" class="view-section hidden animation-fade-in">
+                <div class="glass rounded-2xl overflow-hidden">
+                    <div class="p-6 border-b border-dark-border flex justify-between items-center">
+                        <h3 class="font-bold text-white">تراکنش‌های اخیر</h3>
+                        <button onclick="App.loadTransactions()" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 transition-colors">
+                            بروزرسانی لیست
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left rtl:text-right">
+                            <thead class="text-xs text-gray-400 uppercase bg-black/20">
+                                <tr>
+                                    <th class="px-6 py-4">شناسه کاربر</th>
+                                    <th class="px-6 py-4">TX Hash</th>
+                                    <th class="px-6 py-4">روز</th>
+                                    <th class="px-6 py-4">وضعیت</th>
+                                    <th class="px-6 py-4 text-center">عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="txTableBody" class="divide-y divide-dark-border text-gray-300">
+                                <!-- Data injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-  const elClear = document.getElementById('optClear');
-  if (elClear) elClear.addEventListener('click', ()=> {
-    clearAllTokens();
-    alert('توکن‌ها پاک شدند.');
-  });
-}
-
-function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
-
-/* ================= bootstrap (auth/me) ================= */
-async function bootstrap() {
-  // show loader
-  document.getElementById('initialLoader').classList.remove('hidden');
-  try {
-    const access = getAccess();
-    console.debug('[bootstrap] hasAccess:', !!access);
-
-    const res = await fetchWithAuth(BACKEND + '/auth/me', { method:'GET' });
-
-    console.debug('[bootstrap] /auth/me status', res.status);
-
-    if (res.status === 401 || res.status === 403) {
-      // force user to re-login (security). DO NOT auto-clear tokens here.
-      showOverlay('احراز هویت نامعتبر یا سشن منقضی شده (401/403). لطفاً وارد شوید یا به روت بازگردید.', { auth:true, root:true });
-      return;
-    }
-
-    if (!res.ok) {
-      // server error or network problem -> preserve tokens, allow retry or use cache
-      const j = await res.json().catch(()=>({}));
-      if (j && j.role && j.role !== 'admin') {
-        showOverlay('اکانت شما دسترسی admin ندارد. لطفاً با اکانت مناسب وارد شوید یا به روت بازگردید.', { root:true });
-        return;
-      }
-      showOverlay('خطا در دریافت اطلاعات کاربر. می‌توانید تلاش دوباره کنید یا از جلسهٔ کش‌شده استفاده کنید.', { retry:true, use_cache:true, auth:true });
-      return;
-    }
-
-    const body = await res.json();
-    if (!body || body.role !== 'admin') {
-      showOverlay('اکانت شما نقش admin ندارد. لطفاً با اکانت admin وارد شوید یا به روت بازگردید.', { root:true });
-      return;
-    }
-
-    // success: populate UI and cache me (but NOT tokens)
-    document.getElementById('adminName').innerText = body.username || 'admin';
-    document.getElementById('adminRole').innerText = body.role || '—';
-    try {
-      localStorage.setItem('me_cache', JSON.stringify({
-        username: body.username || null,
-        role: body.role || null,
-        expiryDate: body.expiryDate || null,
-        created_at: body.created_at || null,
-        ts: (new Date()).toISOString()
-      }));
-    } catch(e){ console.warn('me_cache store failed', e); }
-
-    // show app
-    setDegraded(false);
-    showApp();
-    showTab('dashboard');
-    fetchRoot();
-  } catch (err) {
-    console.error('[bootstrap] error', err);
-    showOverlay('خطای شبکه یا CORS هنگام بررسی احراز هویت. می‌توانید تلاش دوباره کنید یا از جلسهٔ کش‌شده استفاده کنید.', { retry:true, use_cache:true, auth:true });
-  } finally {
-    // hide initial loader only when app shown or overlay open
-    // leave it to showApp or overlay to hide
-  }
-}
-
-/* =================== API actions (root, ping, db) =================== */
-async function fetchRoot(){
-  const el = document.getElementById('rootDump');
-  el.innerText = 'در حال بارگذاری...';
-  try {
-    const res = await fetchWithAuth(BACKEND + '/', { method:'GET' });
-    if (!res.ok) { el.innerText = 'خطا: ' + res.status; return; }
-    const j = await res.json();
-    el.innerText = JSON.stringify(j, null, 2);
-    document.getElementById('rootInfo').innerText = (j.server || 'Two Manga API');
-  } catch (e) { el.innerText = 'خطای شبکه هنگام واکشی root'; }
-}
-
-async function ping(){
-  const ld = document.getElementById('pingLoader');
-  ld.innerHTML = '<span class="loader"></span>';
-  try {
-    const res = await fetchWithAuth(BACKEND + '/debug/ping', { method:'GET' });
-    if (!res.ok) { document.getElementById('pingRes').innerText = 'خطا: ' + res.status; return; }
-    const j = await res.json();
-    document.getElementById('pingRes').innerText = j.msg || 'pong';
-  } catch (e) { document.getElementById('pingRes').innerText = 'خطای شبکه'; }
-  ld.innerHTML = '';
-}
-
-async function dbStatus(){
-  document.getElementById('dbRes').innerText = 'در حال بارگذاری...';
-  try {
-    const res = await fetchWithAuth(BACKEND + '/debug/db-status', { method:'GET' });
-    if (!res.ok) { document.getElementById('dbRes').innerText = 'خطا: ' + res.status; return; }
-    const j = await res.json();
-    document.getElementById('dbRes').innerText = 'available: ' + (j.available ? 'yes' : 'no');
-  } catch(e){ document.getElementById('dbRes').innerText = 'خطای شبکه'; }
-}
-
-/* =================== Transactions (important fix) ===================
-   - اگر /admin/transactions برگشت 401 یا 403 => هیچ توکنی پاک نمیشه؛ overlay نمایش داده میشه و کاربر می‌تونه retry یا login بزنه.
-   - در سایر خطاها فقط پیغام داده میشه.
-*/
-async function loadTransactions(){
-  const list = document.getElementById('txList');
-  list.innerHTML = '<div class="mono small-muted p-3">در حال بارگذاری... <span class="loader"></span></div>';
-  const status = document.getElementById('txFilter').value;
-  const qs = status ? '?status='+encodeURIComponent(status) : '';
-  try {
-    const res = await fetchWithAuth(BACKEND + '/admin/transactions' + qs, { method:'GET' });
-    if (res.status === 401 || res.status === 403) {
-      // do NOT auto-clear tokens; show overlay and allow user to act
-      showOverlay('احراز هویت نامعتبر یا مجوز کافی ندارید (401/403). لطفاً لاگین کنید یا از جلسهٔ کش‌شده استفاده کنید.', { auth:true, use_cache:true, retry:true });
-      list.innerHTML = '<div class="small-muted p-3">نیاز به لاگین admin برای مشاهده تراکنش‌ها.</div>';
-      return;
-    }
-    if (!res.ok) {
-      list.innerHTML = '<div class="small-muted p-3">خطا در دریافت تراکنش‌ها: ' + res.status + '</div>';
-      return;
-    }
-    const j = await res.json();
-    const items = j.transactions || [];
-    if (!items.length) { list.innerHTML = '<div class="small-muted p-3">تراکنشی موجود نیست.</div>'; return; }
-    list.innerHTML = '';
-    for (const t of items) {
-      const card = document.createElement('div');
-      card.className = 'glass p-3 flex items-start justify-between';
-      card.innerHTML = `<div>
-                          <div class="mono">#${t._id}</div>
-                          <div class="small-muted">${t.username || t.user_id} · ${t.status}</div>
-                          <div class="small-muted">tx: ${t.tx_hash || '—'} · days: ${t.days || 0}</div>
-                          <div class="small-muted">created: ${t.created_at || '—'}</div>
+            <!-- Coupons View -->
+            <div id="view-coupons" class="view-section hidden animation-fade-in">
+                <div class="max-w-2xl mx-auto glass p-8 rounded-2xl">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
                         </div>
-                        <div class="flex gap-2">
-                          <button class="btn-primary" data-id="${t._id}" data-act="approve">تأیید</button>
-                          <button class="btn-ghost" data-id="${t._id}" data-act="reject">رد</button>
-                        </div>`;
-      list.appendChild(card);
-    }
-    // attach handlers (delegation)
-    list.querySelectorAll('button[data-act]').forEach(btn=>{
-      btn.addEventListener('click', (e)=>{
-        const id = btn.getAttribute('data-id');
-        const act = btn.getAttribute('data-act');
-        if (act === 'approve') adminApprove(id, btn);
-        else adminReject(id, btn);
-      });
-    });
-  } catch (e) {
-    console.error('loadTransactions error', e);
-    list.innerHTML = '<div class="small-muted p-3">خطای شبکه هنگام بارگذاری تراکنش‌ها</div>';
-  }
-}
+                        <h3 class="text-xl font-bold text-white">ایجاد کد تخفیف</h3>
+                    </div>
 
-async function adminApprove(txId, btnEl){
-  if (!confirm('آیا مطمئنی تأیید می‌کنی؟')) return;
-  btnEl.disabled = true;
-  try {
-    const res = await fetchWithAuth(BACKEND + '/admin/transactions/' + encodeURIComponent(txId) + '/approve', { method:'POST', headers:{ 'Content-Type':'application/json' } });
-    if (res.status === 401 || res.status === 403) {
-      showOverlay('احراز هویت یا مجوز ندارید (401/403).', { auth:true, use_cache:true });
-      btnEl.disabled = false;
-      return;
-    }
-    if (!res.ok) {
-      const txt = await res.text().catch(()=> '');
-      alert('خطا در تأیید: ' + res.status + ' ' + txt);
-      btnEl.disabled = false;
-      return;
-    }
-    const j = await res.json();
-    alert('تأیید شد: ' + (j.new_expiry || ''));
-    loadTransactions(); // refresh
-  } catch (e) {
-    alert('خطای شبکه در تأیید');
-    btnEl.disabled = false;
-  }
-}
+                    <form onsubmit="App.createCoupon(event)" class="space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">کد کوپن</label>
+                                <input type="text" name="code" class="w-full input-box p-3 rounded-lg text-white" placeholder="SUMMER2026" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500 mb-1">تعداد روز جایزه</label>
+                                <input type="number" name="bonus_days" class="w-full input-box p-3 rounded-lg text-white" placeholder="30" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">حداکثر استفاده (اختیاری)</label>
+                            <input type="number" name="max_uses" class="w-full input-box p-3 rounded-lg text-white" placeholder="∞">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">تاریخ انقضا (اختیاری)</label>
+                            <input type="datetime-local" name="expires_at" class="w-full input-box p-3 rounded-lg text-gray-400">
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary p-3 rounded-xl font-bold text-white hover:opacity-90 transition-opacity flex justify-center items-center">
+                            ساخت کوپن
+                            <span class="loader ml-2 hidden-force" id="couponLoader"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
 
-async function adminReject(txId, btnEl){
-  const reason = prompt('دلیل رد (اختیاری):','');
-  btnEl.disabled = true;
-  try {
-    const res = await fetchWithAuth(BACKEND + '/admin/transactions/' + encodeURIComponent(txId) + '/reject', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ reason }) });
-    if (res.status === 401 || res.status === 403) {
-      showOverlay('احراز هویت یا مجوز ندارید (401/403).', { auth:true, use_cache:true });
-      btnEl.disabled = false;
-      return;
-    }
-    if (!res.ok) {
-      const txt = await res.text().catch(()=> '');
-      alert('خطا در رد: ' + res.status + ' ' + txt);
-      btnEl.disabled = false;
-      return;
-    }
-    alert('تراکنش رد شد.');
-    loadTransactions();
-  } catch (e) {
-    alert('خطای شبکه در رد تراکنش');
-    btnEl.disabled = false;
-  }
-}
+        </div>
+    </main>
 
-/* ============ Coupons / Rates (similar pattern) ============ */
-function toggleCouponCreate(){ document.getElementById('couponCreate').classList.toggle('hidden'); }
-async function createCoupon(){
-  const code = document.getElementById('c_code').value.trim();
-  const days = parseInt(document.getElementById('c_days').value || '0',10);
-  const max = document.getElementById('c_max').value;
-  const exp = document.getElementById('c_exp').value.trim();
-  const msg = document.getElementById('c_msg');
-  if (!code || !days) { alert('کد و days معتبر وارد کن'); return; }
-  msg.innerText = 'در حال ارسال...';
-  try {
-    const res = await fetchWithAuth(BACKEND + '/admin/coupons', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ code, bonus_days: days, max_uses: max || undefined, expires_at: exp || undefined }) });
-    if (res.status === 401 || res.status === 403) { showOverlay('نیاز به دسترسی admin دارید (401/403).', { auth:true, use_cache:true }); msg.innerText=''; return; }
-    if (!res.ok) { const txt=await res.text().catch(()=> ''); msg.innerText='خطا'; alert('خطا: '+res.status+' '+txt); return; }
-    msg.innerText = 'کوپن ایجاد شد';
-    listCoupons();
-  } catch(e){ msg.innerText='خطای شبکه'; }
-}
-async function listCoupons(){
-  const p = document.getElementById('couponList'); p.innerHTML='در حال بارگذاری...';
-  try {
-    const res = await fetchWithAuth(BACKEND + '/admin/coupons', { method:'GET' });
-    if (!res.ok){ p.innerText='خطا: '+res.status; return; }
-    const j = await res.json(); const arr = j.coupons||[];
-    p.innerHTML = arr.length ? '' : '<div class="small-muted">کوپنی نیست</div>';
-    arr.forEach(c=>{
-      const el = document.createElement('div'); el.className='glass p-2 flex justify-between';
-      el.innerHTML = `<div><div class="mono">${c.code}</div><div class="small-muted">bonus_days:${c.bonus_days} · uses:${c.uses||0}</div></div><div class="small-muted">${c.expires_at||''}</div>`;
-      p.appendChild(el);
-    });
-  } catch(e){ p.innerText='خطای شبکه'; }
-}
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 left-5 glass p-4 rounded-xl flex items-center gap-3 transition-all transform translate-y-20 opacity-0 z-50">
+        <div id="toastIcon" class="w-2 h-2 rounded-full bg-white"></div>
+        <p id="toastMessage" class="text-sm font-medium"></p>
+    </div>
 
-async function fetchRates(){
-  const m = document.getElementById('ratesMsg'); m.innerText='در حال فچ...';
-  try {
-    const res = await fetchWithAuth(BACKEND + '/admin/fetch-rates', { method:'POST' });
-    if (!res.ok){ m.innerText='خطا: ' + res.status; return; }
-    m.innerText = 'نرخ‌ها فچ شد';
-  } catch(e){ m.innerText='خطای شبکه'; }
-}
+    <!-- Logic Core -->
+    <script>
+        // --- تنظیمات سیستم ---
+        const CONFIG = {
+            API_URL: 'https://two-api-iksq.onrender.com',
+            KEYS: { AT: 'at', RT: 'rt' } // کلیدهای درخواستی کاربر
+        };
 
-/* =================== manual token controls & logout ================== */
-document.getElementById('setTokenBtn').addEventListener('click', ()=>{
-  const v = document.getElementById('manualToken').value.trim();
-  if (!v){ alert('توکن خالی'); return; }
-  setAccessToken(v); alert('توکن access ذخیره شد'); bootstrap();
-});
-document.getElementById('clearTokenBtn').addEventListener('click', ()=>{
-  clearAllTokens(); alert('توکن‌ها پاک شدند'); });
+        // --- مدیریت State و DOM ---
+        const $ = (selector) => document.querySelector(selector);
+        
+        class TwoMangaAdmin {
+            constructor() {
+                this.currentUser = null;
+                this.init();
+            }
 
-document.getElementById('logoutBtn').addEventListener('click', ()=>{
-  clearAllTokens();
-  document.getElementById('app').style.display='none';
-  showOverlay('خروج انجام شد. در صورت نیاز مجدداً وارد شوید.', { auth:true });
-});
+            init() {
+                // چک کردن وضعیت لاگین هنگام شروع
+                const at = localStorage.getItem(CONFIG.KEYS.AT);
+                if (!at) {
+                    this.showAuth();
+                } else {
+                    this.fetchDashboard(); // Ping & Init data
+                    $('#currentUserDisplay').textContent = "Admin";
+                }
 
-/* ================ small UI helpers ================ */
-function showTab(name){
-  document.querySelectorAll('section[id^="tab-"], section[id^="tab-"] ~ *').forEach(s=>{});
-  document.querySelectorAll('[id^="tab-"]').forEach(el=>{ if(el.id==='tab-'+name) el.classList.remove('hidden'); else el.classList.add('hidden'); });
-}
+                // ایونت لیسنر لاگین
+                $('#loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+            }
 
-/* ================= init ================= */
-window.addEventListener('DOMContentLoaded', ()=>{
-  // start bootstrap
-  bootstrap();
-});
+            // --- Authentication Core ---
+            async request(endpoint, method = 'GET', body = null) {
+                let token = localStorage.getItem(CONFIG.KEYS.AT);
+                const headers = { 
+                    'Content-Type': 'application/json',
+                    ...(token && { 'Authorization': `Bearer ${token}` })
+                };
 
-/* ================= export for debugging (optional) ================ */
-window._twoMangaDebug = {
-  fetchWithAuth,
-  bootstrap,
-  loadTransactions,
-  fetchRoot
-};
-</script>
+                const options = { method, headers, ...(body && { body: JSON.stringify(body) }) };
+
+                try {
+                    let response = await fetch(`${CONFIG.API_URL}${endpoint}`, options);
+
+                    // Handle 401 (Expired Token)
+                    if (response.status === 401) {
+                        console.warn('Token expired. Redirecting to Login...');
+                        // از آنجا که بک‌ند روت رفرش خاصی ندارد یا پیچیدگی دارد، 
+                        // ساده‌ترین راه برای امنیت بیشتر خروج و لاگین مجدد است 
+                        // مگر اینکه رفرش توکن به کار بیاید، اما برای جلوگیری از پیچیدگی غیرضروری فرانت:
+                        this.logout();
+                        throw new Error('Unauthorized');
+                    }
+
+                    if (response.status === 403) {
+                        this.showToast('شما دسترسی ادمین ندارید', 'error');
+                        throw new Error('Forbidden');
+                    }
+
+                    return response;
+                } catch (error) {
+                    if (error.message !== 'Unauthorized') this.showToast('خطا در ارتباط با سرور', 'error');
+                    throw error;
+                }
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+                const username = $('#username').value;
+                const password = $('#password').value;
+                const loader = $('#loginLoader');
+                const btnText = $('#loginText');
+                const errMsg = $('#loginError');
+
+                loader.classList.remove('hidden-force');
+                btnText.classList.add('hidden-force');
+                errMsg.classList.add('hidden');
+
+                try {
+                    const res = await fetch(`${CONFIG.API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    
+                    const data = await res.json();
+
+                    if (!res.ok) throw new Error(data.msg || 'Login failed');
+
+                    // ذخیره سازی طبق دستور: at و rt
+                    localStorage.setItem(CONFIG.KEYS.AT, data.access_token);
+                    localStorage.setItem(CONFIG.KEYS.RT, data.refresh_token);
+
+                    // دریافت اطلاعات کاربر برای اطمینان از ادمین بودن
+                    // چون روت /auth/me وجود دارد و در پایتون مشخص شده
+                    this.checkAdminAccess();
+
+                } catch (error) {
+                    errMsg.textContent = error.message === 'Failed to fetch' ? 'اینترنت خود را چک کنید' : 'نام کاربری یا رمز عبور اشتباه است';
+                    errMsg.classList.remove('hidden');
+                    loader.classList.add('hidden-force');
+                    btnText.classList.remove('hidden-force');
+                }
+            }
+
+            async checkAdminAccess() {
+                try {
+                    // با استفاده از تابع ریکوست داخلی خودمان
+                    const res = await this.request('/auth/me');
+                    if(res.ok) {
+                        const data = await res.json();
+                        if (data.role === 'admin') {
+                            // موفق
+                            $('#authModal').classList.add('hidden-force');
+                            // نمایش داشبورد
+                            this.fetchDashboard();
+                            this.showToast('خوش آمدید', 'success');
+                            $('#currentUserDisplay').textContent = data.username;
+                        } else {
+                            throw new Error('Access denied: Not an admin');
+                        }
+                    } else {
+                         throw new Error('Verification failed');
+                    }
+                } catch(e) {
+                    $('#loginError').textContent = 'اکانت شما دسترسی ادمین ندارد';
+                    $('#loginError').classList.remove('hidden');
+                    $('#loginLoader').classList.add('hidden-force');
+                    $('#loginText').classList.remove('hidden-force');
+                    this.logout(false);
+                }
+            }
+
+            logout(uiOnly = true) {
+                localStorage.removeItem(CONFIG.KEYS.AT);
+                localStorage.removeItem(CONFIG.KEYS.RT);
+                if (uiOnly) window.location.reload();
+            }
+
+            showAuth() {
+                $('#authModal').classList.remove('hidden-force');
+            }
+
+            // --- Features Logic ---
+
+            async fetchDashboard() {
+                try {
+                    const res = await this.request('/'); // روت اصلی برای دریافت وضعیت
+                    const data = await res.json();
+                    
+                    $('#dashService').textContent = data.service || 'Unknown';
+                    $('#dashMode').textContent = data.mode || 'Standard';
+                    $('#dashWorkers').textContent = data.workers_active !== undefined ? data.workers_active : '-';
+                    
+                    if(data.db === true) {
+                         $('#dashService').classList.add('text-green-400');
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            async loadTransactions() {
+                const tbody = $('#txTableBody');
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">در حال بارگذاری...</td></tr>';
+                
+                try {
+                    // دقیقاً همان روت فایل پایتون
+                    const res = await this.request('/admin/transactions?status=pending');
+                    const txs = await res.json();
+
+                    tbody.innerHTML = '';
+                    if (txs.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">هیچ تراکنش معلقی وجود ندارد</td></tr>';
+                        return;
+                    }
+
+                    txs.forEach(tx => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-white/5 transition-colors border-b border-dark-border last:border-0';
+                        // ایجاد TX Hash کوتاه شده
+                        const shortTx = tx.tx_hash ? `${tx.tx_hash.substring(0,6)}...${tx.tx_hash.substring(tx.tx_hash.length-4)}` : 'N/A';
+                        
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-400 font-mono text-xs">${tx.username}</td>
+                            <td class="px-6 py-4 text-brand-primary font-mono text-xs" title="${tx.tx_hash}">${shortTx}</td>
+                            <td class="px-6 py-4">${tx.days}</td>
+                            <td class="px-6 py-4"><span class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-md text-xs border border-yellow-500/20">${tx.status}</span></td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="App.approveTx('${tx._id}', this)" class="bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-xs transition-all">
+                                    تایید
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                } catch (e) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">خطا در دریافت لیست</td></tr>';
+                }
+            }
+
+            async approveTx(id, btn) {
+                const originalText = btn.textContent;
+                btn.textContent = '...';
+                btn.disabled = true;
+
+                try {
+                    // طبق کد پایتون: /admin/transactions/<tx_id>/approve POST
+                    // این تابع یک Worker Job را شروع می‌کند و اگر wait=True باشد نتیجه را برمی‌گرداند
+                    const res = await this.request(`/admin/transactions/${id}/approve`, 'POST');
+                    const data = await res.json();
+
+                    if(res.status === 200 || res.status === 202) {
+                        this.showToast('تراکنش با موفقیت تایید شد', 'success');
+                        btn.closest('tr').classList.add('opacity-0', '-translate-x-10');
+                        setTimeout(() => btn.closest('tr').remove(), 300);
+                    } else {
+                         this.showToast(data.msg || 'خطا در عملیات', 'error');
+                         btn.textContent = originalText;
+                         btn.disabled = false;
+                    }
+                } catch (e) {
+                    this.showToast('خطای غیرمنتظره', 'error');
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            }
+
+            async createCoupon(e) {
+                e.preventDefault();
+                const form = e.target;
+                const btnLoader = $('#couponLoader');
+                
+                // داده سازی
+                const body = {
+                    code: form.code.value,
+                    bonus_days: parseInt(form.bonus_days.value),
+                    max_uses: form.max_uses.value ? parseInt(form.max_uses.value) : null,
+                    // فرمت تاریخ برای بکند باید استاندارد ISO باشد
+                    expires_at: form.expires_at.value ? new Date(form.expires_at.value).toISOString() : null
+                };
+
+                btnLoader.classList.remove('hidden-force');
+                
+                try {
+                    const res = await this.request('/admin/coupons', 'POST', body);
+                    const data = await res.json();
+
+                    if (res.status === 201) {
+                        this.showToast('کد تخفیف ساخته شد', 'success');
+                        form.reset();
+                    } else if(res.status === 409) {
+                         this.showToast('این کد قبلاً وجود دارد', 'warning');
+                    } else {
+                        this.showToast('خطا: ' + JSON.stringify(data.msg), 'error');
+                    }
+                } catch(e) {
+                    this.showToast('خطای ارتباط', 'error');
+                } finally {
+                    btnLoader.classList.add('hidden-force');
+                }
+            }
+
+            // --- UI Helper Methods ---
+            
+            showToast(msg, type = 'success') {
+                const toast = $('#toast');
+                const text = $('#toastMessage');
+                const icon = $('#toastIcon');
+                
+                text.textContent = msg;
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                
+                if(type === 'success') {
+                    toast.classList.add('border', 'border-green-500/20');
+                    icon.className = 'w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]';
+                    text.classList.add('text-green-400');
+                    text.classList.remove('text-red-400', 'text-yellow-400');
+                } else if(type === 'error') {
+                     toast.classList.add('border', 'border-red-500/20');
+                     icon.className = 'w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]';
+                     text.classList.add('text-red-400');
+                     text.classList.remove('text-green-400', 'text-yellow-400');
+                } else {
+                     toast.classList.add('border', 'border-yellow-500/20');
+                     icon.className = 'w-2 h-2 rounded-full bg-yellow-500';
+                     text.classList.add('text-yellow-400');
+                }
+
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            }
+        }
+
+        // --- Navigation Logic ---
+        function router(viewName) {
+            // Update Active Nav Style
+            document.querySelectorAll('.nav-item').forEach(el => {
+                if(el.getAttribute('onclick').includes(viewName)) {
+                    el.classList.add('bg-white/10', 'text-white');
+                    el.classList.remove('text-gray-300');
+                } else {
+                    el.classList.remove('bg-white/10', 'text-white');
+                    el.classList.add('text-gray-300');
+                }
+            });
+
+            // Update Mobile & Desktop Visibility
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            // Set Title
+            const titles = { 'dashboard': 'نمای کلی', 'transactions': 'مدیریت پرداخت‌ها', 'coupons': 'کد تخفیف' };
+            $('#pageTitle').textContent = titles[viewName];
+
+            // Close mobile menu if open
+            const sb = $('#sidebar');
+            if (!sb.classList.contains('-translate-x-full') && window.innerWidth < 768) {
+                sb.classList.add('-translate-x-full');
+            }
+
+            // Fetch Data for Specific Views
+            if(viewName === 'transactions') App.loadTransactions();
+            if(viewName === 'dashboard') App.fetchDashboard();
+        }
+
+        function toggleSidebar() {
+            const sb = $('#sidebar');
+            sb.classList.toggle('-translate-x-full');
+            // Allow outside click to close (optional improvement)
+        }
+
+        // --- Initialize ---
+        const App = new TwoMangaAdmin();
+    </script>
 </body>
 </html>

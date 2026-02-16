@@ -485,7 +485,7 @@
             const btn = document.getElementById('btn-gift'); const orig = btn.innerHTML;
             btn.innerHTML = '<span class="loader"></span>'; btn.disabled = true;
             try {
-                const payload = { days: 0, coupon_code: code };
+                const payload = { coupon_code: code };
                 const res = await fetch(`${CONFIG.API_BASE}/payment/submit`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(payload) });
                 const data = await res.json();
                 if (res.ok) {

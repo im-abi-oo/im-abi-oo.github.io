@@ -322,7 +322,11 @@
                         
                         // لینک به ریدر
                         // فرض می‌کنیم روت ریدر /reader است و با هش یا کوئری کار می‌کند
-                        newRow.onclick = () => const targetUrl = `/${SLUG}/reader#ch-${num}`;`;
+                        newRow.onclick = () => {
+                            const targetUrl = `/${SLUG}/reader#ch-${num}`;
+                            window.location.href = targetUrl;
+                        };
+
                     } else {
                         // قفل
                         newRow.classList.add('is-locked');

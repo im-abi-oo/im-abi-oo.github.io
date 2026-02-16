@@ -2,10 +2,11 @@
 <html lang="fa" dir="rtl" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-  <title>Twomang | آرشیو مانگا</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#020005">
+  <meta name="description" content="مرجع تخصصی مانگا و مانهوا با ترجمه اختصاصی و بدون سانسور با کیفیت بالا">
+  <title>تومنگا | مرجع تخصصی مانگا و مانهوا با ترجمه اختصاصی و بدون سانسور با کیفیت بالا</title>
 
-  <!-- Fonts & Libs -->
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -14,530 +15,691 @@
   <style>
     :root { 
       --bg-dark: #020005;
-      --glass-panel: rgba(20, 20, 25, 0.85); 
-      --border-color: rgba(255, 255, 255, 0.08); 
+      --bg-card: #0e0e12;
       --accent: #7c3aed; 
-      --accent-glow: #a78bfa; 
+      --accent-glow: rgba(124, 58, 237, 0.4); 
     }
     
     body { 
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.07), transparent 40%), 
-        radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.05), transparent 40%);
+        radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.07), transparent 40%), 
+        radial-gradient(circle at 85% 85%, rgba(244, 63, 94, 0.05), transparent 40%);
+      background-attachment: fixed;
       color: #e2e8f0; 
       font-family: 'Vazir', sans-serif;
       overflow-x: hidden; 
-      -webkit-tap-highlight-color: transparent; 
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Modern Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-dark); }
-    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-    /* Glass Utilities */
-    .glass {
-      background: rgba(255, 255, 255, 0.03);
+    /* Glass Effect */
+    .glass-nav {
+      background: rgba(2, 0, 5, 0.85);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border-color);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
     }
-    .glass-nav {
-      background: rgba(2, 0, 5, 0.9);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-color);
+    
+    .glass-card {
+        background: rgba(20, 20, 25, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-modal {
+        background: rgba(10, 10, 14, 0.9);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
     }
 
-    /* Filter Drawer Animation */
+    /* Interactive Elements */
+    .manga-card { 
+        transform: translateZ(0); 
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+    @media (hover: hover) {
+        .manga-card:hover { 
+            transform: translateY(-8px) scale(1.02); 
+            box-shadow: 0 12px 40px -10px var(--accent-glow);
+            z-index: 10;
+        }
+    }
+    .manga-card:active { transform: scale(0.96); }
+
+    /* Custom Drawer Animation */
     #filter-drawer {
       transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: transform;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.8);
     }
-    .drawer-open #filter-drawer { transform: translateX(0); }
     .drawer-closed #filter-drawer { transform: translateX(100%); }
-    .backdrop-blur-layer {
-      transition: opacity 0.3s;
-      pointer-events: none;
-      opacity: 0;
-    }
-    .drawer-open .backdrop-blur-layer { opacity: 1; pointer-events: auto; }
+    .drawer-open #filter-drawer { transform: translateX(0); }
 
-    /* Card Hover Effects */
-    .manga-card { transition: all 0.3s ease; }
-    .manga-card:hover { transform: translateY(-8px); box-shadow: 0 12px 40px -10px rgba(124, 58, 237, 0.4); border-color: var(--accent); }
-    .manga-card .cover-img { transition: transform 0.5s ease; }
-    .manga-card:hover .cover-img { transform: scale(1.08); }
+    /* Modal Animation */
+    .modal-enter { opacity: 0; transform: scale(0.95); pointer-events: none; }
+    .modal-active { opacity: 1; transform: scale(1); pointer-events: auto; }
 
-    /* Pagination Buttons */
-    .page-btn.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
+    /* Utils */
+    .text-glow { text-shadow: 0 0 20px rgba(124, 58, 237, 0.5); }
+    .custom-scroll::-webkit-scrollbar { width: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { bg: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
   </style>
 </head>
-<body class="drawer-closed min-h-screen flex flex-col">
+<body class="drawer-closed flex flex-col min-h-screen">
 
-  <!-- Backend Data -->
-  <script id="DATA_SOURCE" type="application/json">[{"chapter": "83", "cover": "https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg", "genres": ["\u0639\u0627\u0634\u0642\u0627\u0646\u0647", "\u0645\u062b\u0644\u062b \u0639\u0634\u0642\u06cc"], "slug": "Domestic-Girlfriend-1234", "status": "\u062f\u0631 \u062d\u0627\u0644 \u0627\u0646\u062a\u0634\u0627\u0631", "summary": "\u0646\u0645\u06cc \u062f\u0627\u0646\u0645", "titleEn": "Domestic Girlfriend", "titleFa": "\u062f\u0648\u0633\u062a \u062f\u062e\u062a\u0631\u062e\u0627\u0646\u06af\u06cc", "type": "Manga", "updatedAt": "2024-05-18"}]</script>
-  <script id="CONFIG_SOURCE" type="application/json">{"apiBase": "https://two-api-iksq.onrender.com", "footer": {"about": "\u062a\u0648\u0645\u0646\u06af\u061b \u0645\u0631\u062c\u0639 \u062a\u062e\u0635\u0635\u06cc \u0648 \u062d\u0631\u0641\u0647\u200c\u0627\u06cc \u0622\u0631\u0634\u06cc\u0648 \u0645\u0627\u0646\u06af\u0627 \u0648 \u0645\u0627\u0646\u0647\u0648\u0627. \u0645\u0627 \u0628\u0627 \u0627\u0631\u0627\u0626\u0647 \u0628\u0627\u0644\u0627\u062a\u0631\u06cc\u0646 \u06a9\u06cc\u0641\u06cc\u062a \u0648 \u062a\u0631\u062c\u0645\u0647\u200c\u0647\u0627\u06cc \u0627\u062e\u062a\u0635\u0627\u0635\u06cc\u060c \u062f\u0646\u06cc\u0627\u06cc \u0633\u06cc\u0627\u0647 \u0648 \u0633\u0641\u06cc\u062f \u0631\u0627 \u0628\u0631\u0627\u06cc \u0634\u0645\u0627 \u0631\u0646\u06af\u06cc\u0646 \u0645\u06cc\u200c\u06a9\u0646\u06cc\u0645.", "columns": [{"links": [{"text": "\u0635\u0641\u062d\u0647 \u0627\u0635\u0644\u06cc", "url": "/"}, {"text": "\u067e\u0646\u0644 \u06a9\u0627\u0631\u0628\u0631\u06cc", "url": "/panel"}, {"text": "\u062e\u0631\u06cc\u062f \u0627\u0634\u062a\u0631\u0627\u06a9", "url": "/panel/plans"}, {"text": "\u0633\u0648\u0627\u0644\u0627\u062a \u0645\u062a\u062f\u0627\u0648\u0644", "url": "/faq.html"}], "title": "\u062f\u0633\u062a\u0631\u0633\u06cc \u0633\u0631\u06cc\u0639"}, {"links": [{"text": "\u0645\u0627\u0646\u0647\u0648\u0627 \u06a9\u0631\u0647\u200c\u0627\u06cc", "url": "/#type=Manhwa"}, {"text": "\u0645\u0627\u0646\u06af\u0627 \u0698\u0627\u067e\u0646\u06cc", "url": "/#type=Manga"}, {"text": "\u0648\u0628\u200c\u062a\u0648\u0646", "url": "/#type=Webtoon"}, {"text": "\u0628\u0631\u062a\u0631\u06cc\u0646\u200c\u0647\u0627\u06cc \u0645\u0627\u0647", "url": "/#sort=popular"}], "title": "\u062f\u0633\u062a\u0647\u200c\u0628\u0646\u062f\u06cc\u200c\u0647\u0627"}, {"links": [{"text": "\u0642\u0648\u0627\u0646\u06cc\u0646 \u0633\u0627\u06cc\u062a", "url": "/terms"}, {"text": "\u062a\u0645\u0627\u0633 \u0628\u0627 \u0645\u0627", "url": "https://t.me/im_abi"}, {"text": "\u06af\u0632\u0627\u0631\u0634 \u062e\u0631\u0627\u0628\u06cc", "url": "/report"}, {"text": "\u062d\u0631\u06cc\u0645 \u062e\u0635\u0648\u0635\u06cc", "url": "/privacy"}], "title": "\u067e\u0634\u062a\u06cc\u0628\u0627\u0646\u06cc \u0648 \u0642\u0648\u0627\u0646\u06cc\u0646"}], "copyright": "\u00a9 2024 Twomang Systems. All rights reserved.", "madeBy": "Designed \u0026 Developed by IM_ABI", "socials": [{"icon": "send", "url": "https://t.me/saino_tm"}, {"icon": "instagram", "url": "#"}, {"icon": "twitter", "url": "#"}, {"icon": "github", "url": "#"}]}, "panelUrl": "/panel", "siteNameEn": "TWOMANG", "siteNameFa": "Twomang", "subscribeTextFa": "\u062e\u0631\u06cc\u062f \u0627\u0634\u062a\u0631\u0627\u06a9 \u0648\u06cc\u0698\u0647", "supportContact": "https://t.me/im_abi", "telegramChannel": "https://t.me/saino_tm"}</script>
+  <noscript>
+      <div class="fixed inset-0 z-[999] bg-[#020005] flex items-center justify-center p-6">
+          <div class="glass-card p-8 rounded-2xl max-w-md text-center border border-rose-500/30 shadow-[0_0_30px_rgba(244,63,94,0.2)]">
+              <div class="w-16 h-16 bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-rose-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              </div>
+              <h2 class="text-xl font-black text-white mb-2">جاوااسکریپت غیرفعال است</h2>
+              <p class="text-gray-400 text-sm leading-7">برای تجربه کامل و تعاملی تومانگا، لطفاً جاوااسکریپت مرورگر خود را فعال کنید. این وب‌اپلیکیشن برای عملکرد صحیح به تکنولوژی‌های مدرن وب نیاز دارد.</p>
+          </div>
+      </div>
+  </noscript>
 
-  <!-- Navbar -->
-  <nav class="fixed top-0 inset-x-0 z-[60] glass-nav h-20">
-    <div class="max-w-[1800px] mx-auto px-4 md:px-8 h-full flex items-center justify-between">
+  <script id="DATA_SOURCE" type="application/json">[{"chapter": "83", "cover": "https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg", "genres": ["\u0639\u0627\u0634\u0642\u0627\u0646\u0647", "\u062f\u0631\u0627\u0645", "\u0627\u06cc\u0686\u06cc"], "slug": "Domestic-Girlfriend-1234", "status": "\u067e\u0627\u06cc\u0627\u0646 \u06cc\u0627\u0641\u062a\u0647", "summary": "\u0646\u0627\u062a\u0633\u0648 \u067e\u0633\u0631\u06cc \u062f\u0628\u06cc\u0631\u0633\u062a\u0627\u0646\u06cc \u0627\u0633\u062a \u06a9\u0647 \u0639\u0627\u0634\u0642 \u0645\u0639\u0644\u0645\u0634\u060c \u0647\u06cc\u0646\u0627 \u0645\u06cc\u200c\u0634\u0648\u062f \u0627\u0645\u0627...", "titleEn": "Domestic Girlfriend", "titleFa": "\u062f\u0648\u0633\u062a \u062f\u062e\u062a\u0631 \u062e\u0627\u0646\u06af\u06cc", "type": "Manga", "updatedAt": "2024-05-20"}]</script>
+  <script id="CONFIG_SOURCE" type="application/json">{"api": {"base": "https://two-api-iksq.onrender.com", "meEndpoint": "/auth/me"}, "footerLinks": [{"items": [{"text": "\u0635\u0641\u062d\u0647 \u0627\u0635\u0644\u06cc", "url": "#"}, {"text": "\u067e\u0646\u0644 \u06a9\u0627\u0631\u0628\u0631\u06cc", "url": "/panel"}, {"text": "\u0627\u0634\u062a\u0631\u0627\u06a9 \u0648\u06cc\u0698\u0647", "url": "/panel/vip"}, {"text": "\u0642\u0648\u0627\u0646\u06cc\u0646 \u0633\u0627\u06cc\u062a", "url": "/terms"}], "title": "\u062f\u0633\u062a\u0631\u0633\u06cc \u0633\u0631\u06cc\u0639"}, {"items": [{"text": "\u0622\u0631\u0634\u06cc\u0648 \u0645\u0627\u0646\u0647\u0648\u0627", "url": "#type=Manhwa"}, {"text": "\u0622\u0631\u0634\u06cc\u0648 \u0645\u0627\u0646\u06af\u0627", "url": "#type=Manga"}, {"text": "\u0645\u062d\u0628\u0648\u0628\u200c\u062a\u0631\u06cc\u0646\u200c\u0647\u0627", "url": "#sort=chapters"}, {"text": "\u062c\u062f\u06cc\u062f\u062a\u0631\u06cc\u0646\u200c\u0647\u0627", "url": "#sort=newest"}], "title": "\u062f\u0633\u062a\u0647\u200c\u0628\u0646\u062f\u06cc\u200c\u0647\u0627"}], "routes": {"channel": "https://t.me/TwoManga", "login": "/auth", "panel": "/panel", "support": "https://t.me/alizenin"}, "siteMeta": {"description": "\u0645\u0631\u062c\u0639 \u062a\u062e\u0635\u0635\u06cc \u0645\u0627\u0646\u06af\u0627 \u0648 \u0645\u0627\u0646\u0647\u0648\u0627 \u0628\u0627 \u062a\u0631\u062c\u0645\u0647 \u0627\u062e\u062a\u0635\u0627\u0635\u06cc \u0648 \u0628\u062f\u0648\u0646 \u0633\u0627\u0646\u0633\u0648\u0631 \u0628\u0627 \u06a9\u06cc\u0641\u06cc\u062a \u0628\u0627\u0644\u0627", "en": "TwoManga", "fa": "\u062a\u0648\u0645\u0646\u06af\u0627"}, "socials": [{"icon": "send", "url": "https://t.me/saino_tm"}, {"icon": "instagram", "url": "#"}], "ui": {"copyright": "\u00a9 2025 TwoManga Systems", "loginBtn": "\u0648\u0631\u0648\u062f / \u0639\u0636\u0648\u06cc\u062a", "madeBy": "Designed by IM_ABI", "noSub": "\u0628\u062f\u0648\u0646 \u0627\u0634\u062a\u0631\u0627\u06a9", "searchPlaceholder": "\u062c\u0633\u062a\u062c\u0648\u06cc \u0646\u0627\u0645\u060c \u0698\u0627\u0646\u0631...", "subscribeBtn": "\u062e\u0631\u06cc\u062f \u0627\u0634\u062a\u0631\u0627\u06a9", "vipDays": "\u0631\u0648\u0632 \u0628\u0627\u0642\u06cc\u200c\u0645\u0627\u0646\u062f\u0647"}}</script>
+
+  <nav class="fixed top-0 inset-x-0 z-50 glass-nav h-16 md:h-20 transition-all duration-300">
+    <div class="max-w-[1900px] mx-auto px-4 h-full flex items-center justify-between">
       
-      <!-- Brand -->
-      <a href="/" class="flex items-center gap-3 group">
-        <div class="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-accent/20 group-hover:rotate-12 transition-transform">TM</div>
-        <div class="hidden md:flex flex-col">
-          <span class="text-xl font-black text-white tracking-tight">TWOMANG</span>
-          <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">Premium Manga</span>
-        </div>
-      </a>
+      <div class="flex items-center gap-6">
+        <a href="#" class="flex items-center gap-3 group select-none outline-none">
+          <div class="w-10 h-10 bg-gradient-to-br from-violet-600 to-indigo-700 rounded-xl flex items-center justify-center text-white shadow-[0_0_15px_rgba(124,58,237,0.4)] group-hover:scale-105 transition">
+            <span class="font-black text-xl">TM</span>
+          </div>
+          <div class="hidden md:flex flex-col">
+             <span class="text-lg font-black tracking-tight text-white group-hover:text-violet-200 transition">TwoManga</span>
+          </div>
+        </a>
 
-      <!-- Desktop Links -->
-      <div class="hidden lg:flex items-center gap-1 p-1.5 bg-white/5 rounded-xl border border-white/5">
-        <button onclick="App.setType('all')" data-type="all" class="nav-btn px-6 py-2 rounded-lg text-sm font-bold transition-all bg-white/10 text-white shadow-inner">همه</button>
-        <button onclick="App.setType('Manhwa')" data-type="Manhwa" class="nav-btn px-6 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all">مانهوا</button>
-        <button onclick="App.setType('Manga')" data-type="Manga" class="nav-btn px-6 py-2 rounded-lg text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all">مانگا</button>
+        <div class="hidden lg:flex items-center gap-1 p-1 bg-white/5 rounded-xl border border-white/5">
+            <a href="javascript:void(0)" onclick="App.setType('all')" id="nav-all" class="nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-400 hover:text-white hover:bg-white/5">همه</a>
+            <a href="javascript:void(0)" onclick="App.setType('Manhwa')" id="nav-Manhwa" class="nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-400 hover:text-white hover:bg-white/5">مانهوا</a>
+            <a href="javascript:void(0)" onclick="App.setType('Manga')" id="nav-Manga" class="nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-400 hover:text-white hover:bg-white/5">مانگا</a>
+        </div>
       </div>
 
-      <!-- Actions -->
-      <div class="flex items-center gap-3 md:gap-4">
-        <!-- Search & Filter Trigger -->
-        <div class="flex items-center bg-white/5 border border-white/10 rounded-xl p-1 focus-within:border-accent focus-within:bg-black/40 transition-colors">
-            <i data-lucide="search" class="w-4 h-4 text-gray-500 mx-3"></i>
-            <input type="text" id="quickSearch" placeholder="جستجو..." class="bg-transparent border-none outline-none text-sm text-white w-24 md:w-48 placeholder-gray-600 font-bold h-9">
-            <button onclick="App.toggleDrawer()" class="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-accent rounded-lg text-white transition-colors relative" title="فیلتر پیشرفته">
-                <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
-                <span id="active-filters-dot" class="hidden absolute top-1 right-1 w-2 h-2 bg-pink-500 rounded-full"></span>
+      <div class="flex items-center gap-2 md:gap-4">
+        
+        <div class="relative group">
+            <div class="hidden md:flex items-center bg-[#151518] border border-white/10 rounded-xl h-10 px-3 focus-within:border-accent focus-within:ring-1 focus-within:ring-accent/50 transition-all w-64 shadow-inner">
+                <i data-lucide="search" class="w-4 h-4 text-gray-500 ml-2"></i>
+                <input type="text" id="quickSearch" placeholder="جستجوی نام، ژانر..." class="bg-transparent border-none outline-none text-xs font-bold text-white w-full placeholder-gray-600 h-full">
+            </div>
+            <button onclick="App.toggleMobileSearch()" class="md:hidden w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl active:bg-white/10 transition">
+                <i data-lucide="search" class="w-5 h-5 text-white"></i>
             </button>
         </div>
 
-        <!-- Auth Button -->
-        <div id="auth-box">
-             <!-- JS Injected -->
-             <div class="w-28 h-10 bg-white/5 animate-pulse rounded-xl"></div>
-        </div>
+        <button onclick="App.toggleDrawer()" class="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 rounded-xl transition border border-white/5 text-white relative">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+            <span id="active-filter-dot" class="hidden absolute top-2 right-2.5 w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse"></span>
+        </button>
+
+        <a href="/panel" class="hidden md:flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-600 text-black px-5 py-2 rounded-xl text-xs font-black shadow-lg shadow-amber-500/20 hover:-translate-y-0.5 transition">
+            <i data-lucide="crown" class="w-3.5 h-3.5 fill-black"></i>
+            <span>خرید اشتراک</span>
+        </a>
+        
+        <div id="auth-box" class="ml-1"></div>
       </div>
+    </div>
+
+    <div id="mobile-search-bar" class="absolute top-[63px] inset-x-0 glass-card border-x-0 border-t-0 border-b border-white/10 p-3 transform -translate-y-[200%] transition-transform duration-300 z-[-1] flex gap-2">
+         <input type="text" id="mobileSearchInput" placeholder="جستجوی نام، ژانر..." class="w-full bg-white/5 rounded-xl px-4 py-3 text-sm text-white outline-none focus:bg-white/10 font-medium">
+         <button onclick="App.toggleMobileSearch()" class="p-3 bg-white/5 rounded-xl text-white active:scale-95 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
   </nav>
 
-  <!-- Filter Drawer (Right Side) -->
-  <div onclick="App.toggleDrawer()" class="backdrop-blur-layer fixed inset-0 bg-black/60 z-[90] backdrop-blur-sm"></div>
-  <aside id="filter-drawer" class="fixed top-0 right-0 bottom-0 w-80 md:w-96 bg-[#0a0a0c] border-l border-white/10 z-[100] shadow-2xl p-6 overflow-y-auto">
-    <div class="flex justify-between items-center mb-8">
-        <h3 class="text-xl font-black text-white flex items-center gap-2"><i data-lucide="filter" class="text-accent"></i> فیلتر پیشرفته</h3>
-        <button onclick="App.toggleDrawer()" class="p-2 hover:bg-white/10 rounded-lg transition"><i data-lucide="x" class="w-5 h-5 text-gray-400"></i></button>
-    </div>
+  <div id="backdrop" onclick="App.toggleDrawer()" class="fixed inset-0 bg-black/60 z-[60] opacity-0 pointer-events-none transition-all duration-300 backdrop-blur-sm"></div>
+  <aside id="filter-drawer" class="fixed inset-y-0 right-0 w-[85%] max-w-[400px] bg-[#101014] z-[70] border-l border-white/10 flex flex-col h-full shadow-2xl">
+      
+      <div class="flex items-center justify-between p-5 border-b border-white/5 bg-[#101014]">
+          <span class="font-black text-lg text-white flex items-center gap-2">
+            <i data-lucide="filter" class="w-5 h-5 text-accent"></i> فیلتر پیشرفته
+          </span>
+          <button onclick="App.toggleDrawer()" class="w-8 h-8 flex items-center justify-center hover:bg-white/5 rounded-full transition"><i data-lucide="x" class="w-5 h-5 text-gray-400"></i></button>
+      </div>
 
-    <div class="space-y-8">
-        <!-- Sort -->
-        <div>
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-3">مرتب‌سازی بر اساس</label>
-            <select id="sortSelect" onchange="App.setSort(this.value)" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white font-bold outline-none focus:border-accent">
-                <option value="newest">🔥 جدیدترین بروزرسانی</option>
-                <option value="chapters">📚 بیشترین چپتر</option>
-                <option value="alpha">🅰 حروف الفبا</option>
-            </select>
-        </div>
+      <div class="flex-grow overflow-y-auto p-5 space-y-8 custom-scroll">
+          
+          <div class="lg:hidden">
+              <label class="text-xs font-bold text-gray-500 block mb-3">نوع اثر</label>
+              <div class="flex gap-2 p-1 bg-white/5 rounded-xl">
+                  <button onclick="App.setType('all'); App.closeDrawerIfMobile()" class="mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors text-gray-400" data-type="all">همه</button>
+                  <button onclick="App.setType('Manhwa'); App.closeDrawerIfMobile()" class="mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors text-gray-400" data-type="Manhwa">مانهوا</button>
+                  <button onclick="App.setType('Manga'); App.closeDrawerIfMobile()" class="mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors text-gray-400" data-type="Manga">مانگا</button>
+              </div>
+          </div>
 
-        <!-- Status -->
-        <div>
-            <label class="block text-xs font-black text-gray-500 uppercase tracking-widest mb-3">وضعیت انتشار</label>
-            <div id="status-container" class="space-y-2"></div>
-        </div>
+          <div>
+              <label class="text-xs font-bold text-gray-500 block mb-3">مرتب‌سازی بر اساس</label>
+              <div class="grid grid-cols-1 gap-2">
+                 <button onclick="App.updateSort('newest')" class="sort-btn text-right px-4 py-3 rounded-xl bg-white/5 text-sm font-bold text-gray-300 hover:bg-white/10 transition border border-transparent data-[active=true]:border-accent data-[active=true]:text-accent" data-val="newest">
+                    🔥 آخرین آپدیت (پیش‌فرض)
+                 </button>
+                 <button onclick="App.updateSort('chapters')" class="sort-btn text-right px-4 py-3 rounded-xl bg-white/5 text-sm font-bold text-gray-300 hover:bg-white/10 transition border border-transparent data-[active=true]:border-accent data-[active=true]:text-accent" data-val="chapters">
+                    📚 بیشترین چپتر
+                 </button>
+                 <button onclick="App.updateSort('alpha')" class="sort-btn text-right px-4 py-3 rounded-xl bg-white/5 text-sm font-bold text-gray-300 hover:bg-white/10 transition border border-transparent data-[active=true]:border-accent data-[active=true]:text-accent" data-val="alpha">
+                    🔤 حروف الفبا
+                 </button>
+              </div>
+          </div>
 
-        <!-- Genres -->
-        <div>
-            <div class="flex justify-between items-center mb-3">
-                <label class="text-xs font-black text-gray-500 uppercase tracking-widest">ژانرها</label>
-                <button onclick="App.clearGenres()" class="text-[10px] text-accent font-bold hover:underline">پاکسازی</button>
-            </div>
-            <div id="genres-container" class="flex flex-wrap gap-2"></div>
-        </div>
-    </div>
-    
-    <div class="mt-12 pt-6 border-t border-white/10">
-        <button onclick="App.toggleDrawer()" class="w-full py-4 bg-accent hover:bg-accentHover text-white font-black rounded-xl transition shadow-lg shadow-accent/20">
-            مشاهده نتایج (<span id="drawer-count">0</span>)
-        </button>
-    </div>
+          <div>
+              <div class="flex justify-between items-center mb-3">
+                 <label class="text-xs font-bold text-gray-500">ژانرها (انتخاب چندگانه)</label>
+                 <button onclick="App.clearGenres()" class="text-[10px] text-accent hover:text-white transition bg-accent/10 px-2 py-1 rounded">پاکسازی همه</button>
+              </div>
+              <div id="genres-container" class="flex flex-wrap gap-2"></div>
+          </div>
+      </div>
+
+      <div class="p-5 bg-[#101014] border-t border-white/5">
+          <button onclick="App.toggleDrawer()" class="w-full py-4 bg-accent hover:bg-violet-600 text-white font-bold rounded-xl active:scale-95 transition shadow-lg shadow-accent/25 flex justify-center items-center gap-2">
+              مشاهده <span id="drawer-count" class="font-black bg-black/20 px-2 py-0.5 rounded text-sm">0</span> عنوان
+          </button>
+      </div>
   </aside>
 
-  <!-- Main Content -->
-  <main class="flex-grow pt-28 pb-20 px-4 md:px-8 max-w-[1800px] mx-auto w-full">
-    
-    <!-- Hero Slider -->
-    <section id="hero-slider" class="relative h-[400px] md:h-[520px] rounded-[2.5rem] overflow-hidden mb-16 border border-white/5 shadow-2xl bg-[#050508] group">
-        <div id="slider-track" class="w-full h-full relative"></div>
-        <div class="absolute bottom-0 w-full h-40 bg-gradient-to-t from-black via-black/80 to-transparent flex items-end p-8 md:p-12 z-20">
-             <div id="slider-dots" class="flex gap-2"></div>
-        </div>
-    </section>
+  <div id="vip-modal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 modal-enter transition-all duration-300">
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="App.toggleVipModal(false)"></div>
+      <div class="glass-modal w-full max-w-sm rounded-3xl p-6 md:p-8 relative transform transition-transform duration-300 scale-100">
+          <button onclick="App.toggleVipModal(false)" class="absolute top-4 right-4 text-gray-400 hover:text-white transition p-2 bg-white/5 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+          
+          <div class="flex flex-col items-center text-center">
+              <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 flex items-center justify-center mb-6 shadow-[0_0_40px_rgba(245,158,11,0.4)]">
+                  <i data-lucide="crown" class="w-10 h-10 text-black fill-black"></i>
+              </div>
+              
+              <h3 class="text-2xl font-black text-white mb-3">اشتراک ویژه نیاز است</h3>
+              <p class="text-gray-400 text-sm leading-7 mb-8">
+                  برای دسترسی به این محتوای اختصاصی و مطالعه بدون محدودیت، لطفاً اشتراک ویژه تهیه کنید.
+              </p>
+              
+              <div class="flex gap-3 w-full">
+                  <a href="/panel" class="flex-1 bg-white text-black font-black py-3.5 rounded-xl hover:bg-gray-200 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">خرید اشتراک</a>
+                  <button onclick="App.toggleVipModal(false)" class="flex-1 border border-white/10 hover:bg-white/5 text-white font-bold py-3.5 rounded-xl transition">بعداً</button>
+              </div>
+          </div>
+      </div>
+  </div>
 
-    <!-- Grid Header -->
-    <div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
-        <div>
-            <h2 class="text-3xl font-black text-white mb-2">لیست عناوین</h2>
-            <p class="text-sm text-gray-400">نمایش <span id="total-count" class="text-accent font-bold">0</span> عنوان موجود در آرشیو</p>
-        </div>
-        <!-- Pagination Info Top -->
-        <div class="text-xs font-bold text-gray-500 bg-white/5 px-4 py-2 rounded-full border border-white/5">
-            صفحه <span id="current-page-disp">1</span> از <span id="total-pages-disp">1</span>
-        </div>
-    </div>
+  <main class="flex-grow pt-24 md:pt-32 px-4 pb-16 w-full max-w-[1900px] mx-auto space-y-12">
+      
+      <section id="hero-slider" class="relative rounded-2xl md:rounded-3xl overflow-hidden aspect-[16/8] md:aspect-[24/9] lg:aspect-[3/1] bg-gray-900 border border-white/5 shadow-2xl group">
+           <div id="slider-track" class="w-full h-full relative"></div>
+           <div class="absolute bottom-5 right-6 flex gap-1.5 z-20" id="slider-dots"></div>
+           <div class="absolute inset-0 bg-gradient-to-t from-[#020005] via-transparent to-transparent z-10 pointer-events-none"></div>
+      </section>
 
-    <!-- Grid -->
-    <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-4 md:gap-6 min-h-[600px]">
-        <!-- Items Injected Here -->
-    </div>
+      <div id="main-anchor">
+        <div class="flex items-end justify-between mb-8 px-1">
+            <div class="flex items-center gap-3">
+                <div class="w-1.5 h-6 bg-gradient-to-b from-accent to-purple-800 rounded-full shadow-[0_0_10px_var(--accent)]"></div>
+                <h1 class="text-xl md:text-2xl font-black text-white tracking-wide">آرشیو عناوین</h1>
+            </div>
+            <span class="text-[10px] md:text-xs text-gray-500 font-bold bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                صفحه <span id="page-num" class="text-accent">1</span>
+            </span>
+        </div>
 
-    <!-- Pagination Bottom -->
-    <div id="pagination" class="mt-20 flex flex-wrap justify-center items-center gap-2"></div>
+        <div id="grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-x-4 gap-y-8 md:gap-x-6 md:gap-y-10 min-h-[500px]">
+            </div>
+
+        <div id="pagination" class="mt-16 flex justify-center flex-wrap gap-2"></div>
+      </div>
 
   </main>
 
-  <!-- Modern Footer -->
-  <footer class="bg-[#08080a] border-t border-white/5 pt-16 pb-8">
-    <div class="max-w-[1800px] mx-auto px-6 md:px-12">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
-            
-            <!-- Brand Column -->
-            <div class="md:col-span-4 space-y-6">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-black">T</div>
-                    <span class="text-2xl font-black text-white">Twomang</span>
-                </div>
-                <p class="text-sm text-gray-400 leading-7 text-justify pl-4">تومنگ؛ مرجع تخصصی و حرفه‌ای آرشیو مانگا و مانهوا. ما با ارائه بالاترین کیفیت و ترجمه‌های اختصاصی، دنیای سیاه و سفید را برای شما رنگین می‌کنیم.</p>
-                <!-- Socials -->
-                <div class="flex gap-3" id="socials-container"></div>
-            </div>
-
-            <!-- Dynamic Columns -->
-            <div class="md:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8" id="footer-cols"></div>
+  <footer class="bg-[#08080b] border-t border-white/5 pt-16 pb-8 px-6">
+    <div class="max-w-[1900px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-12">
+        
+        <div class="md:col-span-5 lg:col-span-4 space-y-6">
+             <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-black text-xl">TM</div>
+                <span class="text-2xl font-black text-white">تومنگا</span>
+             </div>
+             <p class="text-sm text-gray-400 leading-7 text-justify pl-4">مرجع تخصصی مانگا و مانهوا با ترجمه اختصاصی و بدون سانسور با کیفیت بالا</p>
+             <div class="flex gap-4 pt-2" id="social-links"></div>
         </div>
-
-        <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-            <span>© 2024 Twomang Systems. All rights reserved.</span>
-            <span>Designed &amp; Developed by IM_ABI</span>
+        
+        <div class="md:col-span-7 lg:col-span-8 grid grid-cols-2 md:grid-cols-3 gap-8">
+           <div id="footer-dynamic-links" class="contents"></div>
         </div>
+    </div>
+
+    <div class="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-gray-600 font-bold tracking-widest uppercase">
+        <span>© 2025 TwoManga Systems</span>
+        <span>Designed by IM_ABI</span>
     </div>
   </footer>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-10 left-10 z-[110] bg-white text-black px-6 py-4 rounded-xl shadow-2xl font-bold text-sm transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3">
-     <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-     <span id="toast-msg">پیام سیستم</span>
-  </div>
-
   <script>
     const App = (() => {
-      // Load Data
-      const ITEMS = JSON.parse(document.getElementById('DATA_SOURCE').textContent || '[]');
-      const CONFIG = JSON.parse(document.getElementById('CONFIG_SOURCE').textContent || '{}');
-      const API_ME = `${CONFIG.apiBase || 'https://two-api-iksq.onrender.com'}/auth/me`;
-
-      let state = {
-        filtered: [],
-        user: null,
-        limit: 20, // 20 per page as requested
-        page: 1,
-        params: { type: 'all', q: '', genres: [], status: [], sort: 'newest' }
-      };
-
-      const fuse = new Fuse(ITEMS, { keys: ['titleFa', 'titleEn', 'genres', 'summary'], threshold: 0.3 });
-
-      // --- AUTH & SECURITY ---
-      async function initAuth() {
-        const token = localStorage.getItem('at');
-        const box = document.getElementById('auth-box');
+        // --- DATA LOAD ---
+        const RAW_ITEMS = JSON.parse(document.getElementById('DATA_SOURCE').textContent || '[]');
+        const CONFIG = JSON.parse(document.getElementById('CONFIG_SOURCE').textContent || '{}');
         
-        if (!token) {
-            box.innerHTML = `<a href="/auth" class="bg-accent hover:bg-accentHover text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-accent/20 transition-all flex items-center gap-2">ورود / عضویت <i data-lucide="log-in" class="w-4 h-4"></i></a>`;
-            return;
-        }
-
-        try {
-            const res = await fetch(API_ME, { headers: { 'Authorization': `Bearer ${token}` } });
-            if (res.ok) {
-                state.user = await res.json();
-                const isPremium = state.user.days_left > 0;
-                box.innerHTML = `
-                    <a href="/panel" class="flex items-center gap-3 bg-white/5 border border-white/10 hover:bg-white/10 px-4 py-2 rounded-xl transition-all group">
-                        <div class="text-right">
-                            <div class="text-[11px] font-black text-white group-hover:text-accent transition">${state.user.username}</div>
-                            <div class="text-[9px] ${isPremium ? 'text-green-400' : 'text-red-400'} font-bold">${isPremium ? state.user.days_left + ' روز باقی‌مانده' : 'فاقد اشتراک'}</div>
-                        </div>
-                        <i data-lucide="user-check" class="w-5 h-5 text-gray-400"></i>
-                    </a>
-                `;
-            } else {
-                localStorage.removeItem('at');
-                window.location.reload();
-            }
-        } catch(e) { console.error(e); }
-      }
-
-      function guard(e, slug) {
-          e.preventDefault();
-          if(!state.user || state.user.days_left <= 0) {
-              showToast("⛔ دسترسی غیرمجاز! برای مشاهده باید اشتراک فعال داشته باشید.");
-              // Security: Don't navigate.
-              if(!state.user) setTimeout(() => window.location.href = '/auth', 1500);
-              else setTimeout(() => window.location.href = '/panel', 1500);
-          } else {
-              // Allowed
-              window.location.href = e.currentTarget.href;
-          }
-      }
-
-      // --- LOGIC ---
-      function apply() {
-        let res = [...ITEMS];
-        
-        // 1. Type
-        if(state.params.type !== 'all') res = res.filter(i => i.type === state.params.type);
-        
-        // 2. Search (Quick Search Input)
-        if(state.params.q) res = fuse.search(state.params.q).map(r => r.item);
-
-        // 3. Genres
-        if(state.params.genres.length > 0) res = res.filter(i => state.params.genres.every(g => i.genres.includes(g)));
-
-        // 4. Status
-        if(state.params.status.length > 0) res = res.filter(i => state.params.status.includes(i.status));
-
-        // 5. Sort
-        if(state.params.sort === 'newest') res.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt));
-        else if(state.params.sort === 'chapters') res.sort((a,b) => (parseInt(b.chapter)||0) - (parseInt(a.chapter)||0));
-        else if(state.params.sort === 'alpha') res.sort((a,b) => a.titleFa.localeCompare(b.titleFa));
-
-        state.filtered = res;
-        state.page = 1; // Reset to page 1 on filter change
-        render();
-        
-        // Update Filter Dot
-        const hasFilters = state.params.genres.length > 0 || state.params.status.length > 0;
-        document.getElementById('active-filters-dot').style.display = hasFilters ? 'block' : 'none';
-        document.getElementById('drawer-count').innerText = res.length;
-      }
-
-      // --- RENDER ---
-      function render() {
-        const grid = document.getElementById('grid');
-        const total = state.filtered.length;
-        document.getElementById('total-count').innerText = total;
-
-        // Slice for Pagination
-        const start = (state.page - 1) * state.limit;
-        const end = start + state.limit;
-        const itemsToShow = state.filtered.slice(start, end);
-
-        if(itemsToShow.length === 0) {
-            grid.innerHTML = `<div class="col-span-full py-20 text-center opacity-50"><h3 class="text-xl font-bold">نتیجه‌ای یافت نشد</h3></div>`;
-            document.getElementById('pagination').innerHTML = '';
-            return;
-        }
-
-        grid.innerHTML = itemsToShow.map(item => `
-            <a href="/${item.type.toLowerCase()}/${item.slug}/" onclick="App.guard(event)" class="manga-card relative block rounded-2xl overflow-hidden bg-[#121216] border border-white/5 group">
-                <div class="aspect-[2/3] overflow-hidden relative">
-                    <img src="${item.cover}" loading="lazy" class="cover-img w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80"></div>
-                    
-                    <!-- Locked Overlay if No Sub (Visual Hint) -->
-                    ${(!state.user || state.user.days_left <= 0) ? `<div class="absolute top-2 left-2 bg-black/60 backdrop-blur rounded p-1"><i data-lucide="lock" class="w-3 h-3 text-white"></i></div>` : ''}
-                    
-                    <div class="absolute top-2 right-2 flex flex-col items-end gap-1">
-                        <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${item.type==='Manhwa'?'bg-yellow-500 text-black':'bg-red-500 text-white'}">${item.type}</span>
-                    </div>
-
-                    <div class="absolute bottom-0 inset-x-0 p-4">
-                        <div class="flex items-center gap-2 mb-2">
-                             <span class="text-[10px] font-bold bg-white/20 text-white px-1.5 rounded">CH ${item.chapter}</span>
-                             <span class="text-[9px] text-gray-400 font-medium truncate">${item.status}</span>
-                        </div>
-                        <h3 class="text-sm font-black text-white leading-tight truncate">${item.titleFa}</h3>
-                    </div>
-                </div>
-            </a>
-        `).join('');
-
-        renderPagination(Math.ceil(total / state.limit));
-        lucide.createIcons();
-      }
-
-      function renderPagination(totalPages) {
-        const el = document.getElementById('pagination');
-        const dispInfo = document.getElementById('current-page-disp');
-        const dispTotal = document.getElementById('total-pages-disp');
-        
-        el.innerHTML = '';
-        dispInfo.innerText = state.page;
-        dispTotal.innerText = totalPages;
-
-        if (totalPages <= 1) return;
-
-        const createBtn = (p, text, active=false) => {
-            return `<button onclick="App.setPage(${p})" class="page-btn min-w-[40px] h-10 px-3 rounded-xl border border-white/10 text-sm font-bold transition-all ${active ? 'active' : 'bg-white/5 text-gray-400 hover:bg-white/10'}">${text}</button>`;
-        };
-
-        // Prev
-        if (state.page > 1) el.innerHTML += createBtn(state.page - 1, 'قبلی');
-
-        // Logic for "1 ... 4 5 6 ... 100"
-        let range = [];
-        if (totalPages <= 7) {
-            range = Array.from({length: totalPages}, (_, i) => i + 1);
-        } else {
-            if (state.page <= 4) range = [1, 2, 3, 4, 5, '...', totalPages];
-            else if (state.page >= totalPages - 3) range = [1, '...', totalPages-4, totalPages-3, totalPages-2, totalPages-1, totalPages];
-            else range = [1, '...', state.page-1, state.page, state.page+1, '...', totalPages];
-        }
-
-        range.forEach(p => {
-            if (p === '...') el.innerHTML += `<span class="px-2 text-gray-600">...</span>`;
-            else el.innerHTML += createBtn(p, p, p === state.page);
+        // --- FUSE.js (ENHANCED SEARCH) ---
+        // Added 'summary', 'genres', 'status' to search keys for deep searching
+        const fuse = new Fuse(RAW_ITEMS, { 
+            keys: [
+                {name: 'titleFa', weight: 2},
+                {name: 'titleEn', weight: 1.5},
+                {name: 'summary', weight: 0.8}, // Summary is searchable
+                {name: 'genres', weight: 0.5},
+                {name: 'status', weight: 0.5}
+            ], 
+            threshold: 0.4,
+            ignoreLocation: true,
+            useExtendedSearch: true
         });
 
-        // Next
-        if (state.page < totalPages) el.innerHTML += createBtn(state.page + 1, 'بعدی');
-      }
+        // --- STATE ---
+        let state = {
+            page: 1,
+            limit: 24,
+            filter: {
+                type: 'all', 
+                sort: 'newest',
+                genres: [], // Array of strings
+                q: '' 
+            },
+            filtered: [],
+            user: null
+        };
 
-      // --- INITIALIZATION ---
-      return {
-        init: () => {
-            initAuth();
+        // --- AUTH ---
+        const checkAuth = async () => {
+            const box = document.getElementById('auth-box');
+            const token = localStorage.getItem('tm_token');
+            const showLogin = () => {
+                box.innerHTML = `
+                    <a href="${CONFIG.routes.login}" class="h-9 px-4 md:h-10 bg-white hover:bg-gray-200 text-black font-bold text-xs rounded-xl flex items-center gap-2 transition shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                        <span class="hidden md:inline">${CONFIG.ui.loginBtn}</span>
+                        <span class="md:hidden">ورود</span>
+                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                    </a>`;
+            };
+            if(!token) { showLogin(); return; }
+            state.user = { days: 5 }; // Mock User
+            const hasSub = state.user.days > 0;
+            box.innerHTML = `
+                <a href="${CONFIG.routes.panel}" class="relative w-10 h-10 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 hover:bg-white/10 transition flex items-center justify-center group overflow-hidden">
+                    <i data-lucide="user" class="w-5 h-5 text-gray-300 group-hover:text-white transition"></i>
+                    <span class="absolute bottom-0 inset-x-0 h-0.5 ${hasSub ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-rose-500'}"></span>
+                </a>
+            `;
+        };
+
+        // --- HASH & URL MANAGER (DEEP LINKING FIXED) ---
+        const updateHash = () => {
+            const p = new URLSearchParams();
             
-            // Build Footer
-            const fCols = document.getElementById('footer-cols');
-            CONFIG.footer.columns.forEach(col => {
-                fCols.innerHTML += `
-                    <div>
-                        <h4 class="text-white font-bold mb-4 border-b border-white/10 pb-2 inline-block">${col.title}</h4>
-                        <ul class="space-y-2 text-xs font-medium text-gray-500">
-                            ${col.links.map(l => `<li><a href="${l.url}" class="hover:text-accent transition-colors">▪ ${l.text}</a></li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            });
-            const fSoc = document.getElementById('socials-container');
-            CONFIG.footer.socials.forEach(s => {
-                fSoc.innerHTML += `<a href="${s.url}" class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:bg-accent hover:text-white transition-all"><i data-lucide="${s.icon}" class="w-4 h-4"></i></a>`;
-            });
+            // Only add params if they differ from default to keep URL clean
+            if (state.filter.type !== 'all') p.set('type', state.filter.type);
+            if (state.filter.sort !== 'newest') p.set('sort', state.filter.sort);
+            if (state.filter.q) p.set('q', state.filter.q);
+            if (state.filter.genres.length > 0) p.set('genres', state.filter.genres.join(','));
 
-            // Build Filters in Drawer
-            const gs = [...new Set(ITEMS.flatMap(i => i.genres))].sort();
-            document.getElementById('genres-container').innerHTML = gs.map(g => `
-                <button onclick="App.toggleGenre('${g}', this)" class="px-3 py-1.5 rounded-lg border border-white/10 text-[11px] text-gray-400 font-bold hover:border-accent hover:text-white transition ${state.params.genres.includes(g)?'bg-accent text-white border-accent':''}">${g}</button>
-            `).join('');
-
-            const ss = [...new Set(ITEMS.map(i => i.status))];
-            document.getElementById('status-container').innerHTML = ss.map(s => `
-                <label class="flex items-center gap-3 p-3 bg-white/5 rounded-xl cursor-pointer hover:bg-white/10 transition">
-                    <input type="checkbox" onchange="App.toggleStatus('${s}')" class="w-4 h-4 accent-purple-600 bg-transparent rounded border-gray-600" ${state.params.status.includes(s)?'checked':''}>
-                    <span class="text-xs font-bold text-gray-300">${s}</span>
-                </label>
-            `).join('');
-
-            // Search Event
-            document.getElementById('quickSearch').addEventListener('input', (e) => {
-                state.params.q = e.target.value;
-                apply();
-            });
-
-            // Init Slider
-            Slider.init(ITEMS);
+            const str = p.toString();
+            // Use replaceState to avoid history spam, unless meaningful change
+            window.history.replaceState(null, null, str ? '#' + str : window.location.pathname);
             
-            // Initial Apply
-            apply();
-            lucide.createIcons();
-        },
-        toggleDrawer: () => {
-            document.body.classList.toggle('drawer-open');
-            document.body.classList.toggle('drawer-closed');
-        },
-        setType: (t) => {
-            state.params.type = t;
-            // Update UI buttons
-            document.querySelectorAll('.nav-btn').forEach(b => {
-                if(b.dataset.type === t) {
-                    b.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
-                    b.classList.add('bg-white/10', 'text-white', 'shadow-inner');
-                } else {
-                    b.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-white/5');
-                    b.classList.remove('bg-white/10', 'text-white', 'shadow-inner');
+            // Sync UI with new state
+            syncUI();
+        };
+
+        const parseHash = () => {
+            const hash = window.location.hash.slice(1);
+            const params = new URLSearchParams(hash);
+            
+            // Reset to defaults then apply hash
+            let newState = {
+                type: 'all',
+                sort: 'newest',
+                genres: [],
+                q: ''
+            };
+
+            if (params.has('type')) newState.type = params.get('type');
+            if (params.has('sort')) newState.sort = params.get('sort');
+            if (params.has('q')) newState.q = params.get('q');
+            if (params.has('genres')) newState.genres = params.get('genres').split(',').filter(x => x);
+
+            state.filter = newState;
+            
+            // Update input values
+            document.getElementById('quickSearch').value = state.filter.q;
+            document.getElementById('mobileSearchInput').value = state.filter.q;
+            
+            syncUI();
+            applyFilters(true);
+        };
+
+        const syncUI = () => {
+            // 1. Type Tabs (Desktop)
+            ['all', 'Manhwa', 'Manga'].forEach(t => {
+                const isActive = state.filter.type === t;
+                const el = document.getElementById(`nav-${t}`);
+                if(el) {
+                    if(isActive) el.className = "nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-black shadow-lg shadow-white/10";
+                    else el.className = "nav-filter px-5 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-400 hover:text-white hover:bg-white/5";
+                }
+                
+                // Mobile tabs
+                const mobEl = document.querySelector(`.mob-filter[data-type="${t}"]`);
+                if(mobEl) {
+                     if(isActive) mobEl.className = "mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors bg-accent text-white shadow-lg";
+                     else mobEl.className = "mob-filter flex-1 py-2.5 text-[11px] font-bold text-center rounded-lg transition-colors text-gray-400 bg-white/5";
                 }
             });
-            apply();
-        },
-        toggleGenre: (g, el) => {
-            if(state.params.genres.includes(g)) state.params.genres = state.params.genres.filter(x => x !== g);
-            else state.params.genres.push(g);
-            el.classList.toggle('bg-accent');
-            el.classList.toggle('text-white');
-            el.classList.toggle('border-accent');
-            apply();
-        },
-        toggleStatus: (s) => {
-            if(state.params.status.includes(s)) state.params.status = state.params.status.filter(x => x !== s);
-            else state.params.status.push(s);
-            apply();
-        },
-        setSort: (v) => { state.params.sort = v; apply(); },
-        setPage: (p) => { 
-            state.page = p; 
-            document.getElementById('grid').scrollIntoView({behavior:'smooth', block:'start'});
-            render(); 
-        },
-        clearGenres: () => { state.params.genres = []; apply(); document.querySelectorAll('#genres-container button').forEach(b => b.className='px-3 py-1.5 rounded-lg border border-white/10 text-[11px] text-gray-400 font-bold hover:border-accent hover:text-white transition'); },
-        guard: guard
-      };
-    })();
 
-    const Slider = {
-        init(items) {
-            const track = document.getElementById('slider-track');
-            const slides = items.filter(i => i.cover).slice(0, 5); // Pick top 5
+            // 2. Sort Buttons
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.setAttribute('data-active', btn.dataset.val === state.filter.sort);
+            });
+
+            // 3. Genre Buttons
+            document.querySelectorAll('#genres-container button').forEach(btn => {
+                const g = btn.dataset.genre;
+                const isSelected = state.filter.genres.includes(g);
+                if (isSelected) {
+                    btn.className = "text-[10px] font-bold border border-accent/50 px-3 py-2 rounded-xl text-white bg-accent shadow-[0_0_10px_var(--accent)] transition scale-105";
+                } else {
+                    btn.className = "text-[10px] font-bold border border-white/10 px-3 py-2 rounded-xl text-gray-400 hover:border-white/30 bg-[#15151a] hover:bg-white/5 transition";
+                }
+            });
             
-            track.innerHTML = slides.map((it, i) => `
-                <div class="absolute inset-0 transition-opacity duration-700 ${i===0?'opacity-100 z-10':'opacity-0 z-0'} slide">
-                    <img src="${it.cover}" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/40"></div>
-                    <div class="absolute bottom-12 right-0 p-12 z-20 w-full md:w-2/3">
-                        <span class="inline-block px-3 py-1 mb-4 bg-accent text-white text-[10px] font-black tracking-widest uppercase rounded shadow-lg shadow-accent/40">ویژه</span>
-                        <h2 class="text-4xl md:text-6xl font-black text-white mb-4 drop-shadow-2xl">${it.titleFa}</h2>
-                        <p class="text-gray-300 line-clamp-2 max-w-lg leading-relaxed shadow-black drop-shadow-md">${it.summary}</p>
-                        <a href="/${it.type.toLowerCase()}/${it.slug}/" onclick="App.guard(event)" class="inline-flex mt-6 items-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition">شروع مطالعه <i data-lucide="arrow-left" class="w-4 h-4"></i></a>
+            // 4. Dot Indicator
+            const hasFilter = state.filter.genres.length > 0 || state.filter.type !== 'all' || state.filter.sort !== 'newest' || state.filter.q;
+            document.getElementById('active-filter-dot').style.display = hasFilter ? 'block' : 'none';
+        };
+
+        // --- FILTER ENGINE ---
+        const applyFilters = (resetPage = true) => {
+            let res = [...RAW_ITEMS];
+
+            // Filter Type
+            if (state.filter.type !== 'all') res = res.filter(x => x.type === state.filter.type);
+
+            // Search (Fuse.js)
+            if (state.filter.q) {
+                const searchRes = fuse.search(state.filter.q);
+                res = searchRes.map(r => r.item);
+            }
+
+            // Genres (AND Logic: must have ALL selected genres)
+            if (state.filter.genres.length > 0) {
+                res = res.filter(item => 
+                    state.filter.genres.every(g => (item.genres || []).includes(g))
+                );
+            }
+
+            // Sorting
+            const s = state.filter.sort;
+            res.sort((a, b) => {
+                if (s === 'chapters') return (parseInt(b.chapter)||0) - (parseInt(a.chapter)||0);
+                if (s === 'alpha') return a.titleFa.localeCompare(b.titleFa);
+                // Default: newest
+                return new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0);
+            });
+
+            state.filtered = res;
+            if(resetPage) state.page = 1;
+
+            renderGrid();
+            document.getElementById('drawer-count').innerText = res.length.toLocaleString('fa-IR');
+        };
+
+        const renderGrid = () => {
+            const start = (state.page - 1) * state.limit;
+            const end = start + state.limit;
+            const slice = state.filtered.slice(start, end);
+            const grid = document.getElementById('grid');
+            
+            document.getElementById('page-num').innerText = state.page.toLocaleString('fa-IR');
+
+            if (slice.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-32 text-gray-500 opacity-60">
+                        <i data-lucide="frown" class="w-16 h-16 mb-4 stroke-1"></i>
+                        <span class="text-sm font-bold">هیچ نتیجه‌ای یافت نشد</span>
+                    </div>`;
+                document.getElementById('pagination').innerHTML = '';
+                lucide.createIcons();
+                return;
+            }
+
+            const isSubbed = state.user && state.user.days > 0;
+            
+            grid.innerHTML = slice.map(item => {
+                // LINK STRUCTURE: type/slug
+                const linkHref = `${item.type}/${item.slug}`;
+                
+                return `
+                <a href="${linkHref}" onclick="App.handleCardClick(event, '${item.type}')" class="manga-card block relative rounded-2xl overflow-hidden bg-[#0e0e12] aspect-[5/7.2] group">
+                    <img src="${item.cover}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${item.titleEn}">
+                    
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#020005] via-transparent to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                    <div class="absolute top-2.5 right-2.5 flex flex-col items-end gap-1.5 transform translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-300 delay-75">
+                         <span class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-white text-black shadow-lg">${item.type}</span>
+                         <span class="text-[9px] font-bold px-2 py-0.5 rounded-md bg-rose-500 text-white shadow-lg">${item.status || 'Unknown'}</span>
                     </div>
+
+                    <div class="absolute top-2.5 left-2.5">
+                         ${!isSubbed ? `<div class="w-7 h-7 bg-black/50 backdrop-blur rounded-lg flex items-center justify-center text-white/70 border border-white/10"><i data-lucide="lock" class="w-3.5 h-3.5"></i></div>` : ''}
+                    </div>
+
+                    <div class="absolute bottom-0 w-full p-4 transform transition duration-300 group-hover:-translate-y-1">
+                        <div class="text-[10px] text-accent-glow font-bold mb-1 tracking-wider">CH ${(item.chapter || 0).toLocaleString('fa-IR')}</div>
+                        <h3 class="text-xs md:text-sm font-black text-white leading-5 truncate w-full text-glow" dir="rtl">${item.titleFa}</h3>
+                    </div>
+                </a>
+            `}).join('');
+
+            renderPagination(Math.ceil(state.filtered.length / state.limit));
+            lucide.createIcons();
+        };
+
+        const renderPagination = (totalPages) => {
+            const container = document.getElementById('pagination');
+            container.innerHTML = '';
+            if(totalPages <= 1) return;
+
+            const btn = (p, lbl, act) => 
+                `<button onclick="App.goToPage(${p})" class="min-w-[36px] h-9 px-3 rounded-lg text-xs font-bold border transition-all hover:scale-110 active:scale-95 ${act ? 'bg-accent border-accent text-white shadow-[0_0_15px_rgba(124,58,237,0.4)]' : 'border-white/10 bg-white/5 text-gray-400 hover:bg-white/10'}">${lbl}</button>`;
+
+            if(state.page > 1) container.innerHTML += btn(state.page - 1, '<', false);
+            
+            let pages = [];
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= state.page - 1 && i <= state.page + 1)) {
+                    pages.push(i);
+                }
+            }
+            pages = [...new Set(pages)].sort((a,b) => a-b);
+            
+            pages.forEach((p, i) => {
+                if (i > 0 && p - pages[i - 1] > 1) container.innerHTML += `<span class="px-2 pt-2 text-gray-600 font-bold">...</span>`;
+                container.innerHTML += btn(p, p.toLocaleString('fa-IR'), p === state.page);
+            });
+
+            if(state.page < totalPages) container.innerHTML += btn(state.page + 1, '>', false);
+        };
+
+        const renderSlider = () => {
+            const track = document.getElementById('slider-track');
+            const dotCont = document.getElementById('slider-dots');
+            const featured = RAW_ITEMS.slice(0, 5); 
+            if(!featured.length) { document.getElementById('hero-slider').style.display='none'; return; }
+
+            dotCont.innerHTML = featured.map((_, i) => `<div class="h-1 rounded-full transition-all duration-500 bg-white/30 w-1.5 data-[act=true]:w-8 data-[act=true]:bg-accent" data-id="${i}"></div>`).join('');
+            
+            track.innerHTML = featured.map((item, i) => `
+                <div class="slide-item absolute inset-0 transition-opacity duration-1000 flex ${i===0 ? 'opacity-100 z-10' : 'opacity-0 z-0'}">
+                     <img src="${item.cover}" class="w-full h-full object-cover select-none">
+                     <div class="absolute inset-y-0 right-0 w-full md:w-2/3 bg-gradient-to-l from-[#020005] via-[#020005]/80 to-transparent flex flex-col justify-center items-start p-6 md:p-16 pr-8 md:pr-24 text-right">
+                         <div class="mb-4">
+                            <span class="bg-accent/20 text-accent border border-accent/20 px-3 py-1 rounded text-[10px] font-black uppercase tracking-wider">${item.type}</span>
+                         </div>
+                         <h2 class="text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-4 text-glow">${item.titleFa}</h2>
+                         <p class="hidden md:block text-gray-400 text-xs md:text-sm leading-7 max-w-xl mb-8 line-clamp-3">${item.summary || 'توضیحات خاصی در دسترس نیست...'}</p>
+                         
+                         <a href="${item.type}/${item.slug}" onclick="App.handleCardClick(event, '${item.type}')" class="group flex items-center gap-3 bg-white text-black px-6 py-3 rounded-xl font-black text-sm hover:bg-accent hover:text-white hover:scale-105 active:scale-95 transition shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_var(--accent)]">
+                             <span>شروع مطالعه</span>
+                             <i data-lucide="arrow-left" class="w-4 h-4 transition-transform group-hover:-translate-x-1"></i>
+                         </a>
+                     </div>
                 </div>
             `).join('');
 
-            const dots = document.getElementById('slider-dots');
-            dots.innerHTML = slides.map((_, i) => `<div class="h-1.5 rounded-full transition-all duration-300 ${i===0?'w-8 bg-accent':'w-2 bg-white/40'}"></div>`).join('');
+            let current = 0;
+            const cycle = () => {
+                const slides = document.querySelectorAll('.slide-item');
+                const dots = Array.from(dotCont.children);
+                if(!slides.length) return;
+                slides[current].classList.replace('opacity-100','opacity-0');
+                slides[current].classList.replace('z-10','z-0');
+                dots[current].removeAttribute('data-act');
+                current = (current + 1) % slides.length;
+                slides[current].classList.replace('opacity-0','opacity-100');
+                slides[current].classList.replace('z-0','z-10');
+                dots[current].setAttribute('data-act', 'true');
+            };
+            setInterval(cycle, 6000);
+            dotCont.children[0].setAttribute('data-act', 'true');
+        };
 
-            let cur = 0;
-            setInterval(() => {
-                const sEls = document.querySelectorAll('.slide');
-                const dEls = document.querySelectorAll('#slider-dots div');
-                sEls[cur].classList.replace('opacity-100', 'opacity-0');
-                sEls[cur].classList.replace('z-10', 'z-0');
-                dEls[cur].className = 'h-1.5 w-2 bg-white/40 rounded-full transition-all';
-                
-                cur = (cur + 1) % slides.length;
-                
-                sEls[cur].classList.replace('opacity-0', 'opacity-100');
-                sEls[cur].classList.replace('z-0', 'z-10');
-                dEls[cur].className = 'h-1.5 w-8 bg-accent rounded-full transition-all';
-            }, 5000);
-        }
-    };
+        // --- PUBLIC API ---
+        return {
+            init: () => {
+                checkAuth();
+                renderSlider();
 
-    function showToast(msg) {
-        const t = document.getElementById('toast');
-        document.getElementById('toast-msg').innerText = msg;
-        t.classList.remove('opacity-0', 'translate-y-24');
-        setTimeout(() => t.classList.add('opacity-0', 'translate-y-24'), 3000);
-    }
+                // Dynamic Footer
+                const fDiv = document.getElementById('footer-dynamic-links');
+                if (CONFIG.footerLinks) {
+                    CONFIG.footerLinks.forEach(grp => {
+                        fDiv.innerHTML += `
+                            <div class="flex flex-col gap-4">
+                                <h4 class="font-bold text-white text-sm border-b border-white/5 pb-2 inline-block self-start">${grp.title}</h4>
+                                <div class="flex flex-col gap-2">
+                                    ${grp.items.map(lnk => `<a href="${lnk.url}" class="text-gray-400 hover:text-accent text-xs transition">${lnk.text}</a>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                const socialDiv = document.getElementById('social-links');
+                if (CONFIG.socials) {
+                    CONFIG.socials.forEach(s => {
+                        socialDiv.innerHTML += `<a href="${s.url}" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-accent hover:text-white transition transform hover:scale-110"><i data-lucide="${s.icon}" class="w-4 h-4"></i></a>`
+                    });
+                }
+
+                // Render Genres
+                const allG = [...new Set(RAW_ITEMS.flatMap(x=>x.genres))].sort();
+                document.getElementById('genres-container').innerHTML = allG.map(g => 
+                    `<button onclick="App.toggleGenre('${g}')" data-genre="${g}" class="text-[10px] font-bold border border-white/10 px-3 py-2 rounded-xl text-gray-400 hover:border-white/30 bg-[#15151a] hover:bg-white/5 transition">${g}</button>`
+                ).join('');
+
+                // Initial Parse
+                parseHash();
+
+                // Events
+                window.addEventListener('hashchange', parseHash); // Listen to manual URL changes
+                
+                const onSearch = (e) => {
+                    state.filter.q = e.target.value;
+                    updateHash(); // Updates URL and triggers filter
+                };
+                // Debounce search input
+                let timeout = null;
+                const debouncedSearch = (e) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => onSearch(e), 300);
+                };
+
+                document.getElementById('quickSearch').addEventListener('input', debouncedSearch);
+                document.getElementById('mobileSearchInput').addEventListener('input', debouncedSearch);
+            },
+            
+            // Actions
+            toggleDrawer: () => {
+                const body = document.body;
+                const isClosed = body.classList.contains('drawer-closed');
+                body.classList.toggle('drawer-closed');
+                body.classList.toggle('drawer-open');
+                const back = document.getElementById('backdrop');
+                if(isClosed) back.classList.remove('opacity-0', 'pointer-events-none');
+                else back.classList.add('opacity-0', 'pointer-events-none');
+            },
+            closeDrawerIfMobile: () => {
+                if(window.innerWidth < 1024) App.toggleDrawer();
+            },
+            toggleMobileSearch: () => {
+                const bar = document.getElementById('mobile-search-bar');
+                const isHidden = bar.style.transform === 'translateY(-200%)' || bar.style.transform === '';
+                bar.style.transform = isHidden ? 'translateY(0%)' : 'translateY(-200%)';
+                if(isHidden) setTimeout(()=>document.getElementById('mobileSearchInput').focus(), 150);
+            },
+            
+            // Filter Logic Exports
+            setType: (t) => {
+                state.filter.type = t;
+                updateHash();
+            },
+            updateSort: (val) => {
+                state.filter.sort = val;
+                updateHash();
+            },
+            toggleGenre: (g) => {
+                const idx = state.filter.genres.indexOf(g);
+                if (idx > -1) state.filter.genres.splice(idx, 1);
+                else state.filter.genres.push(g);
+                updateHash();
+            },
+            clearGenres: () => {
+                state.filter.genres = [];
+                updateHash();
+            },
+            goToPage: (p) => {
+                state.page = p;
+                renderGrid();
+                document.getElementById('main-anchor').scrollIntoView({behavior: 'smooth', block: 'start'});
+            },
+            
+            // VIP Modal Logic
+            handleCardClick: (e, type) => {
+                if (state.user && state.user.days > 0) {
+                     // Allow navigation
+                     return;
+                }
+                // Prevent navigation and show modal
+                e.preventDefault();
+                App.toggleVipModal(true);
+            },
+            toggleVipModal: (show) => {
+                const modal = document.getElementById('vip-modal');
+                if(show) {
+                    modal.classList.remove('opacity-0', 'pointer-events-none', 'scale-95');
+                    modal.classList.add('opacity-100', 'pointer-events-auto', 'scale-100');
+                } else {
+                    modal.classList.add('opacity-0', 'pointer-events-none', 'scale-95');
+                    modal.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
+                }
+            }
+        };
+    })();
 
     document.addEventListener('DOMContentLoaded', App.init);
   </script>

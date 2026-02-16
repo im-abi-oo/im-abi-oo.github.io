@@ -13,9 +13,6 @@
     
     <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Toastify for Notifications -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
     <script>
         tailwind.config = {
@@ -23,11 +20,12 @@
                 extend: {
                     fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
                     colors: {
-                        glass: "rgba(255, 255, 255, 0.05)",
-                        glassBorder: "rgba(255, 255, 255, 0.1)",
-                        primary: "#8b5cf6", // Violet-500
-                        secondary: "#ec4899", // Pink-500
-                        dark: "#0a0a0a"
+                        brand: {
+                            bg: '#050505',
+                            card: '#121215',
+                            primary: '#8b5cf6', // Violet
+                            secondary: '#d946ef', // Fuchsia
+                        }
                     },
                     animation: {
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -42,21 +40,35 @@
             background-color: #050505;
             background-image: 
                 radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 40%);
-            color: #e5e7eb;
+                radial-gradient(circle at 90% 80%, rgba(217, 70, 239, 0.15) 0%, transparent 40%);
+            color: #e4e4e7;
             min-height: 100vh;
         }
-        
-        .glass-panel {
-            background: rgba(20, 20, 20, 0.6);
+
+        .glass {
+            background: rgba(18, 18, 21, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+            outline: none;
         }
 
         .step-active {
-            @apply border-primary text-primary bg-primary/10;
+            background: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+            color: white;
+            border: none;
         }
         
         .plan-card.selected {
@@ -67,29 +79,42 @@
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #111; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        ::-webkit-scrollbar-track { background: #0f0f13; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+        
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: #8b5cf6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="flex flex-col">
+<body class="flex flex-col antialiased selection:bg-brand-primary selection:text-white pb-10">
 
-    <!-- Navbar -->
-    <nav class="sticky top-0 z-50 w-full border-b border-white/5 bg-black/50 backdrop-blur-lg">
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 w-full backdrop-blur-md border-b border-white/5 bg-black/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
                 <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center font-bold text-white">
-                        TM
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                        <span class="font-black text-white text-lg">T</span>
                     </div>
-                    <span class="font-bold text-xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">TwoManga</span>
+                    <span class="text-xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">TwoManga</span>
                 </div>
+
+                <!-- User Actions -->
                 <div class="flex items-center gap-4">
-                    <div class="hidden md:flex flex-col items-end">
-                        <span id="nav-username" class="text-sm font-medium text-white">کاربر</span>
+                    <div class="hidden md:flex flex-col items-end mr-4">
+                        <span id="nav-username" class="text-sm font-bold text-white">کاربر</span>
                         <span class="text-[10px] text-gray-400">خوش آمدید</span>
                     </div>
-                    <button onclick="logout()" class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all border border-red-500/20 flex items-center gap-2">
+                    <button onclick="logout()" class="p-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 transition-all flex items-center gap-2">
                         <i data-lucide="log-out" class="w-4 h-4"></i>
                         <span class="text-xs font-bold hidden sm:inline">خروج</span>
                     </button>
@@ -98,187 +123,231 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
-        
-        <!-- User Stats Header -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- DASHBOARD HEADER (Stats) -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Profile Card -->
-            <div class="glass-panel rounded-3xl p-6 flex items-center gap-5 md:col-span-2 relative overflow-hidden group">
-                <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-gray-800 to-black border border-white/10 flex items-center justify-center shrink-0">
-                    <i data-lucide="user" class="w-10 h-10 text-gray-400"></i>
-                </div>
-                <div>
-                    <h2 id="display-username" class="text-2xl font-black text-white mb-1">...</h2>
-                    <div class="flex items-center gap-2 text-sm text-gray-400">
-                        <i data-lucide="shield" class="w-4 h-4 text-primary"></i>
-                        <span id="user-role">کاربر عادی</span>
+            <div class="glass rounded-3xl p-6 relative overflow-hidden group">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-violet-600/20 rounded-full blur-3xl group-hover:bg-violet-600/30 transition-all"></div>
+                <div class="relative z-10 flex items-center gap-5">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 border border-white/10 flex items-center justify-center">
+                        <i data-lucide="user" class="w-8 h-8 text-violet-400"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">حساب کاربری</h2>
+                        <h3 id="dash-username" class="text-2xl font-black text-white">...</h3>
+                        <span id="dash-role" class="text-[10px] px-2 py-0.5 rounded bg-white/10 text-gray-300 mt-1 inline-block">User</span>
                     </div>
                 </div>
             </div>
 
             <!-- Subscription Status -->
-            <div class="glass-panel rounded-3xl p-6 flex flex-col justify-center relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/20 blur-3xl rounded-full"></div>
-                <span class="text-gray-400 text-xs font-bold uppercase tracking-wider mb-2">اعتبار باقی‌مانده</span>
-                <div class="flex items-baseline gap-2">
-                    <span id="days-left" class="text-4xl font-black text-white">0</span>
-                    <span class="text-sm text-gray-400">روز</span>
+            <div class="glass rounded-3xl p-6 md:col-span-2 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-violet-600/10 to-transparent"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6 h-full">
+                    <div class="flex items-center gap-4 w-full">
+                        <div class="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <i data-lucide="zap" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="text-gray-400 text-xs font-bold uppercase mb-1">وضعیت اشتراک</div>
+                            <div class="flex items-baseline gap-2">
+                                <span id="days-left" class="text-3xl font-black text-white">0</span>
+                                <span class="text-sm text-gray-400">روز باقی‌مانده</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-auto bg-black/40 rounded-xl px-4 py-3 border border-white/5 text-center min-w-[200px]">
+                        <div class="text-[10px] text-gray-500 mb-1">تاریخ انقضا</div>
+                        <div id="expiry-date" class="text-sm font-mono text-violet-300">---</div>
+                    </div>
                 </div>
-                <div id="expiry-date" class="text-xs text-primary mt-2 font-medium">--/--/--</div>
             </div>
-        </div>
+        </section>
 
+        <!-- MAIN ACTION AREA -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- LEFT: Gift Code (Simple) -->
+            <!-- LEFT COLUMN: Gift Code & Info -->
             <aside class="lg:col-span-4 space-y-6">
-                <div class="glass-panel rounded-3xl p-6">
-                    <div class="flex items-center gap-3 mb-4 text-secondary">
-                        <i data-lucide="gift" class="w-6 h-6"></i>
+                <!-- Gift Code Card -->
+                <div class="glass rounded-3xl p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2 rounded-lg bg-pink-500/10 text-pink-400">
+                            <i data-lucide="gift" class="w-5 h-5"></i>
+                        </div>
                         <h3 class="font-bold text-lg text-white">کد هدیه</h3>
                     </div>
-                    <p class="text-xs text-gray-400 mb-6 leading-relaxed">
-                        اگر کد هدیه (Gift Code) دارید، آن را اینجا وارد کنید تا روزهای اشتراک به حساب شما اضافه شود.
+                    <p class="text-xs text-gray-400 mb-4 leading-relaxed">
+                        کد هدیه را وارد کنید تا روزهای اشتراک به حساب شما اضافه شود.
                     </p>
                     <div class="space-y-3">
-                        <input id="gift-input" type="text" placeholder="GIFT-XXXX-XXXX" 
-                            class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-center text-white placeholder-gray-600 focus:outline-none focus:border-secondary transition-colors font-mono uppercase">
-                        <button onclick="submitGift()" id="btn-gift" 
-                            class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold shadow-lg shadow-pink-900/20 transition-all flex justify-center items-center gap-2">
-                            <span>بررسی و اعمال</span>
-                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <input type="text" id="gift-code" placeholder="CODE-XXXX-XXXX" class="glass-input w-full px-4 py-3 rounded-xl text-center font-mono text-sm uppercase tracking-widest placeholder-gray-600">
+                        <button onclick="submitGift()" id="btn-gift" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold text-sm shadow-lg shadow-pink-900/20 transition-all flex justify-center items-center gap-2">
+                            <span>اعمال کد</span>
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
-                
-                <!-- Info Box -->
-                <div class="glass-panel rounded-3xl p-6 border-r-4 border-r-primary">
-                    <h4 class="font-bold text-white mb-2">پشتیبانی</h4>
-                    <p class="text-xs text-gray-400">
-                        در صورت بروز مشکل در پرداخت یا فعال‌سازی، لطفاً به پشتیبانی تلگرام پیام دهید.
-                    </p>
+
+                <!-- Help Box -->
+                <div class="glass rounded-3xl p-6 border-violet-500/20 bg-violet-900/5">
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="info" class="w-5 h-5 text-violet-400 mt-1"></i>
+                        <div class="text-sm text-gray-400 leading-6">
+                            <strong class="text-violet-300 block mb-1">نیاز به راهنمایی دارید؟</strong>
+                            در صورت بروز مشکل در پرداخت یا فعال‌سازی، لطفاً رسید تراکنش را برای پشتیبانی تلگرام ارسال کنید.
+                        </div>
+                    </div>
                 </div>
             </aside>
 
-            <!-- RIGHT: Purchase Wizard -->
+            <!-- RIGHT COLUMN: Purchase Wizard -->
             <section class="lg:col-span-8">
-                <div class="glass-panel rounded-3xl p-1 min-h-[500px] flex flex-col">
+                <div class="glass rounded-3xl overflow-hidden min-h-[600px] flex flex-col">
                     
-                    <!-- Wizard Tabs -->
-                    <div class="flex border-b border-white/5 p-4 gap-2 overflow-x-auto">
-                        <button class="step-indicator flex-1 py-2 px-4 rounded-lg text-xs font-bold text-gray-500 border border-transparent transition-all flex items-center justify-center gap-2 step-active" data-step="1">
-                            <span class="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center">1</span>
-                            انتخاب پلن
-                        </button>
-                        <div class="w-4 border-t border-dashed border-gray-700 self-center"></div>
-                        <button class="step-indicator flex-1 py-2 px-4 rounded-lg text-xs font-bold text-gray-500 border border-transparent transition-all flex items-center justify-center gap-2" data-step="2">
-                            <span class="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center">2</span>
-                            پرداخت
-                        </button>
-                        <div class="w-4 border-t border-dashed border-gray-700 self-center"></div>
-                        <button class="step-indicator flex-1 py-2 px-4 rounded-lg text-xs font-bold text-gray-500 border border-transparent transition-all flex items-center justify-center gap-2" data-step="3">
-                            <span class="w-5 h-5 rounded-full bg-current/20 flex items-center justify-center">3</span>
-                            ثبت نهایی
-                        </button>
+                    <!-- Wizard Header -->
+                    <div class="bg-black/20 border-b border-white/5 p-6 flex items-center justify-between">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <i data-lucide="credit-card" class="w-5 h-5 text-brand-primary"></i>
+                            خرید اشتراک ویژه
+                        </h2>
+                        <!-- Steps Indicator -->
+                        <div class="flex items-center gap-2">
+                            <div id="ind-1" class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all step-active">1</div>
+                            <div class="w-8 h-0.5 bg-white/10"></div>
+                            <div id="ind-2" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-gray-500 transition-all">2</div>
+                            <div class="w-8 h-0.5 bg-white/10"></div>
+                            <div id="ind-3" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-gray-500 transition-all">3</div>
+                        </div>
                     </div>
 
-                    <!-- Wizard Content -->
-                    <div class="flex-1 p-6 md:p-8 relative">
+                    <!-- Wizard Body -->
+                    <div class="p-6 md:p-8 flex-1 relative">
                         
                         <!-- STEP 1: Select Plan -->
-                        <div id="step-1" class="step-content space-y-6 animate-fade-in">
+                        <div id="step-1" class="space-y-6 fade-in">
                             <div class="text-center mb-8">
-                                <h2 class="text-xl font-bold text-white">مدت زمان اشتراک را انتخاب کنید</h2>
-                                <p class="text-xs text-gray-400 mt-2">دسترسی نامحدود به تمام مانگاها</p>
+                                <h3 class="text-2xl font-bold text-white mb-2">مدت زمان اشتراک را انتخاب کنید</h3>
+                                <p class="text-gray-500 text-sm">دسترسی نامحدود به تمامی محتوا</p>
                             </div>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <!-- Plan 1 -->
-                                <div onclick="selectPlan(30, 2)" class="plan-card cursor-pointer glass-panel p-6 rounded-2xl border-2 border-transparent hover:border-white/10 transition-all text-center group">
-                                    <div class="text-primary font-black text-4xl mb-2 group-hover:scale-110 transition-transform">1</div>
-                                    <div class="text-sm text-gray-300 font-bold mb-4">ماهـه</div>
-                                    <div class="text-2xl font-bold text-white">2 <span class="text-xs text-gray-500">USDT</span></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <!-- Plans will be generated by JS or hardcoded here -->
+                                <div onclick="selectPlan(30, this)" class="plan-card cursor-pointer glass rounded-2xl p-5 border border-white/5 hover:border-violet-500/50 transition-all group">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="px-3 py-1 rounded-lg bg-white/5 text-xs text-gray-400 font-bold group-hover:bg-violet-500/20 group-hover:text-violet-300 transition-colors">برنزی</span>
+                                        <i data-lucide="circle" class="w-5 h-5 text-gray-600 check-icon"></i>
+                                    </div>
+                                    <div class="text-3xl font-black text-white mb-1">1 <span class="text-base font-normal text-gray-500">ماه</span></div>
+                                    <div class="text-sm text-gray-400">30 روز دسترسی کامل</div>
                                 </div>
-                                <!-- Plan 2 -->
-                                <div onclick="selectPlan(90, 5)" class="plan-card cursor-pointer glass-panel p-6 rounded-2xl border-2 border-transparent hover:border-white/10 transition-all text-center group relative">
-                                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-lg shadow-primary/40">پیشنهادی</div>
-                                    <div class="text-primary font-black text-4xl mb-2 group-hover:scale-110 transition-transform">3</div>
-                                    <div class="text-sm text-gray-300 font-bold mb-4">ماهـه</div>
-                                    <div class="text-2xl font-bold text-white">5 <span class="text-xs text-gray-500">USDT</span></div>
+
+                                <div onclick="selectPlan(90, this)" class="plan-card cursor-pointer glass rounded-2xl p-5 border border-white/5 hover:border-violet-500/50 transition-all group">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="px-3 py-1 rounded-lg bg-white/5 text-xs text-gray-400 font-bold group-hover:bg-violet-500/20 group-hover:text-violet-300 transition-colors">نقره‌ای</span>
+                                        <i data-lucide="circle" class="w-5 h-5 text-gray-600 check-icon"></i>
+                                    </div>
+                                    <div class="text-3xl font-black text-white mb-1">3 <span class="text-base font-normal text-gray-500">ماه</span></div>
+                                    <div class="text-sm text-gray-400">90 روز دسترسی کامل</div>
                                 </div>
-                                <!-- Plan 3 -->
-                                <div onclick="selectPlan(180, 9)" class="plan-card cursor-pointer glass-panel p-6 rounded-2xl border-2 border-transparent hover:border-white/10 transition-all text-center group">
-                                    <div class="text-primary font-black text-4xl mb-2 group-hover:scale-110 transition-transform">6</div>
-                                    <div class="text-sm text-gray-300 font-bold mb-4">ماهـه</div>
-                                    <div class="text-2xl font-bold text-white">9 <span class="text-xs text-gray-500">USDT</span></div>
+
+                                <div onclick="selectPlan(180, this)" class="plan-card cursor-pointer glass rounded-2xl p-5 border border-white/5 hover:border-violet-500/50 transition-all group">
+                                    <div class="flex justify-between items-start mb-4">
+                                        <span class="px-3 py-1 rounded-lg bg-white/5 text-xs text-gray-400 font-bold group-hover:bg-violet-500/20 group-hover:text-violet-300 transition-colors">طلایی</span>
+                                        <i data-lucide="circle" class="w-5 h-5 text-gray-600 check-icon"></i>
+                                    </div>
+                                    <div class="text-3xl font-black text-white mb-1">6 <span class="text-base font-normal text-gray-500">ماه</span></div>
+                                    <div class="text-sm text-gray-400">180 روز دسترسی کامل</div>
                                 </div>
+
+                                <div onclick="selectPlan(365, this)" class="plan-card cursor-pointer glass rounded-2xl p-5 border border-white/5 hover:border-violet-500/50 transition-all group relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-violet-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                    <div class="relative z-10">
+                                        <div class="flex justify-between items-start mb-4">
+                                            <span class="px-3 py-1 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 text-xs text-white font-bold">پیشنهاد ویژه</span>
+                                            <i data-lucide="circle" class="w-5 h-5 text-gray-600 check-icon"></i>
+                                        </div>
+                                        <div class="text-3xl font-black text-white mb-1">1 <span class="text-base font-normal text-gray-500">سال</span></div>
+                                        <div class="text-sm text-gray-400">365 روز دسترسی کامل</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 flex justify-end">
+                                <button onclick="nextStep(2)" class="px-8 py-3 rounded-xl bg-white text-black font-bold hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">ادامه</button>
                             </div>
                         </div>
 
-                        <!-- STEP 2: Payment Info -->
-                        <div id="step-2" class="step-content hidden space-y-6 animate-fade-in">
-                            <div class="text-center">
-                                <h2 class="text-xl font-bold text-white mb-1">اطلاعات پرداخت</h2>
-                                <p class="text-xs text-gray-400">لطفاً مبلغ دقیق را به آدرس زیر واریز کنید</p>
+                        <!-- STEP 2: Select Currency -->
+                        <div id="step-2" class="space-y-6 hidden fade-in">
+                            <div class="text-center mb-8">
+                                <h3 class="text-2xl font-bold text-white mb-2">روش پرداخت را انتخاب کنید</h3>
+                                <p class="text-gray-500 text-sm">پشتیبانی از 4 شبکه اصلی</p>
                             </div>
 
-                            <div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex flex-col items-center gap-4 max-w-md mx-auto">
-                                <div class="flex justify-between w-full text-sm">
-                                    <span class="text-gray-400">شبکه:</span>
-                                    <span class="font-bold text-white">TRC20 (Tron)</span>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div onclick="selectCrypto('TRX', this)" class="crypto-card cursor-pointer glass rounded-2xl p-4 flex flex-col items-center gap-3 border border-white/5 hover:border-red-500 transition-all hover:bg-red-500/5">
+                                    <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center font-bold text-red-500">TRX</div>
+                                    <span class="font-bold text-sm">Tron</span>
                                 </div>
-                                <div class="flex justify-between w-full text-sm">
-                                    <span class="text-gray-400">ارز:</span>
-                                    <span class="font-bold text-white">USDT (Tether)</span>
+                                <div onclick="selectCrypto('USDT', this)" class="crypto-card cursor-pointer glass rounded-2xl p-4 flex flex-col items-center gap-3 border border-white/5 hover:border-emerald-500 transition-all hover:bg-emerald-500/5">
+                                    <div class="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center font-bold text-emerald-500">USDT</div>
+                                    <span class="font-bold text-sm">Tether</span>
                                 </div>
-                                <div class="flex justify-between w-full text-sm pt-2 border-t border-white/5">
-                                    <span class="text-gray-400">مبلغ قابل پرداخت:</span>
-                                    <span id="pay-amount" class="font-bold text-2xl text-primary">--</span>
+                                <div onclick="selectCrypto('TON', this)" class="crypto-card cursor-pointer glass rounded-2xl p-4 flex flex-col items-center gap-3 border border-white/5 hover:border-blue-500 transition-all hover:bg-blue-500/5">
+                                    <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center font-bold text-blue-500">TON</div>
+                                    <span class="font-bold text-sm">Toncoin</span>
+                                </div>
+                                <div onclick="selectCrypto('SOL', this)" class="crypto-card cursor-pointer glass rounded-2xl p-4 flex flex-col items-center gap-3 border border-white/5 hover:border-violet-500 transition-all hover:bg-violet-500/5">
+                                    <div class="w-12 h-12 rounded-full bg-violet-500/20 flex items-center justify-center font-bold text-violet-500">SOL</div>
+                                    <span class="font-bold text-sm">Solana</span>
                                 </div>
                             </div>
 
-                            <div class="glass-panel p-4 rounded-xl flex items-center justify-between gap-4 max-w-md mx-auto">
-                                <div class="truncate text-xs text-gray-400 font-mono" id="wallet-address">
-                                    TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t 
-                                    <!-- آدرس تتر ترون تستی/واقعی خود را اینجا بگذارید -->
-                                </div>
-                                <button onclick="copyWallet()" class="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition">
-                                    <i data-lucide="copy" class="w-4 h-4"></i>
-                                </button>
-                            </div>
-
-                            <div class="flex justify-between pt-8">
-                                <button onclick="setStep(1)" class="px-6 py-2 rounded-xl text-gray-400 hover:text-white transition text-sm font-bold">بازگشت</button>
-                                <button onclick="setStep(3)" class="px-8 py-2 rounded-xl bg-primary hover:bg-primary/80 text-white font-bold transition shadow-lg shadow-primary/20">
-                                    پرداخت کردم، مرحله بعد
-                                </button>
+                            <div class="pt-6 flex justify-between items-center">
+                                <button onclick="prevStep(1)" class="text-gray-400 hover:text-white text-sm font-bold px-4 py-2">بازگشت</button>
+                                <button onclick="nextStep(3)" class="px-8 py-3 rounded-xl bg-white text-black font-bold hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">مرحله بعد</button>
                             </div>
                         </div>
 
-                        <!-- STEP 3: Submit Hash -->
-                        <div id="step-3" class="step-content hidden space-y-6 animate-fade-in">
-                            <div class="text-center mb-6">
-                                <h2 class="text-xl font-bold text-white mb-2">ثبت تراکنش</h2>
-                                <p class="text-xs text-gray-400">کد رهگیری (TXID / Hash) تراکنش را وارد کنید تا سیستم آن را بررسی کند.</p>
+                        <!-- STEP 3: Payment & Confirm -->
+                        <div id="step-3" class="space-y-6 hidden fade-in">
+                            <div class="p-4 rounded-xl bg-violet-500/10 border border-violet-500/20 mb-6">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-gray-400 text-xs">پلن انتخابی</span>
+                                    <span id="summary-plan" class="font-bold text-white">...</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-400 text-xs">شبکه پرداخت</span>
+                                    <span id="summary-crypto" class="font-bold text-brand-primary">...</span>
+                                </div>
                             </div>
 
-                            <div class="max-w-md mx-auto space-y-4">
-                                <div>
-                                    <label class="block text-xs text-gray-500 mb-2 mr-1">کد رهگیری (TX Hash)</label>
-                                    <input id="tx-hash" type="text" placeholder="e.g. 8a34b...92c" 
-                                        class="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-700 focus:outline-none focus:border-primary transition-colors font-mono text-sm">
+                            <div class="space-y-4">
+                                <label class="block text-xs font-bold text-gray-400 uppercase">آدرس کیف پول مقصد</label>
+                                <div class="relative group">
+                                    <input type="text" id="wallet-address" readonly class="glass-input w-full pl-4 pr-12 py-3.5 rounded-xl font-mono text-xs md:text-sm text-gray-300 truncate cursor-pointer" value="Loading...">
+                                    <button onclick="copyWallet()" class="absolute right-2 top-2 p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition">
+                                        <i data-lucide="copy" class="w-4 h-4"></i>
+                                    </button>
                                 </div>
+                                <p class="text-[11px] text-gray-500">لطفاً مبلغ مورد نظر را دقیقاً به این آدرس واریز کنید.</p>
+                            </div>
 
-                                <button onclick="submitTransaction()" id="btn-submit-tx" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold shadow-lg shadow-emerald-900/20 transition-all flex justify-center items-center gap-2">
-                                    <span>ثبت نهایی و فعال‌سازی</span>
+                            <div class="space-y-4 pt-4 border-t border-white/5">
+                                <label class="block text-xs font-bold text-gray-400 uppercase">کد رهگیری تراکنش (TX Hash)</label>
+                                <input type="text" id="tx-hash" placeholder="مثال: 7f8c9a..." class="glass-input w-full px-4 py-3.5 rounded-xl font-mono text-sm placeholder-gray-600">
+                            </div>
+
+                            <div class="pt-6 flex justify-between items-center">
+                                <button onclick="prevStep(2)" class="text-gray-400 hover:text-white text-sm font-bold px-4 py-2">بازگشت</button>
+                                <button onclick="submitPayment()" id="btn-submit" class="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold shadow-lg shadow-emerald-900/20 transition flex items-center gap-2">
+                                    <span>ثبت و فعالسازی</span>
                                     <i data-lucide="check-circle" class="w-4 h-4"></i>
                                 </button>
-                            </div>
-                            
-                            <div class="text-center pt-4">
-                                <button onclick="setStep(2)" class="text-xs text-gray-500 hover:text-white transition underline">اصلاح اطلاعات</button>
                             </div>
                         </div>
 
@@ -286,216 +355,258 @@
                 </div>
             </section>
         </div>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="border-t border-white/5 bg-black/50 backdrop-blur mt-8 py-6 text-center">
-        <p class="text-xs text-gray-600">&copy; 2026 TwoManga. All rights reserved.</p>
+    <!-- FOOTER -->
+    <footer class="mt-12 text-center border-t border-white/5 pt-8">
+        <p class="text-xs text-gray-600">&copy; 2026 Two Manga. All rights reserved.</p>
     </footer>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center hidden">
-        <div class="flex flex-col items-center gap-4">
-            <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            <span class="text-white text-sm font-bold animate-pulse">لطفاً صبر کنید...</span>
-        </div>
-    </div>
-
-    <!-- Toastify JS -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- CONFIG ---
-        const API_URL = "https://two-api-iksq.onrender.com";
-        let selectedDays = 0;
-        let selectedPrice = 0;
+        // CONFIG
+        const API_URL = 'https://two-api-iksq.onrender.com';
+        
+        // WALLET ADDRESSES (باید آدرس‌های واقعی خود را اینجا قرار دهید)
+        const WALLETS = {
+            'TRX': 'TRonWalletAddressHere_PleaseChangeMe',
+            'USDT': 'TRC20WalletAddressHere_PleaseChangeMe',
+            'TON': 'TonWalletAddressHere_PleaseChangeMe',
+            'SOL': 'SolanaWalletAddressHere_PleaseChangeMe'
+        };
 
-        // --- ICONS ---
+        // STATE
+        let selectedPlanDays = 0;
+        let selectedCryptoNetwork = '';
+
+        // INIT
         lucide.createIcons();
+        checkAuth();
 
-        // --- AUTH & INIT ---
-        document.addEventListener('DOMContentLoaded', async () => {
+        // --- AUTHENTICATION ---
+        async function checkAuth() {
             const at = localStorage.getItem('at');
             if (!at) {
-                window.location.href = '/login.html'; // Adjust to your actual login path
+                window.location.href = '/auth/login.html'; // Adjust path if needed
                 return;
             }
-            await fetchProfile();
-        });
 
-        async function fetchProfile() {
             try {
-                const res = await fetchWithAuth(`${API_URL}/auth/me`);
+                const res = await fetch(`${API_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${at}` }
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    logout();
+                    return;
+                }
+
                 if (res.ok) {
                     const data = await res.json();
-                    document.getElementById('nav-username').innerText = data.username;
-                    document.getElementById('display-username').innerText = data.username;
-                    document.getElementById('user-role').innerText = data.role === 'admin' ? 'مدیر سیستم' : 'کاربر ویژه';
-                    document.getElementById('days-left').innerText = data.days_left;
-                    
-                    if (data.expiry_iso) {
-                        const date = new Date(data.expiry_iso);
-                        document.getElementById('expiry-date').innerText = `انقضا: ${date.toLocaleDateString('fa-IR')}`;
-                    } else {
-                        document.getElementById('expiry-date').innerText = 'اشتراک فعال ندارید';
-                    }
-                } else {
-                    throw new Error("Auth failed");
+                    updateDashboard(data);
                 }
-            } catch (e) {
-                console.error(e);
-                logout();
+            } catch (err) {
+                console.error("Auth Check Failed", err);
+            }
+        }
+
+        function updateDashboard(user) {
+            document.getElementById('nav-username').innerText = user.username;
+            document.getElementById('dash-username').innerText = user.username;
+            document.getElementById('dash-role').innerText = user.role.toUpperCase();
+            
+            // Animate number
+            document.getElementById('days-left').innerText = user.days_left;
+            
+            // Format Expiry Date
+            if (user.expiry_iso) {
+                const date = new Date(user.expiry_iso);
+                document.getElementById('expiry-date').innerText = new Intl.DateTimeFormat('fa-IR').format(date);
+                
+                if(user.days_left > 0) {
+                    document.getElementById('days-left').classList.add('text-emerald-400');
+                } else {
+                    document.getElementById('days-left').classList.add('text-red-400');
+                }
+            } else {
+                document.getElementById('expiry-date').innerText = "غیرفعال";
             }
         }
 
         function logout() {
             localStorage.removeItem('at');
             localStorage.removeItem('rt');
-            window.location.href = '/login.html';
-        }
-
-        // --- API HELPER ---
-        async function fetchWithAuth(url, options = {}) {
-            const at = localStorage.getItem('at');
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${at}`,
-                ...options.headers
-            };
-
-            const response = await fetch(url, { ...options, headers });
-
-            // Simple 401 handling (Logout)
-            // In a real app, you would use 'rt' to refresh token here
-            if (response.status === 401) {
-                showToast("نشست شما منقضی شده است. لطفاً دوباره وارد شوید.", "error");
-                setTimeout(logout, 2000);
-            }
-
-            return response;
+            window.location.href = '/login.html'; // Adjust path
         }
 
         // --- WIZARD LOGIC ---
-        function selectPlan(days, price) {
-            selectedDays = days;
-            selectedPrice = price;
+        function nextStep(step) {
+            if (step === 2 && selectedPlanDays === 0) {
+                alert('لطفاً ابتدا یک پلن را انتخاب کنید.');
+                return;
+            }
+            if (step === 3 && selectedCryptoNetwork === '') {
+                alert('لطفاً روش پرداخت را انتخاب کنید.');
+                return;
+            }
+
+            // Hide all steps
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-3').classList.add('hidden');
             
-            // Visual feedback
-            document.querySelectorAll('.plan-card').forEach(el => el.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
+            // Show target step
+            const target = document.getElementById(`step-${step}`);
+            target.classList.remove('hidden');
+            target.classList.add('animate-fade-in-up');
 
-            document.getElementById('pay-amount').innerText = `${price} USDT`;
-            setStep(2);
-        }
+            // Update Indicators
+            updateIndicators(step);
 
-        function setStep(step) {
-            // Hide all
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.step-indicator').forEach(el => {
-                el.classList.remove('step-active');
-                el.classList.remove('border-primary', 'text-primary', 'bg-primary/10');
-            });
-
-            // Show active
-            document.getElementById(`step-${step}`).classList.remove('hidden');
-            const activeBtn = document.querySelector(`.step-indicator[data-step="${step}"]`);
-            activeBtn.classList.add('step-active');
-        }
-
-        function copyWallet() {
-            const address = document.getElementById('wallet-address').innerText.trim();
-            navigator.clipboard.writeText(address);
-            showToast("آدرس کیف پول کپی شد!", "success");
-        }
-
-        // --- SUBMIT ACTIONS ---
-
-        async function submitGift() {
-            const code = document.getElementById('gift-input').value.trim();
-            if (!code) return showToast("لطفاً کد هدیه را وارد کنید", "error");
-
-            showLoading(true);
-            try {
-                const res = await fetchWithAuth(`${API_URL}/payment/submit`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        days: 0, // Not used for coupon
-                        coupon_code: code
-                    })
-                });
-                
-                const result = await res.json();
-                
-                if (res.ok) {
-                    showToast("کد هدیه با موفقیت اعمال شد!", "success");
-                    document.getElementById('gift-input').value = "";
-                    fetchProfile(); // Refresh stats
-                } else {
-                    showToast(result.msg || "کد نامعتبر است", "error");
-                }
-            } catch (error) {
-                showToast("خطا در ارتباط با سرور", "error");
-            } finally {
-                showLoading(false);
+            // Setup Step 3 if needed
+            if (step === 3) {
+                document.getElementById('summary-plan').innerText = `${selectedPlanDays} روزه`;
+                document.getElementById('summary-crypto').innerText = selectedCryptoNetwork;
+                document.getElementById('wallet-address').value = WALLETS[selectedCryptoNetwork] || "آدرس یافت نشد";
             }
         }
 
-        async function submitTransaction() {
-            const txHash = document.getElementById('tx-hash').value.trim();
-            if (!txHash) return showToast("لطفاً کد رهگیری (TX Hash) را وارد کنید", "error");
-            if (txHash.length < 10) return showToast("کد رهگیری معتبر نیست", "error");
+        function prevStep(step) {
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('step-3').classList.add('hidden');
+            document.getElementById(`step-${step}`).classList.remove('hidden');
+            updateIndicators(step);
+        }
 
-            showLoading(true);
+        function updateIndicators(current) {
+            for(let i=1; i<=3; i++) {
+                const el = document.getElementById(`ind-${i}`);
+                if (i <= current) {
+                    el.classList.add('step-active', 'text-white');
+                    el.classList.remove('bg-white/5', 'text-gray-500');
+                } else {
+                    el.classList.remove('step-active', 'text-white');
+                    el.classList.add('bg-white/5', 'text-gray-500');
+                }
+            }
+        }
+
+        function selectPlan(days, el) {
+            selectedPlanDays = days;
+            // Remove active class from all
+            document.querySelectorAll('.plan-card').forEach(c => {
+                c.classList.remove('selected');
+                c.querySelector('.check-icon').setAttribute('data-lucide', 'circle');
+                c.querySelector('.check-icon').classList.remove('text-brand-primary');
+            });
+            // Add to clicked
+            el.classList.add('selected');
+            const icon = el.querySelector('.check-icon');
+            // Re-render icon (Lucide needs refresh, simpler to just swap class/svg in raw html but here we assume lucide.createIcons runs)
+            // Simplified visual cue:
+            el.style.borderColor = '#8b5cf6';
+        }
+
+        function selectCrypto(symbol, el) {
+            selectedCryptoNetwork = symbol;
+            document.querySelectorAll('.crypto-card').forEach(c => {
+                c.classList.remove('border-brand-primary', 'bg-white/5');
+                c.style.borderColor = 'rgba(255,255,255,0.05)';
+            });
+            el.style.borderColor = '#8b5cf6';
+            el.classList.add('bg-white/5');
+        }
+
+        function copyWallet() {
+            const copyText = document.getElementById("wallet-address");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            alert("آدرس کپی شد!");
+        }
+
+        // --- API ACTIONS ---
+
+        async function submitPayment() {
+            const txHash = document.getElementById('tx-hash').value.trim();
+            if (!txHash || txHash.length < 5) {
+                alert("لطفاً کد رهگیری معتبر وارد کنید");
+                return;
+            }
+
+            const btn = document.getElementById('btn-submit');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="loader"></div>';
+            btn.disabled = true;
+
             try {
-                const res = await fetchWithAuth(`${API_URL}/payment/submit`, {
+                const res = await fetch(`${API_URL}/payment/submit`, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('at')}`
+                    },
                     body: JSON.stringify({
-                        days: selectedDays,
+                        days: selectedPlanDays,
                         tx_hash: txHash
                     })
                 });
 
                 const result = await res.json();
 
-                if (res.status === 201 || res.status === 200) {
-                    showToast("تراکنش ثبت شد و در انتظار تایید است.", "success");
-                    // Reset Wizard
-                    setTimeout(() => {
-                        setStep(1);
-                        document.getElementById('tx-hash').value = "";
-                    }, 2000);
+                if (res.ok || res.status === 201 || res.status === 202) {
+                    alert("درخواست شما با موفقیت ثبت شد و در انتظار تایید است.");
+                    location.reload();
                 } else {
-                    showToast(result.msg || "خطا در ثبت تراکنش", "error");
+                    alert(result.msg || "خطا در ثبت درخواست");
                 }
             } catch (error) {
-                showToast("خطا در برقراری ارتباط", "error");
+                alert("خطا در برقراری ارتباط با سرور");
+                console.error(error);
             } finally {
-                showLoading(false);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 
-        // --- UI UTILS ---
-        function showLoading(show) {
-            const el = document.getElementById('loading-overlay');
-            if (show) el.classList.remove('hidden');
-            else el.classList.add('hidden');
+        async function submitGift() {
+            const code = document.getElementById('gift-code').value.trim();
+            if (!code) return alert("کد را وارد کنید");
+
+            const btn = document.getElementById('btn-gift');
+            const originalText = btn.innerHTML;
+            btn.innerText = '...';
+            btn.disabled = true;
+
+            try {
+                // According to backend logic: send coupon_code and days=0 (dummy)
+                const res = await fetch(`${API_URL}/payment/submit`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('at')}`
+                    },
+                    body: JSON.stringify({
+                        days: 1, // Dummy value to pass validation schema if needed, logic prioritizes coupon
+                        coupon_code: code
+                    })
+                });
+                
+                const result = await res.json();
+                if (res.ok) {
+                    alert(result.msg || "کد هدیه اعمال شد!");
+                    location.reload();
+                } else {
+                    alert(result.msg || "کد نامعتبر است");
+                }
+            } catch (e) {
+                alert("خطا");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
-        function showToast(text, type) {
-            Toastify({
-                text: text,
-                duration: 3000,
-                gravity: "top", 
-                position: "center", 
-                style: {
-                    background: type === "success" ? "linear-gradient(to right, #059669, #10b981)" : "linear-gradient(to right, #dc2626, #ef4444)",
-                    borderRadius: "12px",
-                    fontSize: "14px",
-                    fontFamily: "Vazirmatn"
-                }
-            }).showToast();
-        }
     </script>
 </body>
 </html>

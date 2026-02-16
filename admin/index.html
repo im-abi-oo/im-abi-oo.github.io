@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل مدیریت | TwoManga</title>
+    <title>پنل مدیریت | TwoManga Ultimate</title>
     
-    <!-- فونت وزیرمتن -->
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Configs & Icons -->
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -17,569 +16,539 @@
                 extend: {
                     fontFamily: { sans: ['Vazirmatn', 'sans-serif'] },
                     colors: {
-                        dark: {
-                            bg: '#09090b',       // Zinc-950
-                            card: '#18181b',     // Zinc-900
-                            border: '#27272a',   // Zinc-800
-                        },
-                        brand: {
-                            primary: '#8b5cf6',  // Violet-500
-                            secondary: '#ec4899',// Pink-500
-                        }
+                        dark: { bg: '#09090b', card: '#18181b', border: '#27272a' },
+                        brand: { primary: '#8b5cf6', secondary: '#ec4899', accent: '#06b6d4' }
                     },
-                    animation: {
-                        'fade-in': 'fadeIn 0.3s ease-out',
-                        'slide-up': 'slideUp 0.4s ease-out',
-                    },
-                    keyframes: {
-                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-                        slideUp: { '0%': { transform: 'translateY(10px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
-                    }
+                    animation: { 'fade-in': 'fadeIn 0.3s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(5px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
                 }
             }
         }
     </script>
-
     <style>
-        /* استایل‌های پایه برای تم شیشه‌ای و اسکرول بار */
-        body { background-color: #000; background-image: radial-gradient(at top right, #1e1b4b 0%, #000000 60%); color: #e4e4e7; overflow-x: hidden; }
-        .glass { background: rgba(24, 24, 27, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .glass-hover:hover { background: rgba(39, 39, 42, 0.8); border-color: rgba(139, 92, 246, 0.3); }
-        .input-box { background: rgba(0,0,0,0.3); border: 1px solid #27272a; transition: all 0.3s; }
-        .input-box:focus { outline: none; border-color: #8b5cf6; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2); }
+        body { background: #000 radial-gradient(at top right, #1e1b4b 0%, #000000 60%); color: #e4e4e7; overflow-x: hidden; font-family: 'Vazirmatn'; }
+        .glass { background: rgba(24, 24, 27, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); }
+        .input-glass { background: rgba(0,0,0,0.4); border: 1px solid #3f3f46; color: white; transition: all 0.3s; }
+        .input-glass:focus { border-color: #8b5cf6; outline: none; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2); }
         
-        /* اسکرول بار زیبا */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #09090b; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #71717a; }
         
-        .loader {
-            width: 20px; height: 20px; border: 2px solid #fff;
-            border-bottom-color: transparent; border-radius: 50%;
-            display: inline-block; animation: rotation 1s linear infinite;
-        }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .hidden-force { display: none !important; }
+        .loader { border: 2px solid #fff; border-bottom-color: transparent; border-radius: 50%; width: 18px; height: 18px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .badge { @apply px-2 py-0.5 rounded text-xs font-bold border; }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col md:flex-row">
+<body class="antialiased min-h-screen flex flex-col md:flex-row text-sm">
 
-    <!-- Auth Modal (Login) -->
-    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity hidden-force">
-        <div class="glass p-8 rounded-2xl w-full max-w-md relative overflow-hidden animation-slide-up">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-primary/20 blur-[50px] rounded-full -mr-10 -mt-10"></div>
-            
-            <h2 class="text-2xl font-bold mb-6 text-white text-center">ورود به پنل مدیریت</h2>
-            
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">نام کاربری</label>
-                    <input type="text" id="username" class="w-full input-box p-3 rounded-lg text-white" placeholder="admin" required>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">رمز عبور</label>
-                    <input type="password" id="password" class="w-full input-box p-3 rounded-lg text-white" required>
-                </div>
-                <button type="submit" class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-3 rounded-lg shadow-lg shadow-purple-900/20 hover:scale-[1.02] transition-transform">
-                    <span id="loginText">ورود امن</span>
-                    <span id="loginLoader" class="loader ml-2 hidden-force"></span>
+    <!-- Auth Overlay -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md hidden transition-opacity">
+        <div class="glass p-8 rounded-2xl w-full max-w-sm relative overflow-hidden border border-brand-primary/20">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-brand-primary/20 blur-[60px] rounded-full -mr-10 -mt-10"></div>
+            <h2 class="text-2xl font-bold mb-6 text-white text-center">ورود مدیریت</h2>
+            <form id="loginForm" class="space-y-4 relative z-10">
+                <input type="text" id="username" class="w-full input-glass p-3 rounded-lg text-center" placeholder="نام کاربری" required>
+                <input type="password" id="password" class="w-full input-glass p-3 rounded-lg text-center" placeholder="رمز عبور" required>
+                <button type="submit" class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white font-bold py-3 rounded-lg hover:brightness-110 transition-all shadow-lg shadow-purple-900/40">
+                    <span id="loginText">ورود به پنل</span>
+                    <span id="loginLoader" class="loader hidden"></span>
                 </button>
             </form>
-            <p id="loginError" class="text-red-500 text-sm mt-4 text-center hidden"></p>
+            <p id="loginError" class="text-red-500 text-xs mt-4 text-center hidden"></p>
         </div>
     </div>
 
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="w-full md:w-72 md:h-screen glass flex flex-col justify-between sticky top-0 z-40 transition-transform -translate-x-full md:translate-x-0 hidden md:flex border-l-0 border-r border-dark-border">
-        <div class="p-6">
-            <div class="flex items-center gap-3 mb-10">
-                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center text-white font-bold text-xl">TM</div>
-                <div>
-                    <h1 class="font-bold text-lg text-white">TwoManga</h1>
-                    <span class="text-xs text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-full">Admin Pro</span>
-                </div>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 glass flex-shrink-0 flex flex-col justify-between hidden md:flex border-l-0 border-y-0 border-r h-screen sticky top-0 z-40">
+        <div class="p-5">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-primary to-blue-500 flex items-center justify-center shadow-lg shadow-brand-primary/20 font-black text-white text-lg">TM</div>
+                <div><h1 class="font-bold text-gray-100">TwoManga</h1><div class="text-[10px] text-gray-500">v2.1 Admin</div></div>
             </div>
 
-            <nav class="space-y-2">
-                <button onclick="router('dashboard')" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all group active-nav">
-                    <svg class="w-5 h-5 text-gray-400 group-hover:text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <nav class="space-y-1">
+                <button onclick="router('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/5 text-gray-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
                     داشبورد
                 </button>
-                <button onclick="router('transactions')" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all group">
-                    <svg class="w-5 h-5 text-gray-400 group-hover:text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <button onclick="router('transactions')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/5 text-gray-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     تراکنش‌ها
                 </button>
-                <button onclick="router('coupons')" class="nav-item w-full flex items-center gap-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-white/5 transition-all group">
-                    <svg class="w-5 h-5 text-gray-400 group-hover:text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
-                    کوپن تخفیف
+                <button onclick="router('coupons')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/5 text-gray-400 hover:text-white">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                    مدیریت کوپن
                 </button>
             </nav>
         </div>
-        <div class="p-6 border-t border-white/5">
-            <button onclick="App.logout()" class="w-full flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                خروج از سیستم
+
+        <div class="p-5 border-t border-white/5">
+            <button onclick="App.logout()" class="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 py-2 rounded-lg transition-colors text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                خروج امن
             </button>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 h-screen overflow-y-auto">
-        <!-- Header (Mobile Toggle & Title) -->
-        <header class="flex justify-between items-center mb-8">
-            <div class="md:hidden p-2 rounded bg-dark-card border border-dark-border" onclick="toggleSidebar()">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+    <!-- Main -->
+    <main class="flex-1 p-4 md:p-6 lg:p-8 h-screen overflow-y-auto relative">
+        <!-- Header -->
+        <header class="flex justify-between items-end mb-6 border-b border-white/5 pb-4">
+            <div>
+                <h2 id="pageTitle" class="text-3xl font-bold text-white tracking-tight">پنل مدیریت</h2>
+                <div class="flex items-center gap-2 text-gray-500 mt-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span id="serverUrl" class="text-xs font-mono opacity-60">Connecting...</span>
+                </div>
             </div>
-            <div class="hidden md:block">
-                <h2 id="pageTitle" class="text-2xl font-bold text-white animation-slide-up">نمای کلی</h2>
-                <p id="pageSubtitle" class="text-sm text-gray-500">خوش آمدید، <span id="currentUserDisplay" class="text-brand-primary">Admin</span></p>
-            </div>
-            <!-- Backend Status Pulse -->
-            <div class="flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
-                <span class="relative flex h-3 w-3">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </span>
-                <span class="text-xs text-green-400 font-mono">Backend Active</span>
+            <!-- Profile Info -->
+            <div class="hidden md:flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                <div class="w-8 h-8 rounded-full bg-brand-secondary/20 flex items-center justify-center text-brand-secondary font-bold">A</div>
+                <div class="text-xs">
+                    <p class="text-white font-medium" id="adminUserDisplay">Admin</p>
+                    <p class="text-gray-500">Super User</p>
+                </div>
             </div>
         </header>
 
-        <!-- Pages Container -->
-        <div id="contentArea" class="space-y-6">
-            
-            <!-- Dashboard View -->
-            <div id="view-dashboard" class="view-section animation-fade-in">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="glass p-6 rounded-2xl relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 w-20 h-20 bg-blue-500/10 rounded-full blur-2xl -mr-5 -mt-5 transition-all group-hover:bg-blue-500/20"></div>
-                        <h3 class="text-gray-400 text-sm">وضعیت سرور</h3>
-                        <p id="dashService" class="text-2xl font-bold text-white mt-2">Loading...</p>
-                        <p class="text-xs text-blue-400 mt-1">Backend Connection</p>
+        <!-- Views Container -->
+        <div id="content" class="space-y-6">
+
+            <!-- DASHBOARD VIEW -->
+            <div id="view-dashboard" class="animate-fade-in space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Status Cards -->
+                    <div class="glass p-5 rounded-2xl border-t-4 border-t-blue-500">
+                        <div class="text-gray-400 mb-1">Service Status</div>
+                        <div id="st-service" class="text-2xl font-bold text-white">...</div>
+                        <div class="text-xs text-blue-400 mt-2 font-mono">Backend Running</div>
                     </div>
-                    <div class="glass p-6 rounded-2xl relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl -mr-5 -mt-5 transition-all group-hover:bg-purple-500/20"></div>
-                        <h3 class="text-gray-400 text-sm">حالت سیستم</h3>
-                        <p id="dashMode" class="text-2xl font-bold text-white mt-2">Loading...</p>
-                        <p class="text-xs text-purple-400 mt-1">Queue & Threading</p>
+                    <div class="glass p-5 rounded-2xl border-t-4 border-t-purple-500">
+                        <div class="text-gray-400 mb-1">Queue Workers</div>
+                        <div id="st-workers" class="text-2xl font-bold text-white">...</div>
+                        <div class="text-xs text-purple-400 mt-2 font-mono">Active Threads</div>
                     </div>
-                    <div class="glass p-6 rounded-2xl relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 w-20 h-20 bg-pink-500/10 rounded-full blur-2xl -mr-5 -mt-5 transition-all group-hover:bg-pink-500/20"></div>
-                        <h3 class="text-gray-400 text-sm">تعداد ورکرها</h3>
-                        <p id="dashWorkers" class="text-2xl font-bold text-white mt-2">-</p>
-                        <p class="text-xs text-pink-400 mt-1">Active Consumers</p>
+                    <div class="glass p-5 rounded-2xl border-t-4 border-t-pink-500">
+                        <div class="text-gray-400 mb-1">Operation Mode</div>
+                        <div id="st-mode" class="text-2xl font-bold text-white">...</div>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-lg text-white">ابزارهای سریع</h3>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="App.fetchRates(this)" class="flex items-center gap-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-4 py-2 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                            بروزرسانی نرخ‌ها (Fetch Rates)
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Transactions View -->
-            <div id="view-transactions" class="view-section hidden animation-fade-in">
-                <div class="glass rounded-2xl overflow-hidden">
-                    <div class="p-6 border-b border-dark-border flex justify-between items-center">
-                        <h3 class="font-bold text-white">تراکنش‌های اخیر</h3>
-                        <button onclick="App.loadTransactions()" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 transition-colors">
-                            بروزرسانی لیست
+            <!-- TRANSACTIONS VIEW -->
+            <div id="view-transactions" class="hidden animate-fade-in space-y-4">
+                <!-- Toolbar -->
+                <div class="glass p-4 rounded-xl flex flex-wrap gap-4 justify-between items-center sticky top-0 z-10 backdrop-blur-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <select id="txFilterStatus" onchange="App.applyTxFilters()" class="input-glass pl-8 pr-10 py-2 rounded-lg appearance-none cursor-pointer">
+                                <option value="all">همه وضعیت‌ها</option>
+                                <option value="pending" selected>در انتظار (Pending)</option>
+                                <option value="approved">تایید شده (Approved)</option>
+                                <option value="rejected">رد شده (Rejected)</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-400">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </div>
+                        </div>
+                        <button onclick="App.loadTransactions()" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300" title="Refresh">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                         </button>
                     </div>
+                    <div class="relative w-full md:w-64">
+                        <input type="text" id="txSearch" onkeyup="App.applyTxFilters()" placeholder="جستجو (User / Hash)..." class="w-full input-glass pl-3 pr-9 py-2 rounded-lg">
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="glass rounded-xl overflow-hidden min-h-[400px]">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left rtl:text-right">
-                            <thead class="text-xs text-gray-400 uppercase bg-black/20">
+                        <table class="w-full text-left">
+                            <thead class="bg-white/5 text-gray-400 uppercase text-xs">
                                 <tr>
-                                    <th class="px-6 py-4">شناسه کاربر</th>
-                                    <th class="px-6 py-4">TX Hash</th>
-                                    <th class="px-6 py-4">روز</th>
-                                    <th class="px-6 py-4">وضعیت</th>
-                                    <th class="px-6 py-4 text-center">عملیات</th>
+                                    <th class="px-6 py-3">User / Date</th>
+                                    <th class="px-6 py-3">Transaction Info</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3 text-center">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="txTableBody" class="divide-y divide-dark-border text-gray-300">
-                                <!-- Data injected via JS -->
+                            <tbody id="txTableBody" class="divide-y divide-white/5 text-sm text-gray-300">
+                                <!-- JS Injection -->
                             </tbody>
                         </table>
                     </div>
+                    <div id="txEmpty" class="hidden flex flex-col items-center justify-center py-20 text-gray-500">
+                        <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                        <p>هیچ تراکنشی یافت نشد</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Coupons View -->
-            <div id="view-coupons" class="view-section hidden animation-fade-in">
-                <div class="max-w-2xl mx-auto glass p-8 rounded-2xl">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white">ایجاد کد تخفیف</h3>
-                    </div>
-
-                    <form onsubmit="App.createCoupon(event)" class="space-y-5">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs text-gray-500 mb-1">کد کوپن</label>
-                                <input type="text" name="code" class="w-full input-box p-3 rounded-lg text-white" placeholder="SUMMER2026" required>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-500 mb-1">تعداد روز جایزه</label>
-                                <input type="number" name="bonus_days" class="w-full input-box p-3 rounded-lg text-white" placeholder="30" required>
-                            </div>
+            <!-- COUPONS VIEW -->
+            <div id="view-coupons" class="hidden animate-fade-in space-y-6">
+                <!-- Create Form -->
+                <div class="glass p-6 rounded-2xl border-r-4 border-r-green-500">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        ساخت کوپن جدید
+                    </h3>
+                    <form onsubmit="App.createCoupon(event)" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        <div>
+                            <label class="block text-gray-500 text-xs mb-1">کد تخفیف *</label>
+                            <input type="text" name="code" placeholder="nOorUzz1403" class="w-full input-glass p-2.5 rounded-lg" required>
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-500 mb-1">حداکثر استفاده (اختیاری)</label>
-                            <input type="number" name="max_uses" class="w-full input-box p-3 rounded-lg text-white" placeholder="∞">
+                            <label class="block text-gray-500 text-xs mb-1">تعداد روز *</label>
+                            <input type="number" name="bonus_days" placeholder="30" class="w-full input-glass p-2.5 rounded-lg" required>
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-500 mb-1">تاریخ انقضا (اختیاری)</label>
-                            <input type="datetime-local" name="expires_at" class="w-full input-box p-3 rounded-lg text-gray-400">
+                            <label class="block text-gray-500 text-xs mb-1">تاریخ انقضا (میلادی)</label>
+                            <input type="datetime-local" name="expires_at" class="w-full input-glass p-2.5 rounded-lg text-gray-400 text-xs">
                         </div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-brand-primary to-brand-secondary p-3 rounded-xl font-bold text-white hover:opacity-90 transition-opacity flex justify-center items-center">
-                            ساخت کوپن
-                            <span class="loader ml-2 hidden-force" id="couponLoader"></span>
-                        </button>
+                        <div>
+                            <label class="block text-gray-500 text-xs mb-1">محدودیت تعداد</label>
+                            <input type="number" name="max_uses" placeholder="100" class="w-full input-glass p-2.5 rounded-lg">
+                        </div>
+                        <div class="md:col-span-4 flex justify-end mt-2">
+                            <button type="submit" class="bg-green-600/20 hover:bg-green-600/30 text-green-400 border border-green-500/30 px-6 py-2.5 rounded-lg transition-colors font-bold text-sm">
+                                ایجاد کوپن
+                            </button>
+                        </div>
                     </form>
+                </div>
+
+                <!-- Search Coupons -->
+                 <div class="relative">
+                    <input type="text" id="couponSearch" onkeyup="App.filterCoupons()" placeholder="جستجو در کوپن‌ها..." class="w-full input-glass pl-3 pr-10 py-3 rounded-xl bg-black/40">
+                    <div class="absolute inset-y-0 left-3 flex items-center text-gray-500 pointer-events-none">
+                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Active Coupons List -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="couponsList">
+                    <!-- Coupons injected here -->
                 </div>
             </div>
 
         </div>
     </main>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 left-5 glass p-4 rounded-xl flex items-center gap-3 transition-all transform translate-y-20 opacity-0 z-50">
-        <div id="toastIcon" class="w-2 h-2 rounded-full bg-white"></div>
-        <p id="toastMessage" class="text-sm font-medium"></p>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 left-5 transform translate-y-20 opacity-0 transition-all z-[60]">
+        <div class="glass px-4 py-3 rounded-lg border-l-4 shadow-2xl flex items-center gap-3">
+            <span id="toastIcon"></span>
+            <p id="toastMsg" class="font-medium text-sm text-white"></p>
+        </div>
     </div>
 
-    <!-- Logic Core -->
+    <!-- JS Logic -->
     <script>
-        // --- تنظیمات سیستم ---
-        const CONFIG = {
-            API_URL: 'https://two-api-iksq.onrender.com',
-            KEYS: { AT: 'at', RT: 'rt' } // کلیدهای درخواستی کاربر
-        };
-
-        // --- مدیریت State و DOM ---
-        const $ = (selector) => document.querySelector(selector);
+        const API_BASE = "https://two-api-iksq.onrender.com";
         
-        class TwoMangaAdmin {
+        class AdminPanel {
             constructor() {
-                this.currentUser = null;
-                this.init();
+                this.tokens = { at: localStorage.getItem('at'), rt: localStorage.getItem('rt') };
+                this.data = { transactions: [], coupons: [] }; // Local Cache
+                
+                document.getElementById('serverUrl').innerText = API_BASE.replace('https://','');
+                
+                if(!this.tokens.at) this.toggleAuth(true);
+                else this.init();
+            }
+
+            async request(url, method = 'GET', body = null) {
+                const headers = { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.tokens.at}` 
+                };
+                try {
+                    const res = await fetch(`${API_BASE}${url}`, { method, headers, body: body ? JSON.stringify(body) : null });
+                    if(res.status === 401) { this.logout(); throw new Error("Unauthorized"); }
+                    if(res.status === 403) { this.toast("عدم دسترسی کافی", 'err'); return null; }
+                    return res;
+                } catch(e) {
+                    if(e.message !== "Unauthorized") this.toast("خطای شبکه", 'err');
+                    throw e;
+                }
             }
 
             init() {
-                // چک کردن وضعیت لاگین هنگام شروع
-                const at = localStorage.getItem(CONFIG.KEYS.AT);
-                if (!at) {
-                    this.showAuth();
-                } else {
-                    this.fetchDashboard(); // Ping & Init data
-                    $('#currentUserDisplay').textContent = "Admin";
-                }
-
-                // ایونت لیسنر لاگین
-                $('#loginForm').addEventListener('submit', (e) => this.handleLogin(e));
-            }
-
-            // --- Authentication Core ---
-            async request(endpoint, method = 'GET', body = null) {
-                let token = localStorage.getItem(CONFIG.KEYS.AT);
-                const headers = { 
-                    'Content-Type': 'application/json',
-                    ...(token && { 'Authorization': `Bearer ${token}` })
-                };
-
-                const options = { method, headers, ...(body && { body: JSON.stringify(body) }) };
-
-                try {
-                    let response = await fetch(`${CONFIG.API_URL}${endpoint}`, options);
-
-                    // Handle 401 (Expired Token)
-                    if (response.status === 401) {
-                        console.warn('Token expired. Redirecting to Login...');
-                        // از آنجا که بک‌ند روت رفرش خاصی ندارد یا پیچیدگی دارد، 
-                        // ساده‌ترین راه برای امنیت بیشتر خروج و لاگین مجدد است 
-                        // مگر اینکه رفرش توکن به کار بیاید، اما برای جلوگیری از پیچیدگی غیرضروری فرانت:
-                        this.logout();
-                        throw new Error('Unauthorized');
-                    }
-
-                    if (response.status === 403) {
-                        this.showToast('شما دسترسی ادمین ندارید', 'error');
-                        throw new Error('Forbidden');
-                    }
-
-                    return response;
-                } catch (error) {
-                    if (error.message !== 'Unauthorized') this.showToast('خطا در ارتباط با سرور', 'error');
-                    throw error;
-                }
-            }
-
-            async handleLogin(e) {
-                e.preventDefault();
-                const username = $('#username').value;
-                const password = $('#password').value;
-                const loader = $('#loginLoader');
-                const btnText = $('#loginText');
-                const errMsg = $('#loginError');
-
-                loader.classList.remove('hidden-force');
-                btnText.classList.add('hidden-force');
-                errMsg.classList.add('hidden');
-
-                try {
-                    const res = await fetch(`${CONFIG.API_URL}/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
+                this.fetchRoot();
+                // Check Access
+                this.request('/auth/me').then(res => {
+                    if(res && res.ok) res.json().then(d => {
+                         if(d.role !== 'admin') { this.toast("شما ادمین نیستید!", 'err'); this.logout(); }
+                         else {
+                             document.getElementById('adminUserDisplay').innerText = d.username || 'Admin';
+                             this.toggleAuth(false);
+                             this.loadTransactions(); // Auto load pending
+                         }
                     });
-                    
-                    const data = await res.json();
-
-                    if (!res.ok) throw new Error(data.msg || 'Login failed');
-
-                    // ذخیره سازی طبق دستور: at و rt
-                    localStorage.setItem(CONFIG.KEYS.AT, data.access_token);
-                    localStorage.setItem(CONFIG.KEYS.RT, data.refresh_token);
-
-                    // دریافت اطلاعات کاربر برای اطمینان از ادمین بودن
-                    // چون روت /auth/me وجود دارد و در پایتون مشخص شده
-                    this.checkAdminAccess();
-
-                } catch (error) {
-                    errMsg.textContent = error.message === 'Failed to fetch' ? 'اینترنت خود را چک کنید' : 'نام کاربری یا رمز عبور اشتباه است';
-                    errMsg.classList.remove('hidden');
-                    loader.classList.add('hidden-force');
-                    btnText.classList.remove('hidden-force');
-                }
+                });
             }
 
-            async checkAdminAccess() {
+            // --- Features ---
+            
+            async fetchRoot() {
                 try {
-                    // با استفاده از تابع ریکوست داخلی خودمان
-                    const res = await this.request('/auth/me');
-                    if(res.ok) {
+                    const res = await this.request('/');
+                    if(res && res.ok) {
                         const data = await res.json();
-                        if (data.role === 'admin') {
-                            // موفق
-                            $('#authModal').classList.add('hidden-force');
-                            // نمایش داشبورد
-                            this.fetchDashboard();
-                            this.showToast('خوش آمدید', 'success');
-                            $('#currentUserDisplay').textContent = data.username;
-                        } else {
-                            throw new Error('Access denied: Not an admin');
-                        }
-                    } else {
-                         throw new Error('Verification failed');
+                        document.getElementById('st-service').innerHTML = data.service ? '<span class="text-green-400">Active</span>' : 'Offline';
+                        document.getElementById('st-mode').innerText = data.mode || '-';
+                        document.getElementById('st-workers').innerText = data.workers_active || '0';
                     }
-                } catch(e) {
-                    $('#loginError').textContent = 'اکانت شما دسترسی ادمین ندارد';
-                    $('#loginError').classList.remove('hidden');
-                    $('#loginLoader').classList.add('hidden-force');
-                    $('#loginText').classList.remove('hidden-force');
-                    this.logout(false);
-                }
+                } catch(e) {}
             }
-
-            logout(uiOnly = true) {
-                localStorage.removeItem(CONFIG.KEYS.AT);
-                localStorage.removeItem(CONFIG.KEYS.RT);
-                if (uiOnly) window.location.reload();
-            }
-
-            showAuth() {
-                $('#authModal').classList.remove('hidden-force');
-            }
-
-            // --- Features Logic ---
-
-            async fetchDashboard() {
-                try {
-                    const res = await this.request('/'); // روت اصلی برای دریافت وضعیت
-                    const data = await res.json();
-                    
-                    $('#dashService').textContent = data.service || 'Unknown';
-                    $('#dashMode').textContent = data.mode || 'Standard';
-                    $('#dashWorkers').textContent = data.workers_active !== undefined ? data.workers_active : '-';
-                    
-                    if(data.db === true) {
-                         $('#dashService').classList.add('text-green-400');
-                    }
-                } catch (e) { console.error(e); }
-            }
-
-            async loadTransactions() {
-                const tbody = $('#txTableBody');
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">در حال بارگذاری...</td></tr>';
-                
-                try {
-                    // دقیقاً همان روت فایل پایتون
-                    const res = await this.request('/admin/transactions?status=pending');
-                    const txs = await res.json();
-
-                    tbody.innerHTML = '';
-                    if (txs.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">هیچ تراکنش معلقی وجود ندارد</td></tr>';
-                        return;
-                    }
-
-                    txs.forEach(tx => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-white/5 transition-colors border-b border-dark-border last:border-0';
-                        // ایجاد TX Hash کوتاه شده
-                        const shortTx = tx.tx_hash ? `${tx.tx_hash.substring(0,6)}...${tx.tx_hash.substring(tx.tx_hash.length-4)}` : 'N/A';
-                        
-                        row.innerHTML = `
-                            <td class="px-6 py-4 text-gray-400 font-mono text-xs">${tx.username}</td>
-                            <td class="px-6 py-4 text-brand-primary font-mono text-xs" title="${tx.tx_hash}">${shortTx}</td>
-                            <td class="px-6 py-4">${tx.days}</td>
-                            <td class="px-6 py-4"><span class="bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded-md text-xs border border-yellow-500/20">${tx.status}</span></td>
-                            <td class="px-6 py-4 text-center">
-                                <button onclick="App.approveTx('${tx._id}', this)" class="bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 px-3 py-1.5 rounded-lg text-xs transition-all">
-                                    تایید
-                                </button>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-
-                } catch (e) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">خطا در دریافت لیست</td></tr>';
-                }
-            }
-
-            async approveTx(id, btn) {
-                const originalText = btn.textContent;
-                btn.textContent = '...';
+            
+            async fetchRates(btn) {
+                btn.innerHTML = `<span class="loader w-4 h-4 mr-2"></span> در حال دریافت...`;
                 btn.disabled = true;
+                const res = await this.request('/admin/fetch-rates', 'POST');
+                if(res && res.ok) this.toast("نرخ‌ها بروز شدند", 'success');
+                btn.innerHTML = 'بروزرسانی نرخ‌ها';
+                btn.disabled = false;
+            }
 
-                try {
-                    // طبق کد پایتون: /admin/transactions/<tx_id>/approve POST
-                    // این تابع یک Worker Job را شروع می‌کند و اگر wait=True باشد نتیجه را برمی‌گرداند
-                    const res = await this.request(`/admin/transactions/${id}/approve`, 'POST');
+            // Transactions Logic
+            async loadTransactions() {
+                const status = document.getElementById('txFilterStatus').value; // 'pending' | 'approved' | 'rejected' | 'all'
+                let query = "";
+                
+                // Note: The API likely accepts `?status=x`. If `all`, we might send nothing or handle filtering client side.
+                // Assuming Backend supports filter. If not, client side filtering handles the display.
+                if(status !== 'all') query = `?status=${status}`;
+
+                const tbody = document.getElementById('txTableBody');
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8"><span class="loader"></span></td></tr>';
+                document.getElementById('txEmpty').classList.add('hidden');
+
+                const res = await this.request(`/admin/transactions${query}`);
+                if(res && res.ok) {
                     const data = await res.json();
-
-                    if(res.status === 200 || res.status === 202) {
-                        this.showToast('تراکنش با موفقیت تایید شد', 'success');
-                        btn.closest('tr').classList.add('opacity-0', '-translate-x-10');
-                        setTimeout(() => btn.closest('tr').remove(), 300);
-                    } else {
-                         this.showToast(data.msg || 'خطا در عملیات', 'error');
-                         btn.textContent = originalText;
-                         btn.disabled = false;
-                    }
-                } catch (e) {
-                    this.showToast('خطای غیرمنتظره', 'error');
-                    btn.textContent = originalText;
-                    btn.disabled = false;
+                    this.data.transactions = data; // Store raw data (likely object: {transactions: [...]}) or array
+                    // Check structure (Assume array for now, adjust based on python)
+                    const list = Array.isArray(data) ? data : (data.transactions || []);
+                    this.data.transactions = list; 
+                    this.applyTxFilters();
+                } else {
+                    tbody.innerHTML = '';
                 }
+            }
+
+            applyTxFilters() {
+                const search = document.getElementById('txSearch').value.toLowerCase();
+                const statusFilter = document.getElementById('txFilterStatus').value;
+                
+                const filtered = this.data.transactions.filter(tx => {
+                    const sParams = (tx.username||'').toLowerCase() + (tx.tx_hash||'').toLowerCase() + (tx._id||'');
+                    const matchesSearch = sParams.includes(search);
+                    // If backend filtering works, we rely on it. If we are in 'all' mode and cache is full mix, we filter locally too.
+                    const matchesStatus = statusFilter === 'all' ? true : tx.status === statusFilter;
+                    return matchesSearch && matchesStatus;
+                });
+
+                this.renderTx(filtered);
+            }
+
+            renderTx(list) {
+                const tbody = document.getElementById('txTableBody');
+                const empty = document.getElementById('txEmpty');
+                tbody.innerHTML = '';
+                
+                if(list.length === 0) { empty.classList.remove('hidden'); return; }
+                empty.classList.add('hidden');
+
+                list.forEach(tx => {
+                    const color = tx.status === 'pending' ? 'text-yellow-400' : (tx.status === 'approved' ? 'text-green-400' : 'text-red-400');
+                    const actions = tx.status === 'pending' ? `
+                        <div class="flex justify-center gap-2">
+                            <button onclick="App.actTx('${tx._id}', 'approve')" class="p-1.5 rounded bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 transition" title="Approve">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                            </button>
+                            <button onclick="App.actTx('${tx._id}', 'reject')" class="p-1.5 rounded bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition" title="Reject">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                        </div>
+                    ` : `<span class="text-xs text-gray-500">-</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-white/5 transition border-b border-white/5 last:border-0";
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">
+                            <div class="text-white font-medium">${tx.username || 'ID:'+tx.user_id}</div>
+                            <div class="text-[10px] text-gray-500 font-mono">${new Date(tx.created_at || Date.now()).toLocaleDateString('fa-IR')}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="bg-white/5 px-2 py-1 rounded text-xs font-mono text-blue-300" title="${tx.tx_hash || ''}">
+                                    ${(tx.tx_hash||'N/A').substring(0,8)}...
+                                </div>
+                                <div class="text-xs text-gray-400">${tx.days} روز</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4"><span class="badge bg-white/5 border-white/10 ${color}">${tx.status}</span></td>
+                        <td class="px-6 py-4 text-center">${actions}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            async actTx(id, action) {
+                if(!confirm(`آیا از ${action === 'approve' ? 'تایید' : 'رد کردن'} این تراکنش اطمینان دارید؟`)) return;
+                const res = await this.request(`/admin/transactions/${id}/${action}`, 'POST'); // or maybe Body logic based on Python
+                if(res && (res.status === 200 || res.status === 202)) {
+                    this.toast(`تراکنش ${action === 'approve' ? 'تایید' : 'رد'} شد`, 'success');
+                    this.loadTransactions(); // Refresh
+                }
+            }
+
+            // Coupon Logic
+            async listCoupons() {
+                // If API exists: GET /admin/coupons
+                const listEl = document.getElementById('couponsList');
+                listEl.innerHTML = '<span class="loader"></span>';
+                const res = await this.request('/admin/coupons');
+                if(res && res.ok) {
+                    const json = await res.json();
+                    this.data.coupons = json.coupons || json; // adjust based on API format
+                    this.filterCoupons();
+                }
+            }
+
+            filterCoupons() {
+                const term = document.getElementById('couponSearch').value.toLowerCase();
+                const container = document.getElementById('couponsList');
+                container.innerHTML = '';
+                
+                const filtered = this.data.coupons.filter(c => c.code.toLowerCase().includes(term));
+                
+                if(filtered.length === 0) {
+                     container.innerHTML = '<div class="col-span-full text-center text-gray-500 py-4">کوپنی یافت نشد.</div>';
+                     return;
+                }
+
+                filtered.forEach(c => {
+                    const el = document.createElement('div');
+                    el.className = 'glass p-4 rounded-xl relative group hover:border-brand-primary/50 transition';
+                    const exp = c.expires_at ? new Date(c.expires_at).toLocaleDateString() : 'بدون انقضا';
+                    el.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-mono text-xl font-bold text-white tracking-widest">${c.code}</h4>
+                            <span class="badge border-green-500/30 text-green-400">+${c.bonus_days} روز</span>
+                        </div>
+                        <div class="text-xs text-gray-400 space-y-1">
+                            <p>تعداد مصرف: ${c.uses || 0} / ${c.max_uses || '∞'}</p>
+                            <p>انقضا: ${exp}</p>
+                        </div>
+                        <button onclick="App.deleteCoupon('${c.code}')" class="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all" title="حذف کوپن">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    `;
+                    container.appendChild(el);
+                });
             }
 
             async createCoupon(e) {
                 e.preventDefault();
-                const form = e.target;
-                const btnLoader = $('#couponLoader');
-                
-                // داده سازی
-                const body = {
-                    code: form.code.value,
-                    bonus_days: parseInt(form.bonus_days.value),
-                    max_uses: form.max_uses.value ? parseInt(form.max_uses.value) : null,
-                    // فرمت تاریخ برای بکند باید استاندارد ISO باشد
-                    expires_at: form.expires_at.value ? new Date(form.expires_at.value).toISOString() : null
+                const f = e.target;
+                const data = {
+                    code: f.code.value,
+                    bonus_days: Number(f.bonus_days.value),
+                    max_uses: f.max_uses.value ? Number(f.max_uses.value) : null,
+                    expires_at: f.expires_at.value ? new Date(f.expires_at.value).toISOString() : null
                 };
-
-                btnLoader.classList.remove('hidden-force');
-                
-                try {
-                    const res = await this.request('/admin/coupons', 'POST', body);
-                    const data = await res.json();
-
-                    if (res.status === 201) {
-                        this.showToast('کد تخفیف ساخته شد', 'success');
-                        form.reset();
-                    } else if(res.status === 409) {
-                         this.showToast('این کد قبلاً وجود دارد', 'warning');
-                    } else {
-                        this.showToast('خطا: ' + JSON.stringify(data.msg), 'error');
-                    }
-                } catch(e) {
-                    this.showToast('خطای ارتباط', 'error');
-                } finally {
-                    btnLoader.classList.add('hidden-force');
+                const res = await this.request('/admin/coupons', 'POST', data);
+                if(res && (res.status === 201 || res.ok)) {
+                    this.toast("کوپن ایجاد شد", 'success');
+                    f.reset();
+                    this.listCoupons();
                 }
             }
 
-            // --- UI Helper Methods ---
-            
-            showToast(msg, type = 'success') {
-                const toast = $('#toast');
-                const text = $('#toastMessage');
-                const icon = $('#toastIcon');
-                
-                text.textContent = msg;
-                toast.classList.remove('translate-y-20', 'opacity-0');
-                
-                if(type === 'success') {
-                    toast.classList.add('border', 'border-green-500/20');
-                    icon.className = 'w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]';
-                    text.classList.add('text-green-400');
-                    text.classList.remove('text-red-400', 'text-yellow-400');
-                } else if(type === 'error') {
-                     toast.classList.add('border', 'border-red-500/20');
-                     icon.className = 'w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]';
-                     text.classList.add('text-red-400');
-                     text.classList.remove('text-green-400', 'text-yellow-400');
+            async deleteCoupon(code) {
+                if(!confirm(`حذف کوپن ${code}؟`)) return;
+                // Assuming DELETE Method
+                const res = await this.request(`/admin/coupons/${code}`, 'DELETE');
+                if(res && res.ok) {
+                    this.toast("کوپن حذف شد", 'success');
+                    this.listCoupons();
                 } else {
-                     toast.classList.add('border', 'border-yellow-500/20');
-                     icon.className = 'w-2 h-2 rounded-full bg-yellow-500';
-                     text.classList.add('text-yellow-400');
+                    // Fallback purely UI removal if backend lacks Delete (Not recommended but handles missing endpoint case gracefully for user)
+                   // this.toast("API Delete Failed (See console)", 'err');
                 }
+            }
 
-                setTimeout(() => {
-                    toast.classList.add('translate-y-20', 'opacity-0');
-                }, 3000);
+
+            // Helpers
+            logout() { localStorage.clear(); window.location.reload(); }
+            toggleAuth(show) { document.getElementById('authModal').classList.toggle('hidden', !show); }
+            toast(msg, type='info') {
+                const t = document.getElementById('toast'), tm = document.getElementById('toastMsg'), ti = document.getElementById('toastIcon');
+                t.classList.remove('opacity-0', 'translate-y-20', 'border-red-500', 'border-green-500', 'border-blue-500');
+                const color = type === 'err' ? 'bg-red-500' : (type === 'success' ? 'bg-green-500' : 'bg-blue-500');
+                t.className = `glass fixed bottom-5 left-5 px-5 py-3 rounded-xl border-l-4 shadow-2xl flex items-center gap-3 transform transition-all duration-300 z-50 border-${type === 'err' ? 'red' : (type === 'success' ? 'green' : 'blue')}-500`;
+                ti.className = `w-2 h-2 rounded-full ${color}`;
+                tm.innerText = msg;
+                setTimeout(() => t.classList.add('opacity-0', 'translate-y-20'), 3000);
             }
         }
 
-        // --- Navigation Logic ---
-        function router(viewName) {
-            // Update Active Nav Style
-            document.querySelectorAll('.nav-item').forEach(el => {
-                if(el.getAttribute('onclick').includes(viewName)) {
-                    el.classList.add('bg-white/10', 'text-white');
-                    el.classList.remove('text-gray-300');
-                } else {
-                    el.classList.remove('bg-white/10', 'text-white');
-                    el.classList.add('text-gray-300');
-                }
+        // Router
+        window.router = (v) => {
+            document.querySelectorAll('[id^="view-"]').forEach(e => e.classList.add('hidden'));
+            document.getElementById(`view-${v}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                if(b.getAttribute('onclick').includes(v)) b.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all bg-brand-primary text-white shadow-lg shadow-brand-primary/25 font-bold";
+                else b.className = "nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all hover:bg-white/5 text-gray-400 hover:text-white";
             });
+            if(v === 'coupons') App.listCoupons();
+            if(v === 'transactions') App.loadTransactions();
+        };
 
-            // Update Mobile & Desktop Visibility
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-
-            // Set Title
-            const titles = { 'dashboard': 'نمای کلی', 'transactions': 'مدیریت پرداخت‌ها', 'coupons': 'کد تخفیف' };
-            $('#pageTitle').textContent = titles[viewName];
-
-            // Close mobile menu if open
-            const sb = $('#sidebar');
-            if (!sb.classList.contains('-translate-x-full') && window.innerWidth < 768) {
-                sb.classList.add('-translate-x-full');
+        // Login Logic
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const u = document.getElementById('username').value, p = document.getElementById('password').value;
+            const btn = document.getElementById('loginText'), ldr = document.getElementById('loginLoader'), err = document.getElementById('loginError');
+            btn.classList.add('hidden'); ldr.classList.remove('hidden'); err.classList.add('hidden');
+            
+            try {
+                const req = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({username:u, password:p})
+                });
+                const d = await req.json();
+                if(req.ok) {
+                    localStorage.setItem('at', d.access_token);
+                    localStorage.setItem('rt', d.refresh_token);
+                    location.reload();
+                } else throw new Error(d.msg || 'ورود ناموفق');
+            } catch(ex) {
+                err.innerText = ex.message; err.classList.remove('hidden');
+                btn.classList.remove('hidden'); ldr.classList.add('hidden');
             }
+        });
 
-            // Fetch Data for Specific Views
-            if(viewName === 'transactions') App.loadTransactions();
-            if(viewName === 'dashboard') App.fetchDashboard();
-        }
-
-        function toggleSidebar() {
-            const sb = $('#sidebar');
-            sb.classList.toggle('-translate-x-full');
-            // Allow outside click to close (optional improvement)
-        }
-
-        // --- Initialize ---
-        const App = new TwoMangaAdmin();
+        // Start
+        const App = new AdminPanel();
     </script>
 </body>
 </html>

@@ -17,7 +17,7 @@
           colors: {
             bg: '#020005',
             glass: 'rgba(20, 20, 25, 0.7)',
-            accent: '#8b5cf6', 
+            accent: '#8b5cf6',
             accentHover: '#7c3aed',
             error: '#ef4444',
             success: '#10b981'
@@ -36,105 +36,120 @@
   </script>
 
   <style>
-    body { background: #020005; color: #fff; overflow: hidden; }
-    
-    .orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; z-index: -1; }
+    :root {
+      --accent: #8b5cf6;
+      --accent-hover: #7c3aed;
+      --glass-bg: rgba(10,10,12,0.6);
+    }
+    html,body { height:100%; }
+    body { background: #020005; color: #fff; overflow: hidden; font-family: Vazirmatn, sans-serif; }
+
+    .orb { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4; z-index: -1; pointer-events:none; }
     .orb-1 { width: 500px; height: 500px; background: #4c1d95; top: -10%; left: -10%; animation: pulse 10s infinite alternate; }
     .orb-2 { width: 400px; height: 400px; background: #be185d; bottom: -10%; right: -10%; animation: pulse 8s infinite alternate-reverse; }
-    
+    @keyframes pulse { from { transform: scale(0.95); } to { transform: scale(1.05); } }
+
     .glass-box {
-      background: rgba(10, 10, 12, 0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
     }
 
-    .input-group { position: relative; transition: all 0.3s; }
     .input-field {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
       color: #fff;
-      transition: all 0.3s;
+      transition: all 0.18s ease;
       direction: ltr;
       text-align: left;
+      caret-color: var(--accent);
     }
-    .input-field:focus { 
-      border-color: #8b5cf6; 
-      background: rgba(139, 92, 246, 0.05);
-      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1); 
-      outline: none; 
+    .input-field:focus {
+      border-color: var(--accent);
+      background: rgba(139,92,246,0.04);
+      box-shadow: 0 0 0 6px rgba(139,92,246,0.06);
+      outline: none;
     }
-    
-    .loader { border: 2px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; }
+
+    /* Tabs */
+    .tabs { position: relative; display:flex; gap:6px; padding:4px; border-radius:12px; background: rgba(255,255,255,0.03); }
+    .tab-btn { flex:1; z-index:10; padding:10px 6px; border-radius:10px; font-weight:700; font-size:14px; transition: all .18s ease; }
+    .tab-active { color: white; background: linear-gradient(90deg,var(--accent),var(--accent-hover)); box-shadow: 0 8px 20px rgba(139,92,246,0.16); transform: translateY(-2px); }
+    .tab-inactive { color: #000; background: rgba(255,255,255,0.9); opacity:0.95; } /* inactive appears black text on light bg to satisfy "سیاه" خواسته */ 
+
+    /* Error box */
+    .error-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.18); color:#ffd5d5; }
+    .success-box { background: rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.12); color:#c8f7e6; }
+
+    .loader { border: 2px solid rgba(255,255,255,0.12); border-top-color: #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; }
     @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
-<body class="flex items-center justify-center min-h-screen px-4 font-sans relative">
+<body class="flex items-center justify-center min-h-screen px-4 relative">
 
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <main class="w-full max-w-[400px] glass-box rounded-[2rem] p-8 animate-slide-up relative overflow-hidden">
-    
-    <!-- Top Light Accent -->
-    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent opacity-50"></div>
+  <main class="w-full max-w-[460px] glass-box rounded-[1.25rem] p-8 animate-slide-up relative overflow-hidden">
+    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[color:var(--accent)] to-transparent opacity-50"></div>
 
-    <header class="text-center mb-8">
-      <h1 class="text-3xl font-black tracking-tighter mb-2">
-        <span class="text-white">Two</span><span class="text-accent">Manga</span>
+    <header class="text-center mb-6">
+      <h1 class="text-3xl font-black tracking-tighter mb-1">
+        <span class="text-white">Two</span><span style="color:var(--accent)">Manga</span>
       </h1>
       <p class="text-xs text-gray-400 font-medium">دروازه ورود به دنیای مانگا</p>
     </header>
 
     <!-- Tabs -->
-    <div class="grid grid-cols-2 p-1 bg-white/5 rounded-xl mb-6 relative">
-      <div id="active-bg" class="absolute inset-y-1 w-[calc(50%-4px)] bg-accent rounded-lg transition-all duration-300 left-1 shadow-lg shadow-accent/20"></div>
-      
-      <button onclick="setMode('login')" class="relative z-10 py-2.5 text-sm font-bold transition-colors duration-300 text-white" id="tab-login">ورود</button>
-      <button onclick="setMode('register')" class="relative z-10 py-2.5 text-sm font-bold transition-colors duration-300 text-gray-400 hover:text-white" id="tab-register">ثبت نام</button>
+    <div class="tabs mb-6">
+      <button id="tab-login" class="tab-btn tab-active" type="button" onclick="setMode('login')">ورود</button>
+      <button id="tab-register" class="tab-btn tab-inactive" type="button" onclick="setMode('register')">ثبت نام</button>
     </div>
 
     <!-- Error Box -->
-    <div id="error-box" class="hidden mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
+    <div id="error-box" class="hidden mb-4 p-3 rounded-xl error-box flex items-start gap-3">
         <i data-lucide="alert-triangle" class="w-5 h-5 text-red-400 shrink-0 mt-0.5"></i>
-        <p id="error-msg" class="text-xs text-red-200 leading-5 font-bold">خطا</p>
+        <div>
+          <p id="error-msg" class="text-sm font-bold">خطا</p>
+          <p id="error-sub" class="text-xs text-red-200 mt-1"></p>
+        </div>
     </div>
 
     <!-- Forms -->
-    <form id="auth-form" onsubmit="handleSubmit(event)" class="space-y-4">
-      
+    <form id="auth-form" onsubmit="handleSubmit(event)" class="space-y-4" novalidate>
       <div class="space-y-1">
-        <label class="text-[10px] font-bold text-gray-500 px-1 uppercase tracking-wider">Username</label>
+        <label class="text-[11px] font-bold text-gray-400 px-1 uppercase tracking-wider">نام کاربری</label>
         <div class="relative">
-          <input type="text" id="username" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 text-sm font-bold placeholder-gray-600" placeholder="نام کاربری..." required>
-          <i data-lucide="user" class="absolute left-3 top-3.5 w-4 h-4 text-gray-500"></i>
+          <input type="text" id="username" autocomplete="username" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 text-sm font-medium placeholder-gray-600" placeholder="نام کاربری..." required>
+          <i data-lucide="user" class="absolute left-3 top-3.5 w-4 h-4 text-gray-400"></i>
         </div>
       </div>
-      
+
       <div class="space-y-1">
         <div class="flex justify-between px-1">
-            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Password</label>
+            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">رمز عبور</label>
         </div>
         <div class="relative">
-          <input type="password" id="password" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 text-sm font-bold placeholder-gray-600 tracking-widest" placeholder="••••••••" required>
-          <button type="button" onclick="togglePass()" class="absolute left-3 top-3.5 text-gray-500 hover:text-white transition">
+          <input type="password" id="password" autocomplete="current-password" class="input-field w-full rounded-xl px-4 py-3.5 pl-10 text-sm font-medium placeholder-gray-600" placeholder="••••••••" required>
+          <button type="button" onclick="togglePass()" class="absolute left-3 top-3.5 text-gray-400 hover:text-white transition">
             <i data-lucide="eye" class="w-4 h-4" id="eye-icon"></i>
           </button>
         </div>
       </div>
 
-      <div id="register-hint" class="hidden text-[10px] text-gray-500 bg-white/5 p-3 rounded-lg border border-white/5 leading-relaxed">
-        نام کاربری فقط حروف انگلیسی و اعداد. رمز عبور حداقل ۶ کاراکتر.
+      <div id="register-hint" class="hidden text-[12px] text-gray-300 bg-white/3 p-3 rounded-lg border border-white/5 leading-relaxed">
+        نام کاربری: ۳ تا ۳۲ کاراکتر (حروف، عدد، نقطه، زیرخط). رمز عبور: حداقل ۸ کاراکتر و شامل حروف و اعداد.
       </div>
 
-      <button type="submit" id="submit-btn" class="w-full bg-accent hover:bg-accentHover text-white font-black py-4 rounded-xl shadow-lg shadow-accent/25 transition-all transform active:scale-95 flex justify-center items-center gap-2 mt-2">
+      <button type="submit" id="submit-btn" class="w-full bg-[color:var(--accent)] hover:bg-[color:var(--accent-hover)] text-white font-black py-3.5 rounded-xl shadow-lg shadow-[rgba(139,92,246,0.16)] transition-all transform active:scale-95 flex justify-center items-center gap-3 mt-2">
         <span id="btn-text">ورود به حساب</span>
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
       </button>
 
-      <div class="text-center pt-2">
-         <a href="https://t.me/im_abi" target="_blank" class="text-[10px] text-gray-500 hover:text-white transition">مشکل در ورود؟ ارتباط با پشتیبانی</a>
+      <div class="text-center pt-3">
+         <a href="https://t.me/im_abi" target="_blank" class="text-[12px] text-gray-400 hover:text-white transition">مشکل در ورود؟ ارتباط با پشتیبانی</a>
       </div>
     </form>
   </main>
@@ -148,146 +163,209 @@
         <h3 class="text-xl font-black text-white mb-2">عملیات موفق!</h3>
         <p id="modal-msg" class="text-sm text-gray-400 mb-6">در حال انتقال...</p>
         <div class="flex flex-col gap-2">
-            <button onclick="window.location.href='/panel'" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition">ورود به پنل کاربری</button>
-            <button onclick="window.location.href='/'" class="w-full py-3 bg-accent hover:bg-accentHover text-white rounded-xl font-bold transition">بازگشت به سایت</button>
+            <button id="to-panel" class="w-full py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition">ورود به پنل کاربری</button>
+            <button id="to-home" class="w-full py-3 bg-[color:var(--accent)] hover:bg-[color:var(--accent-hover)] text-white rounded-xl font-bold transition">بازگشت به سایت</button>
         </div>
     </div>
   </div>
 
   <script>
+    // ---------- CONFIG ----------
     const API_BASE = "https://two-api-iksq.onrender.com";
-    let currentMode = 'login';
-
+    let currentMode = 'login'; // 'login' or 'register'
     lucide.createIcons();
+
+    // ---------- UI HELPERS ----------
+    const tabLogin = document.getElementById('tab-login');
+    const tabReg = document.getElementById('tab-register');
+    const regHint = document.getElementById('register-hint');
+    const btnText = document.getElementById('btn-text');
+    const submitBtn = document.getElementById('submit-btn');
+    const errorBox = document.getElementById('error-box');
+    const errorMsg = document.getElementById('error-msg');
+    const errorSub = document.getElementById('error-sub');
 
     function setMode(mode) {
       currentMode = mode;
-      const bg = document.getElementById('active-bg');
-      const btnLogin = document.getElementById('tab-login');
-      const btnReg = document.getElementById('tab-register');
-      const btnText = document.getElementById('btn-text');
-      const regHint = document.getElementById('register-hint');
-      const errBox = document.getElementById('error-box');
-
-      errBox.classList.add('hidden');
-
+      errorBox.classList.add('hidden');
       if (mode === 'login') {
-        bg.style.transform = 'translateX(0)';
-        bg.style.left = 'auto'; 
-        bg.style.right = '4px'; // RTL fix if needed via CSS, here we assume absolute positioning logic
-        // Actually simpler:
-        bg.style.left = 'auto'; bg.style.right = 'auto'; // Reset
-        // Since it's CSS/Tailwind, let's use translate.
-        // Assuming LTR dom for the tabs structure for simplicity:
-        // Left button is login? No, in RTL structure right is login usually.
-        // Let's rely on transforms.
-        
-        // Simpler Tab Logic via classes
-        if(mode === 'login') {
-            bg.style.left = '4px'; 
-            btnLogin.classList.add('text-white'); btnLogin.classList.remove('text-gray-400');
-            btnReg.classList.add('text-gray-400'); btnReg.classList.remove('text-white');
-            btnText.innerText = "ورود به حساب";
-            regHint.classList.add('hidden');
-        }
+        tabLogin.classList.add('tab-active'); tabLogin.classList.remove('tab-inactive');
+        tabReg.classList.add('tab-inactive'); tabReg.classList.remove('tab-active');
+        regHint.classList.add('hidden');
+        btnText.innerText = "ورود به حساب";
       } else {
-        bg.style.left = '50%';
-        btnLogin.classList.add('text-gray-400'); btnLogin.classList.remove('text-white');
-        btnReg.classList.add('text-white'); btnReg.classList.remove('text-gray-400');
-        btnText.innerText = "ثبت نام و شروع";
+        tabReg.classList.add('tab-active'); tabReg.classList.remove('tab-inactive');
+        tabLogin.classList.add('tab-inactive'); tabLogin.classList.remove('tab-active');
         regHint.classList.remove('hidden');
+        btnText.innerText = "ثبت نام و شروع";
       }
+      // adjust input autocomplete attributes for register/login
+      document.getElementById('username').setAttribute('autocomplete', mode === 'login' ? 'username' : 'new-username');
+      document.getElementById('password').setAttribute('autocomplete', mode === 'login' ? 'current-password' : 'new-password');
     }
-    // Fix initial tab pos
-    document.getElementById('active-bg').style.left = '4px';
+
+    // set initial
+    setMode('login');
 
     function togglePass() {
       const inp = document.getElementById('password');
       inp.type = inp.type === 'password' ? 'text' : 'password';
     }
 
+    // ---------- Validation rules (match backend) ----------
+    function usernameValid(u) {
+      // backend expects: 3-32 chars, letters/numbers/._ (we follow the schema we agreed)
+      return /^[a-zA-Z0-9._]{3,32}$/.test(u);
+    }
+    function passwordValid(p) {
+      // backend requires length >= 8 and at least one letter and one number
+      return p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p);
+    }
+
+    // ---------- Error parsing ----------
+    function extractErrorText(payload) {
+      if (!payload) return "خطای نامشخص";
+      if (typeof payload === 'string') return payload;
+      if (payload.msg) return payload.msg;
+      if (payload.message) return payload.message;
+      // Marshmallow returns object with field -> [messages]
+      if (typeof payload === 'object') {
+        try {
+          // collect first useful message
+          for (const k of Object.keys(payload)) {
+            const v = payload[k];
+            if (Array.isArray(v) && v.length) return (typeof v[0] === 'string') ? v[0] : JSON.stringify(v[0]);
+            if (typeof v === 'string') return v;
+            if (typeof v === 'object') {
+              // nested
+              const inner = Object.values(v)[0];
+              if (inner) return typeof inner === 'string' ? inner : JSON.stringify(inner);
+            }
+          }
+        } catch(e) {}
+      }
+      return JSON.stringify(payload);
+    }
+
+    function showError(msg, sub="") {
+      errorMsg.innerText = msg || "خطا";
+      errorSub.innerText = sub || "";
+      errorBox.classList.remove('hidden');
+      // reset button state if needed
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = `<span id="btn-text">${currentMode === 'login' ? 'ورود به حساب' : 'ثبت نام و شروع'}</span><i data-lucide="arrow-left" class="w-4 h-4"></i>`;
+      lucide.createIcons();
+    }
+
+    function showSuccess(msg, toPanel=false) {
+      document.getElementById('modal-msg').innerText = msg || "عملیات موفق";
+      const m = document.getElementById('success-modal');
+      m.classList.remove('hidden'); m.classList.add('flex');
+      // buttons
+      document.getElementById('to-panel').onclick = () => window.location.href = '/panel';
+      document.getElementById('to-home').onclick = () => window.location.href = '/';
+      // auto redirect after short delay
+      setTimeout(() => {
+        if (toPanel) window.location.href = '/panel';
+        else window.location.href = '/';
+      }, 1700);
+    }
+
+    // ---------- Submit ----------
     async function handleSubmit(e) {
       e.preventDefault();
+      errorBox.classList.add('hidden');
+
       const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value;
-      const btn = document.getElementById('submit-btn');
-      const originalBtn = btn.innerHTML;
-      const errBox = document.getElementById('error-box');
-      const errMsg = document.getElementById('error-msg');
 
-      // Validation
-      if(currentMode === 'register') {
-        const regex = /^[a-z0-9]+$/i;
-        if(!regex.test(user)) return showError("نام کاربری فقط حروف انگلیسی و عدد (بدون فاصله).");
-        if(pass.length < 6) return showError("رمز عبور باید حداقل ۶ کاراکتر باشد.");
+      // client-side validation that matches backend
+      if (currentMode === 'register') {
+        if (!usernameValid(user)) return showError("نام کاربری نامعتبر", "نام کاربری باید ۳–۳۲ کاراکتر، شامل حروف/عدد/نقطه/زیرخط باشد.");
+        if (!passwordValid(pass)) return showError("رمز عبور نامعتبر", "رمز عبور باید حداقل ۸ کاراکتر بوده و شامل حروف و عدد باشد.");
+      } else {
+        // login: minimal checks
+        if (user.length < 3) return showError("نام کاربری کوتاه است", "نام کاربری باید حداقل ۳ کاراکتر باشد.");
+        if (pass.length === 0) return showError("رمز عبور وارد نشده");
       }
 
-      errBox.classList.add('hidden');
-      btn.innerHTML = '<div class="loader"></div>';
-      btn.disabled = true;
-
+      // set loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="loader"></div>';
+      
       try {
         const res = await fetch(`${API_BASE}/auth/${currentMode}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: user, password: pass })
         });
-        
-        const data = await res.json();
 
-        if(!res.ok) throw new Error(data.msg || 'خطایی رخ داد');
+        let data;
+        try { data = await res.json(); } catch(_) { data = null; }
 
-        // Success
-        if(data.access_token) {
-          localStorage.setItem('at', data.access_token);
-          if(data.refresh_token) localStorage.setItem('rt', data.refresh_token);
+        if (!res.ok) {
+          const message = extractErrorText(data);
+          throw new Error(message || 'خطایی رخ داد');
         }
 
-        // Check Subscription if login
+        // on success: store tokens if provided
+        if (data && data.access_token) {
+          localStorage.setItem('at', data.access_token);
+          if (data.refresh_token) localStorage.setItem('rt', data.refresh_token);
+        }
+
+        // If login: check subscription status through /auth/me
         if (currentMode === 'login') {
-             await checkSubStatus(data.access_token);
+          const token = data && data.access_token ? data.access_token : localStorage.getItem('at');
+          if (!token) {
+            // fallback: success without token -> redirect to panel
+            showSuccess("ورود موفقیت‌آمیز. درحال هدایت...", true);
+            return;
+          }
+          await checkSubStatus(token);
         } else {
-            // Register success
-            showSuccess("ثبت نام موفقیت‌آمیز بود!");
+          // register: immediate success
+          showSuccess("ثبت نام با موفقیت انجام شد. خوش آمدید!", true);
         }
 
       } catch (err) {
-        showError(err.message === 'Failed to fetch' ? 'عدم دسترسی به سرور' : err.message);
-        btn.innerHTML = originalBtn;
-        btn.disabled = false;
+        const userMsg = (err && err.message) ? err.message : "خطایی رخ داد";
+        showError("ناموفق", userMsg);
       }
     }
 
+    // ---------- Check subscription ----------
     async function checkSubStatus(token) {
-        try {
-            const res = await fetch(`${API_BASE}/auth/me`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const me = await res.json();
-            
-            if (me.days_left > 0) {
-                showSuccess(`خوش آمدید! ${me.days_left} روز اشتراک دارید.`);
-                setTimeout(() => window.location.href = '/', 1500);
-            } else {
-                showSuccess("اشتراک فعال ندارید. هدایت به پنل...");
-                document.getElementById('modal-msg').innerText = "برای دسترسی کامل باید اشتراک تهیه کنید.";
-                setTimeout(() => window.location.href = '/panel', 2000);
-            }
-        } catch(e) {
-            window.location.href = '/';
+      try {
+        const res = await fetch(`${API_BASE}/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        let me = null;
+        try { me = await res.json(); } catch(_) { me = null; }
+
+        if (!res.ok) {
+          const err = extractErrorText(me);
+          // If token invalid / session expired: redirect to login (stay on page)
+          return showError("ورود ناموفق", err || "نشست منقضی شده");
         }
-    }
 
-    function showError(msg) {
-        document.getElementById('error-msg').innerText = msg;
-        document.getElementById('error-box').classList.remove('hidden');
-    }
+        // me should contain days_left
+        if (me && typeof me.days_left !== 'undefined') {
+          if (me.days_left > 0) {
+            showSuccess(`خوش آمدید! ${me.days_left} روز اشتراک دارید.`, true);
+          } else {
+            showSuccess("شما اشتراک فعال ندارید. هدایت به پنل...", true);
+          }
+        } else {
+          // fallback
+          showSuccess("ورود موفقیت‌آمیز. در حال هدایت...", true);
+        }
 
-    function showSuccess(msg) {
-        document.getElementById('modal-msg').innerText = msg;
-        const m = document.getElementById('success-modal');
-        m.classList.remove('hidden');
-        m.classList.add('flex');
+      } catch (e) {
+        // network or unexpected
+        showError("عدم دسترسی به سرور", "خطا در ارتباط با سرور. لطفاً بعداً تلاش کنید.");
+      }
     }
   </script>
 </body>

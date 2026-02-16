@@ -285,6 +285,54 @@
   <script id="manga-db" type="application/json">{"titleFa": "دوست دختر خانگی", "titleEn": "Domestic girlfriend", "baseUrl": "https://raw.githubusercontent.com/im-abi-oo/mioooo/main/oo/", "backUrl": "./", "chapters": [{"chapterNumber": 1, "imageCount": 20}, {"chapterNumber": 2, "imageCount": 20}], "unlockLimit": 2}</script>
 
   <script>
+    const API_URL = "https://two-api-iksq.onrender.com";
+
+    // AUTH CHECK FUNCTION
+    async function checkAuth() {
+        const at = localStorage.getItem('at');
+        // اگه اصلا ورود نزده بود (توکن نداشت)
+        if(!at) {
+            window.location.href = '/auth';
+            return false;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/auth/me`, {
+                method: 'GET',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${at}`
+                }
+            });
+
+            // اگه 401 بود یعنی توکن فیک یا اکسپایر شده
+            if(res.status === 401 || res.status === 403) {
+                // شوتش کن به auth
+                window.location.href = '/auth';
+                return false;
+            }
+
+            const data = await res.json();
+
+            // اگه اشتراک داشت
+            if (data.days_left && data.days_left > 0) {
+                // ولش کن بخونه (محدودیت رو برمیداریم که راحت بخونه)
+                if(typeof DB !== 'undefined') DB.unlockLimit = 99999;
+                return true; 
+            } else {
+                // اشتراک نداشت -> شوتش کن مسیر روا ./
+                window.location.href = './';
+                return false;
+            }
+
+        } catch (error) {
+            console.error('Auth Check Error:', error);
+            // توی خطا برای احتیاط میفرستیم صفحه قبل تا دوباره تلاش کنه
+            window.location.href = './';
+            return false;
+        }
+    }
+
     // DB
     const DB = (function(){
         try {
@@ -295,59 +343,6 @@
             return { titleFa: '', titleEn: '', baseUrl: '', unlockLimit: 0, chapters: [] };
         }
     })();
-
-    // ----------------------------------------------------
-    // START: AUTHENTICATION & SUBSCRIPTION CHECK
-    // ----------------------------------------------------
-    const AUTH_API = "https://two-api-iksq.onrender.com";
-
-    async function checkSubscription() {
-        const at = localStorage.getItem('ar'); // Access Token
-        const rt = localStorage.getItem('rt'); // Refresh Token
-
-        // اگر توکن‌ها موجود نیستند -> خروج
-        if (!at || !rt) {
-            kickUser();
-            return;
-        }
-
-        try {
-            const res = await fetch(`${AUTH_API}/auth/me`, {
-                headers: { 'Authorization': `Bearer ${at}` }
-            });
-
-            if (res.status === 401 || res.status === 403) {
-                // توکن نامعتبر است -> خروج
-                kickUser();
-                return;
-            }
-
-            if (res.status === 200) {
-                const data = await res.json();
-                // چک کردن روزهای باقی‌مانده
-                if (typeof data.days_left === 'number' && data.days_left <= 0) {
-                    alert('اشتراک شما به پایان رسیده است.');
-                    kickUser();
-                }
-            }
-        } catch (e) {
-            console.error("Auth Check Failed:", e);
-            // در صورت خطای شبکه یا سرور، تصمیم با شماست.
-            // فعلاً طبق دستور "امنیت بالا"، اگر نتوانیم چک کنیم، کاربر را خارج می‌کنیم.
-            kickUser();
-        }
-    }
-
-    function kickUser() {
-        // حذف توکن‌های احتمالی نامعتبر
-        localStorage.removeItem('ar');
-        localStorage.removeItem('rt');
-        // هدایت به صفحه لاگین (اگر نام فایل لاگین شما فرق دارد، اینجا را تغییر دهید)
-        window.location.href = './login.html';
-    }
-    // ----------------------------------------------------
-    // END: AUTHENTICATION CHECK
-    // ----------------------------------------------------
 
     let scroller = null;
     let userSettings = JSON.parse(localStorage.getItem('manga_pro_v3')) || { 
@@ -361,9 +356,11 @@
 
     function pad(n,l=2){ return String(n).padStart(l,'0'); }
 
-    function init(){
-        // فراخوانی چک اشتراک در لحظه شروع
-        checkSubscription();
+    // Init اصلاح شده با Auth
+    async function init(){
+        // اول احراز هویت میکنه، اگه اوکی نبود کدهای پایین اصلا اجرا نمیشن
+        const authorized = await checkAuth();
+        if(!authorized) return;
 
         scroller = document.getElementById('scroller');
         

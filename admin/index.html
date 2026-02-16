@@ -3,9 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>پنل ادمین — Two Manga</title>
+  <title>پنل مدیریت جامع — Two Manga</title>
 
-  <!-- Tailwind config (provided by you) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+
   <script>
     tailwind = window.tailwind || {};
     tailwind.config = {
@@ -22,631 +24,461 @@
           },
           animation: {
             'float': 'float 6s ease-in-out infinite',
-            'spin-slow': 'spin 3s linear infinite',
-            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+            'fade-in': 'fadeIn 0.3s ease-out forwards',
           },
           keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-10px)' },
-            },
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(20px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
+            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }
           }
         }
       }
-    }
+    };
   </script>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
-
   <style>
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0f0f13; }
-    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
-
-    body {
-      background-color: #050505;
-      background-image:
-        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.06) 0%, transparent 25%);
-      color: #f4f4f5;
-      overflow-x: hidden;
-      font-family: Vazirmatn, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
-
-    .glass-panel {
-      background: rgba(24, 24, 27, 0.62);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
-    }
-    .glass-input {
-      background: rgba(0, 0, 0, 0.28);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      color: white;
-      transition: all 0.2s ease;
-      padding: .6rem .8rem;
-      border-radius: .5rem;
-    }
-    .glass-input:focus {
-      border-color: #8b5cf6;
-      box-shadow: 0 0 18px rgba(139, 92, 246, 0.16);
-      outline: none;
-    }
-    .text-gradient {
-      background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #e879f9 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hover-card { transition: all 0.28s cubic-bezier(0.4,0,0.2,1); }
-    .hover-card:hover { transform: translateY(-6px); box-shadow: 0 26px 60px -12px rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.28); }
-
-    .plan-card { position: relative; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); transition: all 0.28s ease; border-radius: 12px; }
-    .plan-card.active { background: linear-gradient(145deg, rgba(139,92,246,0.12), rgba(0,0,0,0)); border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139,92,246,0.12); }
-
-    .crypto-btn { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.18); transition: all 0.18s; padding: .5rem .75rem; border-radius: .6rem; }
-    .crypto-btn:hover { background: rgba(255,255,255,0.03); }
-    .crypto-btn.active { border-color: #d946ef; background: rgba(217,70,239,0.08); box-shadow: 0 0 12px rgba(217,70,239,0.12); }
-
-    .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #8b5cf6; border-radius: 50%; width: 22px; height: 22px; animation: spin 1s linear infinite; display: inline-block; }
-    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
-
-    .btn-primary { background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%); background-size: 200% auto; transition: 0.45s; color: white; }
-    .btn-primary:hover { background-position: right center; box-shadow: 0 10px 40px rgba(139, 92, 246, 0.24); transform: translateY(-2px); }
-
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Helvetica Neue", monospace; }
-    .small-muted { color: rgba(255,255,255,0.5); font-size: 0.86rem; }
-    .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); }
-
+    body { background-color: #0f0f13; color: #e4e4e7; scroll-behavior: smooth; }
+    .glass { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(139, 92, 246, 0.15); }
+    .nav-link.active { background: rgba(139, 92, 246, 0.1); border-right: 4px solid #8b5cf6; color: #8b5cf6; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+    #initial-loader { position: fixed; inset: 0; z-index: 100; background: #0f0f13; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   </style>
 </head>
-<body>
+<body class="min-h-screen font-sans custom-scrollbar">
 
-  <div class="max-w-7xl mx-auto px-4 py-6">
-    <header class="flex items-center justify-between mb-6">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#d946ef] flex items-center justify-center shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l4 2"/></svg>
+  <!-- Full Screen Auth Check Loader -->
+  <div id="initial-loader">
+    <div class="relative w-20 h-20 mb-6">
+      <div class="absolute inset-0 border-4 border-brand-accent/20 rounded-full"></div>
+      <div class="absolute inset-0 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
+    </div>
+    <h2 class="text-xl font-bold text-white mb-2">در حال تایید هویت ادمین...</h2>
+    <p class="text-gray-500 text-sm">لطفاً شکیبا باشید</p>
+  </div>
+
+  <div id="app-ui" class="opacity-0 transition-opacity duration-500 flex flex-col md:flex-row min-h-screen">
+    
+    <!-- Sidebar -->
+    <aside class="w-full md:w-72 glass p-6 flex flex-col gap-8 z-20">
+      <div class="flex items-center gap-4 px-2">
+        <div class="w-12 h-12 bg-gradient-to-br from-brand-accent to-brand-glow rounded-2xl flex items-center justify-center shadow-lg shadow-brand-accent/30">
+          <span class="text-2xl">⚡</span>
         </div>
         <div>
-          <div class="text-lg font-semibold">پنل ادمین — Two Manga</div>
-          <div class="small-muted">آدرس بک‌اند: <span id="backendUrl" class="mono">https://two-api-iksq.onrender.com</span></div>
+          <h1 class="text-lg font-black text-white">TWO MANGA</h1>
+          <p class="text-[10px] text-brand-accent tracking-widest font-bold">ADMIN PANEL v2.0</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <div class="text-right">
-          <div id="adminName" class="text-sm small-muted">بارگذاری...</div>
-          <div class="text-xs small-muted">سطح دسترسی: <span id="adminRole">—</span></div>
+      <nav class="flex-1 space-y-1">
+        <p class="text-[10px] text-gray-500 font-bold px-4 mb-2 uppercase">اصلی</p>
+        <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3">
+          <span class="opacity-70">📊</span> داشبورد مدیریتی
+        </button>
+        
+        <p class="text-[10px] text-gray-500 font-bold px-4 mb-2 mt-6 uppercase">مالی و فروش</p>
+        <button onclick="showTab('transactions')" id="nav-transactions" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3 relative">
+          <span class="opacity-70">💳</span> تراکنش‌ها
+          <span id="pendingBadge" class="hidden absolute left-3 top-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+        </button>
+        <button onclick="showTab('rates')" id="nav-rates" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3">
+          <span class="opacity-70">💰</span> تنظیمات نرخ ارز
+        </button>
+
+        <p class="text-[10px] text-gray-500 font-bold px-4 mb-2 mt-6 uppercase">کاربران</p>
+        <button onclick="showTab('users')" id="nav-users" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3">
+          <span class="opacity-70">👥</span> مدیریت کاربران
+        </button>
+      </nav>
+
+      <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-brand-accent/20 flex items-center justify-center text-brand-accent text-sm font-bold" id="adminInitial">A</div>
+          <div class="flex-1 min-w-0">
+            <p id="adminUserDisplay" class="text-sm font-bold truncate text-white"></p>
+            <p class="text-[10px] text-gray-400">سطح: مدیر ارشد</p>
+          </div>
         </div>
-        <button id="btnLogout" class="btn-primary px-4 py-2 rounded-lg shadow hover:shadow-lg">خروج</button>
+        <button onclick="logout()" class="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-xs font-bold transition-colors">
+          خروج از سیستم
+        </button>
       </div>
-    </header>
+    </aside>
 
-    <main class="grid grid-cols-12 gap-6">
-      <!-- left column (controls) -->
-      <aside class="col-span-3 glass-panel p-4 space-y-4">
-        <div class="flex items-center justify-between">
-          <div class="text-sm small-muted">نِویگِیشن</div>
-          <div class="text-xs small-muted">admin</div>
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-8 space-y-8 max-h-screen overflow-y-auto custom-scrollbar">
+      
+      <!-- Dashboard Tab -->
+      <div id="tab-dashboard" class="tab-content">
+        <header class="mb-8">
+          <h2 class="text-3xl font-black text-white">داشبورد</h2>
+          <p class="text-gray-500 mt-1">خلاصه وضعیت سیستم در یک نگاه</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="glass p-6 rounded-3xl relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-20 h-20 bg-brand-accent/10 rounded-full blur-2xl group-hover:bg-brand-accent/20 transition-all"></div>
+            <p class="text-gray-400 text-sm">کاربران کل</p>
+            <h3 id="stat-total-users" class="text-3xl font-black mt-2 text-white">---</h3>
+          </div>
+          <div class="glass p-6 rounded-3xl relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-20 h-20 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all"></div>
+            <p class="text-gray-400 text-sm">تراکنش‌های موفق</p>
+            <h3 id="stat-total-paid" class="text-3xl font-black mt-2 text-white">---</h3>
+          </div>
+          <div class="glass p-6 rounded-3xl relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-20 h-20 bg-yellow-500/10 rounded-full blur-2xl group-hover:bg-yellow-500/20 transition-all"></div>
+            <p class="text-gray-400 text-sm">تراکنش‌های در انتظار</p>
+            <h3 id="stat-pending-tx" class="text-3xl font-black mt-2 text-white">---</h3>
+          </div>
+          <div class="glass p-6 rounded-3xl border-brand-accent/30 shadow-lg shadow-brand-accent/5">
+            <p class="text-brand-accent text-sm font-bold">وضعیت API</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+              <span id="backendUrl" class="text-xs font-mono opacity-60"></span>
+            </div>
+          </div>
         </div>
 
-        <nav class="flex flex-col gap-2">
-          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="dashboard" onclick="showTab('dashboard')">
-            داشبورد وضعیت
-            <div class="small-muted text-sm">ping / db-status / root</div>
-          </button>
-          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="transactions" onclick="showTab('transactions')">
-            تراکنش‌ها
-            <div class="small-muted text-sm">مشاهده — تأیید — رد</div>
-          </button>
-          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="coupons" onclick="showTab('coupons')">
-            کوپن‌ها
-            <div class="small-muted text-sm">ایجاد — لیست</div>
-          </button>
-          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="rates" onclick="showTab('rates')">
-            نرخ‌ها (دستی)
-            <div class="small-muted text-sm">فچ و ذخیرهٔ نرخ</div>
-          </button>
-          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="logs" onclick="showTab('logs')">
-            لاگ‌ها / روت & queue
-            <div class="small-muted text-sm">وضعیت صف و لاگ‌های سریع</div>
-          </button>
-        </nav>
-      </aside>
+        <div class="mt-8 glass p-8 rounded-3xl">
+          <div class="flex justify-between items-center mb-6">
+            <h4 class="text-xl font-bold">آخرین تراکنش‌های سیستم</h4>
+            <button onclick="loadDashboardStats()" class="text-brand-accent text-sm hover:underline">بروزرسانی</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-right">
+              <thead>
+                <tr class="text-gray-500 text-sm border-b border-white/5">
+                  <th class="pb-4 pr-4">کاربر</th>
+                  <th class="pb-4">مبلغ (تومان)</th>
+                  <th class="pb-4">نوع اشتراک</th>
+                  <th class="pb-4">وضعیت</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-tx-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-      <!-- main content -->
-      <section class="col-span-9 space-y-6">
-        <!-- dashboard -->
-        <section id="tab-dashboard" class="glass-panel p-6">
-          <div class="flex items-start justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold text-gradient">داشبورد سلامت</h2>
-              <p class="small-muted mt-1">در این صفحه می‌توانید وضعیت سلامت سرور، DB و front/back root را بررسی کنید.</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <button id="btnPing" class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="pingServer()">
-                بررسی سلامت <span id="pingLoader" class="inline-block ml-2"></span>
-              </button>
-              <button id="btnDbStatus" class="glass-input px-4 py-2 rounded-lg" onclick="dbStatus()">
-                وضعیت DB
-              </button>
-            </div>
+      <!-- Transactions Tab -->
+      <div id="tab-transactions" class="tab-content">
+        <header class="mb-8 flex justify-between items-end">
+          <div>
+            <h2 class="text-3xl font-black text-white">تراکنش‌ها</h2>
+            <p class="text-gray-500 mt-1">تایید یا رد پرداخت‌های کاربران</p>
+          </div>
+          <button onclick="loadTransactions()" class="px-6 py-2 bg-brand-accent rounded-xl font-bold text-sm">رفرش لیست</button>
+        </header>
+
+        <div class="glass rounded-3xl overflow-hidden">
+          <table class="w-full text-right border-collapse">
+            <thead class="bg-white/5 text-gray-400 text-sm font-bold">
+              <tr>
+                <th class="p-5">کاربر / زمان</th>
+                <th class="p-5">کد پیگیری</th>
+                <th class="p-5">مبلغ / پلن</th>
+                <th class="p-5 text-center">عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="transactions-list" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Rates Tab -->
+      <div id="tab-rates" class="tab-content">
+        <h2 class="text-3xl font-black text-white mb-8">تنظیمات نرخ ارز</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="glass p-8 rounded-3xl space-y-6">
+            <h4 class="text-xl font-bold text-brand-accent flex items-center gap-2">
+              <span>🔄</span> آپدیت اتوماتیک
+            </h4>
+            <p class="text-gray-400 text-sm leading-relaxed">با فشردن دکمه زیر، سیستم از طریق APIهای خارجی (نظیر Nobitex یا منابع دیگر تعریف شده در بک‌ند) قیمت لحظه‌ای دلار/تتر را دریافت کرده و قیمت تمام اشتراک‌ها را آپدیت می‌کند.</p>
+            <button id="btnFetchRates" onclick="fetchRates()" class="w-full py-4 bg-gradient-to-r from-brand-accent to-brand-glow rounded-2xl font-black text-white shadow-xl shadow-brand-accent/20 transition-all hover:scale-[1.02] active:scale-95">
+              فچ و بروزرسانی قیمت‌ها
+            </button>
+            <p id="ratesMsg" class="text-center text-xs text-gray-500 font-mono"></p>
           </div>
 
-          <div class="mt-6 grid grid-cols-3 gap-4">
-            <div class="p-4 plan-card glass-panel">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="small-muted">Queue / Root</div>
-                  <div id="rootInfo" class="text-lg font-medium mono">بارگذاری...</div>
-                </div>
-                <div id="rootQueue" class="pill">—</div>
-              </div>
-            </div>
-
-            <div class="p-4 plan-card glass-panel">
-              <div class="small-muted">Ping</div>
-              <div id="pingResult" class="text-lg font-medium mono mt-2">—</div>
-            </div>
-
-            <div class="p-4 plan-card glass-panel">
-              <div class="small-muted">DB Status</div>
-              <div id="dbResult" class="text-lg font-medium mono mt-2">—</div>
-            </div>
+          <div class="glass p-8 rounded-3xl flex items-center justify-center border-dashed border-2 border-white/10 text-gray-500">
+             بخش تغییر دستی قیمت پلن‌ها در آپدیت بعدی فعال می‌شود.
           </div>
-        </section>
+        </div>
+      </div>
 
-        <!-- transactions -->
-        <section id="tab-transactions" class="glass-panel p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold text-gradient">مدیریت تراکنش‌ها</h2>
-              <p class="small-muted mt-1">لیست آخرین تراکنش‌ها — میتونی تأیید یا رد کنی.</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <select id="filterStatus" class="glass-input" onchange="loadTransactions()">
-                <option value="">همه</option>
-                <option value="pending">pending</option>
-                <option value="pending_verification">pending_verification</option>
-                <option value="approved">approved</option>
-                <option value="rejected">rejected</option>
-              </select>
-              <button class="glass-input px-4 py-2 rounded-lg" onclick="loadTransactions()">بارگذاری</button>
-            </div>
+      <!-- Users Tab -->
+      <div id="tab-users" class="tab-content">
+        <h2 class="text-3xl font-black text-white mb-8">مدیریت کاربران</h2>
+        <div class="glass rounded-3xl overflow-hidden">
+          <div class="p-6 border-b border-white/5 flex gap-4">
+            <input type="text" id="userSearchInput" placeholder="جستجوی نام کاربری..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brand-accent transition-all">
+            <button onclick="loadUsers()" class="px-6 py-2 bg-white/10 rounded-xl hover:bg-white/20 transition-all text-sm font-bold">جستجو</button>
           </div>
+          <table class="w-full text-right">
+            <thead class="bg-white/5 text-gray-400 text-sm font-bold">
+              <tr>
+                <th class="p-5">نام کاربری</th>
+                <th class="p-5">وضعیت نقش</th>
+                <th class="p-5">تاریخ انقضا</th>
+                <th class="p-5 text-center">عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="users-list" class="divide-y divide-white/5"></tbody>
+          </table>
+        </div>
+      </div>
 
-          <div id="transactionsList" class="mt-6 space-y-3">
-            <div class="small-muted">هیچ‌چیزی لود نشده — روی بارگذاری بزن.</div>
-          </div>
-        </section>
-
-        <!-- coupons -->
-        <section id="tab-coupons" class="glass-panel p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold text-gradient">کوپن‌ها</h2>
-              <p class="small-muted mt-1">ایجاد و مدیریت کوپن‌ها</p>
-            </div>
-            <div>
-              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="showCouponCreate()">ایجاد کوپن جدید</button>
-            </div>
-          </div>
-
-          <div id="couponCreateArea" class="mt-6 hidden">
-            <div class="grid grid-cols-3 gap-3">
-              <input id="couponCode" placeholder="کد کوپن" class="glass-input col-span-1" />
-              <input id="couponDays" type="number" placeholder="تعداد روز - bonus_days" class="glass-input col-span-1" />
-              <input id="couponMaxUses" type="number" placeholder="max_uses (اختیاری)" class="glass-input col-span-1" />
-            </div>
-            <div class="mt-3 flex items-center gap-2">
-              <input id="couponExpires" placeholder="expires_at (ISO, اختیاری)" class="glass-input w-1/2" />
-              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="createCoupon()">ایجاد</button>
-              <span id="couponCreateMsg" class="small-muted"></span>
-            </div>
-          </div>
-
-          <div class="mt-6">
-            <button class="glass-input px-4 py-2 rounded-lg" onclick="listCoupons()">لیست کوپن‌ها</button>
-          </div>
-
-          <div id="couponList" class="mt-4 space-y-2 small-muted"></div>
-        </section>
-
-        <!-- rates -->
-        <section id="tab-rates" class="glass-panel p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold text-gradient">نرخ‌ها</h2>
-              <p class="small-muted mt-1">فچ دستی نرخ‌ها و ذخیره در دیتابیس (admin فقط)</p>
-            </div>
-            <div>
-              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="fetchRates()">فچ و ذخیره نرخ‌ها</button>
-            </div>
-          </div>
-
-          <div id="ratesMsg" class="mt-4 small-muted">—</div>
-        </section>
-
-        <!-- logs -->
-        <section id="tab-logs" class="glass-panel p-6 hidden">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-semibold text-gradient">روت / لاگ سریع</h2>
-              <p class="small-muted mt-1">اطلاعات root, queue_size و debug endpoints</p>
-            </div>
-            <div>
-              <button class="glass-input px-4 py-2 rounded-lg" onclick="fetchRoot()">رفرش root</button>
-            </div>
-          </div>
-
-          <div class="mt-4">
-            <pre id="rootDump" class="mono small-muted p-4 rounded-lg bg-black/30 overflow-auto" style="max-height: 300px">—</pre>
-          </div>
-        </section>
-      </section>
     </main>
   </div>
 
   <script>
-    // Configuration
-    const BACKEND = "https://two-api-iksq.onrender.com";
-    const AUTH_PAGE = "https://im-abi-oo.github.io/auth";
-    const PUBLIC_PANEL = "https://im-abi-oo.github.io/panel";
+    const BACKEND = "http://127.0.0.1:5000";
+    const AUTH_PAGE = "/auth/";
+    const USER_PANEL = "/panel/";
 
-    // Utility: get token from localStorage in common keys
-    function getStoredToken() {
-      return localStorage.getItem("access_token") || localStorage.getItem("twomanga_access") || localStorage.getItem("twomanga_access_token") || null;
-    }
+    function getStoredToken() { return localStorage.getItem("access_token"); }
 
-    // set header for fetch calls
     function authHeaders() {
-      const token = getStoredToken();
-      if (!token) return {};
-      return { "Authorization": "Bearer " + token };
+      return {
+        "Authorization": "Bearer " + getStoredToken(),
+        "Content-Type": "application/json"
+      };
     }
 
-    // redirect helpers
-    function redirectToAuth() { window.location.href = AUTH_PAGE; }
-    function redirectToPanel() { window.location.href = PUBLIC_PANEL; }
-
-    // UI utilities
-    function showTab(name) {
-      document.querySelectorAll("[id^='tab-']").forEach(el => {
-        if (el.id === "tab-" + name) el.classList.remove("hidden");
-        else el.classList.add("hidden");
-      });
-      // active nav
-      document.querySelectorAll("[data-tab]").forEach(btn => btn.classList.remove("active"));
-      const navBtn = document.querySelector(`[data-tab='${name}']`);
-      if (navBtn) navBtn.classList.add("active");
-    }
-
-    // on logout
-    document.getElementById("btnLogout").addEventListener("click", () => {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("twomanga_access");
-      localStorage.removeItem("twomanga_admin_token");
-      redirectToAuth();
-    });
-
-    // --- authentication & bootstrapping ---
+    // --- Core: Bootstrap & Auth Check ---
     async function bootstrap() {
       const token = getStoredToken();
       if (!token) {
-        // هیچ توکنی نیست => هدایت به auth
-        return redirectToAuth();
-      }
-      try {
-        const res = await fetch(BACKEND + "/auth/me", {
-          method: "GET",
-          headers: { ...authHeaders(), "Accept": "application/json" }
-        });
-        if (res.status === 401 || res.status === 403) {
-          // توکن نامعتبر یا سشن نامعتبر: پاک و ریدایرکت
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("twomanga_access");
-          return redirectToAuth();
-        }
-        if (!res.ok) {
-          // اگر سرور پاسخی داد اما ادمین نبود یا خطا داشت
-          // سعی کن پیغام بفرستی ولی اگر role غیر admin باشه هدایت به پنل عادی
-          const j = await res.json().catch(()=>({}));
-          if (j && j.role && j.role !== "admin") {
-            return redirectToPanel();
-          }
-          // سایر خطاها => ریدایرکت به auth
-          return redirectToAuth();
-        }
-        const body = await res.json();
-        // body میتواند { username, role, is_premium, ... }
-        document.getElementById("adminName").innerText = body.username || "admin";
-        document.getElementById("adminRole").innerText = body.role || "—";
-
-        if (body.role !== "admin") {
-          // اگر لاگین کرده ولی ادمین نیست => هدایت به panel عمومی
-          return redirectToPanel();
-        }
-
-        // بارگذاری اولیه
-        showTab("dashboard");
-        fetchRoot(); // root و queue
-        // bind other UI
-      } catch (err) {
-        console.error("bootstrap error", err);
-        // خطای شبکه یا مشابه => ریدایرکت به auth
-        return redirectToAuth();
-      }
-    }
-
-    // --- Root & ping & db-status ---
-    async function fetchRoot() {
-      setLoading("rootInfo", true);
-      try {
-        const res = await fetch(BACKEND + "/", { headers: { "Accept": "application/json", ...authHeaders() }});
-        if (!res.ok) {
-          document.getElementById("rootDump").innerText = "خطا در واکشی root: " + res.status;
-        } else {
-          const j = await res.json();
-          document.getElementById("rootDump").innerText = JSON.stringify(j, null, 2);
-          document.getElementById("rootInfo").innerText = (j.server || "Two Manga API");
-          document.getElementById("rootQueue").innerText = "queue:" + (j.queue_size ?? "—");
-        }
-      } catch (e) {
-        document.getElementById("rootDump").innerText = "خطای شبکه هنگام واکشی root";
-      } finally {
-        setLoading("rootInfo", false);
-      }
-    }
-
-    async function pingServer() {
-      document.getElementById("pingLoader").innerHTML = '<span class="loader"></span>';
-      try {
-        const res = await fetch(BACKEND + "/debug/ping", { headers: { "Accept": "application/json", ...authHeaders() }});
-        if (!res.ok) {
-          document.getElementById("pingResult").innerText = "پاسخ نامعتبر: " + res.status;
-          return;
-        }
-        const j = await res.json();
-        document.getElementById("pingResult").innerText = (j.msg || "pong");
-      } catch (e) {
-        document.getElementById("pingResult").innerText = "خطای شبکه";
-      } finally {
-        document.getElementById("pingLoader").innerHTML = "";
-      }
-    }
-
-    async function dbStatus() {
-      document.getElementById("dbResult").innerText = "در حال بارگذاری...";
-      try {
-        const res = await fetch(BACKEND + "/debug/db-status", { headers: { "Accept": "application/json", ...authHeaders() }});
-        if (!res.ok) {
-          document.getElementById("dbResult").innerText = "خطا: " + res.status;
-          return;
-        }
-        const j = await res.json();
-        document.getElementById("dbResult").innerText = "available: " + (j.available ? "yes" : "no");
-      } catch (e) {
-        document.getElementById("dbResult").innerText = "خطای شبکه";
-      }
-    }
-
-    // --- transactions management ---
-    async function loadTransactions() {
-      const container = document.getElementById("transactionsList");
-      container.innerHTML = '<div class="p-4 mono small-muted">در حال بارگذاری... <span class="loader inline-block"></span></div>';
-      const status = document.getElementById("filterStatus").value;
-      const qs = status ? "?status=" + encodeURIComponent(status) : "";
-      try {
-        const res = await fetch(BACKEND + "/admin/transactions" + qs, { headers: { "Accept": "application/json", ...authHeaders() }});
-        if (res.status === 401 || res.status === 403) {
-          // توکن منقضی یا غیرمجاز
-          alert("احراز هویت ادمین ناموفق است. به صفحهٔ ورود هدایت می‌شوید.");
-          localStorage.removeItem("access_token");
-          redirectToAuth();
-          return;
-        }
-        if (!res.ok) {
-          container.innerHTML = '<div class="p-4 small-muted">خطا در دریافت تراکنش‌ها: ' + res.status + '</div>';
-          return;
-        }
-        const json = await res.json();
-        const items = json.transactions || [];
-        if (!items.length) {
-          container.innerHTML = '<div class="p-4 small-muted">تراکنشی موجود نیست.</div>';
-          return;
-        }
-        container.innerHTML = "";
-        for (const t of items) {
-          const card = document.createElement("div");
-          card.className = "p-4 plan-card glass-panel flex items-start justify-between gap-4";
-          const left = document.createElement("div");
-          left.innerHTML = `<div class="mono text-sm">#${t._id}</div>
-                            <div class="text-sm small-muted">${t.username || t.user_id} · ${t.status}</div>
-                            <div class="small-muted mt-2">tx: ${t.tx_hash || "—"} · days: ${t.days || 0}</div>
-                            <div class="small-muted">created: ${t.created_at || "—"}</div>`;
-          const right = document.createElement("div");
-          right.className = "flex items-center gap-2";
-          const approveBtn = document.createElement("button");
-          approveBtn.className = "btn-primary px-3 py-2 rounded-md";
-          approveBtn.innerText = "تأیید";
-          approveBtn.onclick = () => adminApprove(t._id, card);
-          const rejectBtn = document.createElement("button");
-          rejectBtn.className = "glass-input px-3 py-2 rounded-md";
-          rejectBtn.innerText = "رد";
-          rejectBtn.onclick = () => adminReject(t._id, card);
-          right.appendChild(approveBtn);
-          right.appendChild(rejectBtn);
-          card.appendChild(left);
-          card.appendChild(right);
-          container.appendChild(card);
-        }
-      } catch (e) {
-        container.innerHTML = '<div class="p-4 small-muted">خطای شبکه هنگام بارگذاری تراکنش‌ها</div>';
-      }
-    }
-
-    async function adminApprove(txId, node) {
-      if (!confirm("آیا مطمئنی تراکنش رو تأیید می‌کنی؟")) return;
-      const url = BACKEND + "/admin/transactions/" + encodeURIComponent(txId) + "/approve";
-      try {
-        node.querySelectorAll("button").forEach(b=>b.disabled=true);
-        const res = await fetch(url, { method: "POST", headers: { "Accept":"application/json", "Content-Type":"application/json", ...authHeaders() }});
-        if (res.ok) {
-          const j = await res.json();
-          alert("تأیید شد: " + (j.new_expiry || ""));
-          node.remove();
-        } else {
-          const txt = await res.text();
-          alert("خطا در تأیید: " + res.status + " " + txt);
-          node.querySelectorAll("button").forEach(b=>b.disabled=false);
-        }
-      } catch (e) {
-        alert("خطای شبکه در تأیید");
-        node.querySelectorAll("button").forEach(b=>b.disabled=false);
-      }
-    }
-
-    async function adminReject(txId, node) {
-      const reason = prompt("دلیل رد (اختیاری):", "");
-      const url = BACKEND + "/admin/transactions/" + encodeURIComponent(txId) + "/reject";
-      try {
-        node.querySelectorAll("button").forEach(b=>b.disabled=true);
-        const res = await fetch(url, { method: "POST", headers: { "Accept":"application/json", "Content-Type":"application/json", ...authHeaders() }, body: JSON.stringify({ reason })});
-        if (res.ok) {
-          alert("تراکنش رد شد.");
-          node.remove();
-        } else {
-          const txt = await res.text();
-          alert("خطا در رد: " + res.status + " " + txt);
-          node.querySelectorAll("button").forEach(b=>b.disabled=false);
-        }
-      } catch (e) {
-        alert("خطای شبکه در رد تراکنش");
-        node.querySelectorAll("button").forEach(b=>b.disabled=false);
-      }
-    }
-
-    // --- coupons ---
-    function showCouponCreate() {
-      const area = document.getElementById("couponCreateArea");
-      area.classList.toggle("hidden");
-    }
-
-    async function createCoupon() {
-      const code = document.getElementById("couponCode").value.trim();
-      const bonus = parseInt(document.getElementById("couponDays").value || "0", 10);
-      const max_uses = document.getElementById("couponMaxUses").value;
-      const expires_at = document.getElementById("couponExpires").value.trim();
-      if (!code || !bonus || bonus <= 0) {
-        alert("کد و bonus_days معتبر وارد کن.");
+        window.location.href = AUTH_PAGE;
         return;
       }
-      const payload = { code, bonus_days: bonus };
-      if (max_uses) payload.max_uses = parseInt(max_uses,10);
-      if (expires_at) payload.expires_at = expires_at;
-      document.getElementById("couponCreateMsg").innerText = "در حال ارسال...";
+
       try {
-        const res = await fetch(BACKEND + "/admin/coupons", {
-          method: "POST",
-          headers: { "Content-Type":"application/json", "Accept":"application/json", ...authHeaders() },
-          body: JSON.stringify(payload)
+        // فچ کردن اطلاعات از روت جدید me برای تشخیص Role
+        const res = await fetch(`${BACKEND}/auth/me`, {
+          method: "GET",
+          headers: authHeaders()
         });
-        if (res.ok) {
-          document.getElementById("couponCreateMsg").innerText = "کوپن ساخته شد.";
-          document.getElementById("couponCode").value = "";
-          document.getElementById("couponDays").value = "";
-          document.getElementById("couponMaxUses").value = "";
-          document.getElementById("couponExpires").value = "";
-          listCoupons();
-        } else {
-          const txt = await res.text();
-          document.getElementById("couponCreateMsg").innerText = "خطا: " + res.status;
-          alert("خطا در ایجاد کوپن: " + res.status + " " + txt);
+
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const user = await res.json();
+
+        // چک کردن نقش
+        if (user.role !== "admin") {
+          alert("شما دسترسی ادمین ندارید.");
+          window.location.href = USER_PANEL;
+          return;
         }
-      } catch (e) {
-        document.getElementById("couponCreateMsg").innerText = "خطای شبکه";
+
+        // اگر ادمین بود:
+        document.getElementById("adminUserDisplay").innerText = user.username;
+        document.getElementById("adminInitial").innerText = user.username[0].toUpperCase();
+        document.getElementById("backendUrl").innerText = BACKEND;
+        
+        // حذف لودر
+        const loader = document.getElementById("initial-loader");
+        loader.classList.add("opacity-0");
+        setTimeout(() => {
+          loader.style.display = "none";
+          document.getElementById("app-ui").classList.remove("opacity-0");
+        }, 500);
+
+        // لود کردن دیتای اولیه
+        showTab('dashboard');
+        loadDashboardStats();
+
+      } catch (err) {
+        console.error("Auth Fail:", err);
+        localStorage.removeItem("access_token");
+        window.location.href = AUTH_PAGE;
       }
     }
 
-    async function listCoupons() {
-      const place = document.getElementById("couponList");
-      place.innerHTML = '<div class="p-4 mono small-muted">در حال بارگذاری... <span class="loader inline-block"></span></div>';
+    // --- Navigation ---
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      
+      document.getElementById('tab-' + tabId).classList.add('active');
+      document.getElementById('nav-' + tabId).classList.add('active');
+
+      if(tabId === 'transactions') loadTransactions();
+      if(tabId === 'users') loadUsers();
+      if(tabId === 'dashboard') loadDashboardStats();
+    }
+
+    // --- Dashboard Stats ---
+    async function loadDashboardStats() {
       try {
-        const res = await fetch(BACKEND + "/admin/coupons", { headers: { "Accept":"application/json", ...authHeaders() }});
-        if (!res.ok) {
-          place.innerHTML = '<div class="p-4 small-muted">خطا: ' + res.status + '</div>';
-          return;
+        const res = await fetch(`${BACKEND}/admin/users`, { headers: authHeaders() });
+        const usersData = await res.json();
+        
+        const txRes = await fetch(`${BACKEND}/admin/transactions`, { headers: authHeaders() });
+        const txData = await txRes.json();
+
+        if (res.ok && txRes.ok) {
+          const users = usersData.users || [];
+          const txs = txData.transactions || [];
+          
+          document.getElementById("stat-total-users").innerText = users.length;
+          document.getElementById("stat-total-paid").innerText = txs.filter(t => t.status === 'paid').length;
+          const pendingCount = txs.filter(t => t.status === 'pending').length;
+          document.getElementById("stat-pending-tx").innerText = pendingCount;
+          
+          const badge = document.getElementById("pendingBadge");
+          if(pendingCount > 0) badge.classList.remove('hidden');
+          else badge.classList.add('hidden');
+
+          // رندر جدول داشبورد
+          const tbody = document.getElementById("dashboard-tx-table");
+          tbody.innerHTML = txs.slice(0, 5).map(t => `
+            <tr class="text-sm border-b border-white/5 hover:bg-white/5 transition-colors">
+              <td class="py-4 pr-4 font-bold text-white">${t.username}</td>
+              <td class="py-4">${Number(t.amount).toLocaleString()}</td>
+              <td class="py-4 text-xs text-gray-400">${t.plan_id}</td>
+              <td class="py-4">
+                <span class="px-2 py-1 rounded-full text-[10px] ${t.status === 'paid' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}">
+                  ${t.status === 'paid' ? 'تایید شده' : 'در انتظار'}
+                </span>
+              </td>
+            </tr>
+          `).join('');
         }
-        const j = await res.json();
-        const coupons = j.coupons || [];
-        if (!coupons.length) {
-          place.innerHTML = '<div class="p-4 small-muted">کوپنی موجود نیست.</div>';
-          return;
-        }
-        place.innerHTML = "";
-        for (const c of coupons) {
-          const el = document.createElement("div");
-          el.className = "p-3 plan-card glass-panel flex items-center justify-between";
-          el.innerHTML = `<div>
-                            <div class="font-medium mono">${c.code}</div>
-                            <div class="small-muted">bonus_days: ${c.bonus_days} · uses: ${c.uses || 0} ${c.max_uses ? "· max: "+c.max_uses : ""}</div>
-                          </div>
-                          <div class="text-right small-muted">${c.expires_at ? c.expires_at : ""}</div>`;
-          place.appendChild(el);
-        }
-      } catch (e) {
-        place.innerHTML = '<div class="p-4 small-muted">خطای شبکه در واکشی کوپن‌ها</div>';
-      }
+      } catch (err) { console.error(err); }
     }
 
-    // --- rates ---
+    // --- Transactions Management ---
+    async function loadTransactions() {
+      const tbody = document.getElementById("transactions-list");
+      tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center animate-pulse">در حال لود...</td></tr>';
+      
+      try {
+        const res = await fetch(`${BACKEND}/admin/transactions`, { headers: authHeaders() });
+        const data = await res.json();
+        
+        if (res.ok) {
+          const list = data.transactions || [];
+          if(list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center opacity-40">تراکنشی یافت نشد.</td></tr>';
+            return;
+          }
+          
+          tbody.innerHTML = list.reverse().map(t => `
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="p-5">
+                <div class="font-bold text-white">${t.username}</div>
+                <div class="text-[10px] text-gray-500 mt-1">${new Date(t.created_at).toLocaleString('fa-IR')}</div>
+              </td>
+              <td class="p-5 font-mono text-xs text-brand-accent">${t.ref_id || 'N/A'}</td>
+              <td class="p-5">
+                <div class="text-sm">${Number(t.amount).toLocaleString()} تومان</div>
+                <div class="text-[10px] text-gray-500">${t.plan_id}</div>
+              </td>
+              <td class="p-5">
+                ${t.status === 'pending' ? `
+                  <div class="flex justify-center gap-2">
+                    <button onclick="updateTx('${t._id}', 'approve')" class="px-4 py-1.5 bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white rounded-lg text-xs font-bold transition-all">تایید</button>
+                    <button onclick="updateTx('${t._id}', 'reject')" class="px-4 py-1.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg text-xs font-bold transition-all">رد</button>
+                  </div>
+                ` : `
+                  <div class="text-center text-[10px] uppercase font-bold ${t.status === 'paid' ? 'text-green-500' : 'text-red-500'}">
+                    ${t.status === 'paid' ? 'پرداخت شده' : 'رد شده'}
+                  </div>
+                `}
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-red-500">خطای شبکه</td></tr>'; }
+    }
+
+    async function updateTx(txId, action) {
+      if(!confirm("آیا از انجام این عملیات روی تراکنش مطمئن هستید؟")) return;
+      try {
+        const res = await fetch(`${BACKEND}/admin/transactions/${txId}/${action}`, {
+          method: "POST",
+          headers: authHeaders()
+        });
+        if(res.ok) {
+          alert("تراکنش با موفقیت آپدیت شد.");
+          loadTransactions();
+          loadDashboardStats();
+        } else {
+          const err = await res.json();
+          alert("خطا: " + err.msg);
+        }
+      } catch (err) { alert("خطای سرور"); }
+    }
+
+    // --- Rates ---
     async function fetchRates() {
-      const el = document.getElementById("ratesMsg");
-      el.innerText = "در حال فچ و ذخیره...";
+      const btn = document.getElementById("btnFetchRates");
+      const msg = document.getElementById("ratesMsg");
+      btn.disabled = true;
+      msg.innerText = "⏳ در حال استعلام قیمت دلار و آپدیت پلن‌ها...";
+      
       try {
-        const res = await fetch(BACKEND + "/admin/fetch-rates", { method: "POST", headers: { "Accept":"application/json", ...authHeaders() }});
-        if (res.ok) {
-          el.innerText = "نرخ‌ها با موفقیت فچ شدند.";
+        const res = await fetch(`${BACKEND}/admin/fetch-rates`, {
+          method: "POST",
+          headers: authHeaders()
+        });
+        if(res.ok) {
+          msg.className = "text-center text-xs text-green-500 font-bold";
+          msg.innerText = "✅ نرخ‌ها با موفقیت آپدیت شدند.";
+          setTimeout(() => { msg.innerText = ""; btn.disabled = false; }, 3000);
         } else {
-          const txt = await res.text();
-          el.innerText = "خطا: " + res.status;
-          alert("خطا در فچ نرخ‌ها: " + res.status + " " + txt);
+          msg.innerText = "❌ خطا در آپدیت نرخ‌ها";
+          btn.disabled = false;
         }
       } catch (e) {
-        el.innerText = "خطای شبکه";
+        msg.innerText = "⚠️ خطای شبکه";
+        btn.disabled = false;
       }
     }
 
-    // small helper to set a loader state on an element id
-    function setLoading(id, loading) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      if (loading) el.classList.add("opacity-60");
-      else el.classList.remove("opacity-60");
+    // --- Users ---
+    async function loadUsers() {
+      const tbody = document.getElementById("users-list");
+      tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center animate-pulse">در حال فچ کاربران...</td></tr>';
+      try {
+        const res = await fetch(`${BACKEND}/admin/users`, { headers: authHeaders() });
+        const data = await res.json();
+        if(res.ok) {
+          let list = data.users || [];
+          const search = document.getElementById("userSearchInput").value.toLowerCase();
+          if(search) list = list.filter(u => u.username.toLowerCase().includes(search));
+
+          tbody.innerHTML = list.map(u => `
+            <tr class="hover:bg-white/[0.02]">
+              <td class="p-5 font-bold text-white">${u.username}</td>
+              <td class="p-5">
+                <span class="px-2 py-0.5 rounded-full text-[10px] ${u.role === 'admin' ? 'bg-brand-accent/20 text-brand-accent' : 'bg-white/10 text-gray-400'}">
+                  ${u.role}
+                </span>
+              </td>
+              <td class="p-5 text-sm text-gray-500 font-mono">${u.expiryDate ? new Date(u.expiryDate).toLocaleDateString('fa-IR') : 'دائم / نامشخص'}</td>
+              <td class="p-5 text-center">
+                <button class="text-xs text-brand-accent hover:underline">ویرایش دسترسی</button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) { tbody.innerHTML = '<tr><td colspan="4" class="p-5 text-red-500 text-center">خطا</td></tr>'; }
     }
 
-    // init
-    (function init() {
-      // set backend url in UI
-      document.getElementById("backendUrl").innerText = BACKEND;
-      // bootstrap (auth check -> show panel or redirect)
-      bootstrap();
-      // show default tab only after bootstrap succeeded and role admin
-      // keep event listeners for dynamic actions
-      // keyboard shortcut: R reload root
-      window.addEventListener("keydown", (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r") {
-          fetchRoot();
-        }
-      });
-    })();
+    function logout() {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      window.location.href = AUTH_PAGE;
+    }
+
+    // Start
+    window.onload = bootstrap;
   </script>
 </body>
 </html>

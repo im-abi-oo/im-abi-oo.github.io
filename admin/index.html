@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>پنل ادمین - Two Manga</title>
+  <title>پنل ادمین — Two Manga</title>
 
-  <!-- Tailwind config -->
+  <!-- Tailwind config (provided by you) -->
   <script>
     tailwind = window.tailwind || {};
     tailwind.config = {
@@ -52,29 +52,31 @@
     body {
       background-color: #050505;
       background-image:
-        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.08) 0%, transparent 25%);
+        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.06) 0%, transparent 25%);
       color: #f4f4f5;
       overflow-x: hidden;
       font-family: Vazirmatn, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     }
 
     .glass-panel {
-      background: rgba(24, 24, 27, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      background: rgba(24, 24, 27, 0.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
     }
     .glass-input {
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       color: white;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
+      padding: .6rem .8rem;
+      border-radius: .5rem;
     }
     .glass-input:focus {
       border-color: #8b5cf6;
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 0 18px rgba(139, 92, 246, 0.16);
       outline: none;
     }
     .text-gradient {
@@ -82,693 +84,569 @@
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .hover-card { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
-    .hover-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -5px rgba(139,92,246,0.15); border-color: rgba(139,92,246,0.3); }
+    .hover-card { transition: all 0.28s cubic-bezier(0.4,0,0.2,1); }
+    .hover-card:hover { transform: translateY(-6px); box-shadow: 0 26px 60px -12px rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.28); }
 
-    .plan-card { position: relative; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.03); transition: all 0.3s ease; }
-    .plan-card.active { background: linear-gradient(145deg, rgba(139,92,246,0.2), rgba(0,0,0,0)); border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139,92,246,0.2); }
-    .plan-card.active::before { content: ''; position: absolute; top:0; right:0; width: 4px; height: 100%; background: #8b5cf6; box-shadow: 0 0 10px #8b5cf6; }
+    .plan-card { position: relative; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); transition: all 0.28s ease; border-radius: 12px; }
+    .plan-card.active { background: linear-gradient(145deg, rgba(139,92,246,0.12), rgba(0,0,0,0)); border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139,92,246,0.12); }
 
-    .crypto-btn { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); transition: all 0.2s; }
-    .crypto-btn:hover { background: rgba(255,255,255,0.05); }
-    .crypto-btn.active { border-color: #d946ef; background: rgba(217,70,239,0.1); box-shadow: 0 0 15px rgba(217,70,239,0.15); }
+    .crypto-btn { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.18); transition: all 0.18s; padding: .5rem .75rem; border-radius: .6rem; }
+    .crypto-btn:hover { background: rgba(255,255,255,0.03); }
+    .crypto-btn.active { border-color: #d946ef; background: rgba(217,70,239,0.08); box-shadow: 0 0 12px rgba(217,70,239,0.12); }
 
-    .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #8b5cf6; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+    .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #8b5cf6; border-radius: 50%; width: 22px; height: 22px; animation: spin 1s linear infinite; display: inline-block; }
     @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
 
-    .step-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
-    .step-content.active { display: block; opacity: 1; transform: translateY(0); }
-
-    .btn-primary { background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%); background-size: 200% auto; transition: 0.5s; }
-    .btn-primary:hover { background-position: right center; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
+    .btn-primary { background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%); background-size: 200% auto; transition: 0.45s; color: white; }
+    .btn-primary:hover { background-position: right center; box-shadow: 0 10px 40px rgba(139, 92, 246, 0.24); transform: translateY(-2px); }
 
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Helvetica Neue", monospace; }
+    .small-muted { color: rgba(255,255,255,0.5); font-size: 0.86rem; }
+    .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); }
+
   </style>
 </head>
+<body>
 
-<body class="min-h-screen antialiased">
-  <div class="max-w-7xl mx-auto px-4 py-8">
-    <!-- Header -->
+  <div class="max-w-7xl mx-auto px-4 py-6">
     <header class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-bold text-gradient">پنل ادمین — Two Manga</h1>
-        <p class="text-sm text-gray-400 mt-1">مدیریت تراکنش‌ها، کوپن‌ها و نرخ‌ها</p>
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#d946ef] flex items-center justify-center shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l4 2"/></svg>
+        </div>
+        <div>
+          <div class="text-lg font-semibold">پنل ادمین — Two Manga</div>
+          <div class="small-muted">آدرس بک‌اند: <span id="backendUrl" class="mono">https://two-api-iksq.onrender.com</span></div>
+        </div>
       </div>
 
       <div class="flex items-center gap-3">
-        <input id="token" type="text" placeholder="توکن JWT ادمین (می‌توانید لاگین کنید)" class="glass-input px-3 py-2 rounded-md w-80 text-sm" />
-        <button id="loadBtn" class="btn-primary text-sm px-4 py-2 rounded-md shadow hover:scale-[1.01]" onclick="initLoad()">بارگذاری</button>
-        <button class="glass-input text-sm px-3 py-2 rounded-md" onclick="openLoginModal()">ورود</button>
-        <button id="logoutBtn" class="glass-input text-sm px-3 py-2 rounded-md" onclick="logout()">خروج</button>
+        <div class="text-right">
+          <div id="adminName" class="text-sm small-muted">بارگذاری...</div>
+          <div class="text-xs small-muted">سطح دسترسی: <span id="adminRole">—</span></div>
+        </div>
+        <button id="btnLogout" class="btn-primary px-4 py-2 rounded-lg shadow hover:shadow-lg">خروج</button>
       </div>
     </header>
 
     <main class="grid grid-cols-12 gap-6">
-      <!-- Sidebar -->
-      <aside class="col-span-3 glass-panel p-4 rounded-lg h-fit">
-        <nav class="space-y-3">
-          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5 active-tab text-sm" data-tab="transactions" onclick="switchTab('transactions')">تراکنش‌ها</button>
-          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5" data-tab="coupons" onclick="switchTab('coupons')">کوپن‌ها</button>
-          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5" data-tab="rates" onclick="switchTab('rates')">نرخ‌ها</button>
-          <button class="w-full text-right py-2 px-3 rounded hover:bg-white/5" data-tab="stats" onclick="switchTab('stats')">آمار</button>
-        </nav>
-        <hr class="my-4 border-white/6" />
-        <div class="space-y-2 text-xs text-gray-300">
-          <div>حالت: <span id="statusIndicator" class="mono">انتظار توکن</span></div>
-          <div>کاربر: <span id="meUser" class="mono">—</span></div>
-          <div>API base: <span id="apiBase" class="text-sm text-gray-200 mono">/</span></div>
-          <div class="flex items-center gap-2 mt-2">
-            <input id="apiBaseInput" class="glass-input px-2 py-1 rounded text-xs mono" placeholder="مثال: http://localhost:5001" />
-            <button class="glass-input text-xs px-2 py-1 rounded" onclick="setApiBaseFromInput()">تنظیم API</button>
-          </div>
+      <!-- left column (controls) -->
+      <aside class="col-span-3 glass-panel p-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="text-sm small-muted">نِویگِیشن</div>
+          <div class="text-xs small-muted">admin</div>
         </div>
+
+        <nav class="flex flex-col gap-2">
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="dashboard" onclick="showTab('dashboard')">
+            داشبورد وضعیت
+            <div class="small-muted text-sm">ping / db-status / root</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="transactions" onclick="showTab('transactions')">
+            تراکنش‌ها
+            <div class="small-muted text-sm">مشاهده — تأیید — رد</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="coupons" onclick="showTab('coupons')">
+            کوپن‌ها
+            <div class="small-muted text-sm">ایجاد — لیست</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="rates" onclick="showTab('rates')">
+            نرخ‌ها (دستی)
+            <div class="small-muted text-sm">فچ و ذخیرهٔ نرخ</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="logs" onclick="showTab('logs')">
+            لاگ‌ها / روت & queue
+            <div class="small-muted text-sm">وضعیت صف و لاگ‌های سریع</div>
+          </button>
+        </nav>
       </aside>
 
-      <!-- Content -->
-      <section class="col-span-9">
-        <!-- Transactions Tab -->
-        <div id="tab-transactions" class="step-content active">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium">تراکنش‌ها</h2>
-            <div class="flex items-center gap-2">
-              <select id="statusFilter" class="glass-input px-3 py-2 rounded text-sm" onchange="loadTransactions()">
-                <option value="">همه</option>
-                <option value="pending">در انتظار</option>
-                <option value="pending_verification">در انتظار تایید بلاکچین</option>
-                <option value="approved">تایید شده</option>
-                <option value="rejected">رد شده</option>
-              </select>
-              <button class="btn-primary px-3 py-2 rounded text-sm" onclick="loadTransactions()">بارگذاری</button>
+      <!-- main content -->
+      <section class="col-span-9 space-y-6">
+        <!-- dashboard -->
+        <section id="tab-dashboard" class="glass-panel p-6">
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">داشبورد سلامت</h2>
+              <p class="small-muted mt-1">در این صفحه می‌توانید وضعیت سلامت سرور، DB و front/back root را بررسی کنید.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button id="btnPing" class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="pingServer()">
+                بررسی سلامت <span id="pingLoader" class="inline-block ml-2"></span>
+              </button>
+              <button id="btnDbStatus" class="glass-input px-4 py-2 rounded-lg" onclick="dbStatus()">
+                وضعیت DB
+              </button>
             </div>
           </div>
 
-          <div id="txList" class="space-y-3">
-            <div id="txEmpty" class="text-sm text-gray-400">برای نمایش تراکنش‌ها روی «بارگذاری» کلیک کنید.</div>
-          </div>
-        </div>
-
-        <!-- Coupons Tab -->
-        <div id="tab-coupons" class="step-content">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium">کوپن‌ها</h2>
-            <div class="flex items-center gap-2">
-              <button class="btn-primary px-3 py-2 rounded text-sm" onclick="openCouponModal()">ایجاد کوپن</button>
-              <button class="glass-input px-3 py-2 rounded text-sm" onclick="loadCoupons()">بارگذاری</button>
-            </div>
-          </div>
-
-          <div id="couponsList" class="grid grid-cols-1 gap-3">
-            <div class="text-sm text-gray-400">کوپنی موجود نیست — «بارگذاری» را بزنید.</div>
-          </div>
-        </div>
-
-        <!-- Rates Tab -->
-        <div id="tab-rates" class="step-content">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium">نرخ‌ها</h2>
-            <div class="flex items-center gap-2">
-              <button class="btn-primary px-3 py-2 rounded text-sm" onclick="adminFetchRates()">دریافت نرخ (ادمین)</button>
-              <button class="glass-input px-3 py-2 rounded text-sm" onclick="loadPublicRates()">بارگذاری نرخ عمومی</button>
-            </div>
-          </div>
-
-          <div id="ratesCard" class="glass-panel p-4 rounded-lg">
-            <div id="ratesEmpty" class="text-sm text-gray-400">برای نمایش نرخ‌ها «بارگذاری نرخ عمومی» را بزنید یا ابتدا توکن وارد کنید.</div>
-            <div id="ratesContent" class="hidden">
-              <div class="grid grid-cols-2 gap-4">
-                <div class="p-3 bg-white/3 rounded">
-                  <div class="text-sm text-gray-300">USDT</div>
-                  <div id="rateUSDT" class="text-2xl font-semibold mt-1 mono">—</div>
+          <div class="mt-6 grid grid-cols-3 gap-4">
+            <div class="p-4 plan-card glass-panel">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="small-muted">Queue / Root</div>
+                  <div id="rootInfo" class="text-lg font-medium mono">بارگذاری...</div>
                 </div>
-                <div class="p-3 bg-white/3 rounded">
-                  <div class="text-sm text-gray-300">TRX</div>
-                  <div id="rateTRX" class="text-2xl font-semibold mt-1 mono">—</div>
-                </div>
-                <div class="p-3 bg-white/3 rounded">
-                  <div class="text-sm text-gray-300">TON</div>
-                  <div id="rateTON" class="text-2xl font-semibold mt-1 mono">—</div>
-                </div>
-                <div class="p-3 bg-white/3 rounded">
-                  <div class="text-sm text-gray-300">SOL</div>
-                  <div id="rateSOL" class="text-2xl font-semibold mt-1 mono">—</div>
-                </div>
+                <div id="rootQueue" class="pill">—</div>
               </div>
-              <div class="text-xs text-gray-400 mt-3">آخرین به‌روزرسانی: <span id="ratesTs">—</span></div>
             </div>
-          </div>
-        </div>
 
-        <!-- Stats Tab -->
-        <div id="tab-stats" class="step-content">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-medium">آمار کلی</h2>
-            <button class="glass-input px-3 py-2 rounded text-sm" onclick="loadStats()">بارگذاری آمار</button>
+            <div class="p-4 plan-card glass-panel">
+              <div class="small-muted">Ping</div>
+              <div id="pingResult" class="text-lg font-medium mono mt-2">—</div>
+            </div>
+
+            <div class="p-4 plan-card glass-panel">
+              <div class="small-muted">DB Status</div>
+              <div id="dbResult" class="text-lg font-medium mono mt-2">—</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- transactions -->
+        <section id="tab-transactions" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">مدیریت تراکنش‌ها</h2>
+              <p class="small-muted mt-1">لیست آخرین تراکنش‌ها — میتونی تأیید یا رد کنی.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="filterStatus" class="glass-input" onchange="loadTransactions()">
+                <option value="">همه</option>
+                <option value="pending">pending</option>
+                <option value="pending_verification">pending_verification</option>
+                <option value="approved">approved</option>
+                <option value="rejected">rejected</option>
+              </select>
+              <button class="glass-input px-4 py-2 rounded-lg" onclick="loadTransactions()">بارگذاری</button>
+            </div>
           </div>
 
-          <div id="statsGrid" class="grid grid-cols-3 gap-4">
-            <div class="glass-panel p-4 rounded-lg text-center">
-              <div class="text-sm text-gray-300">تعداد تراکنش‌ها</div>
-              <div id="statTx" class="text-3xl font-bold mt-2 mono">—</div>
+          <div id="transactionsList" class="mt-6 space-y-3">
+            <div class="small-muted">هیچ‌چیزی لود نشده — روی بارگذاری بزن.</div>
+          </div>
+        </section>
+
+        <!-- coupons -->
+        <section id="tab-coupons" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">کوپن‌ها</h2>
+              <p class="small-muted mt-1">ایجاد و مدیریت کوپن‌ها</p>
             </div>
-            <div class="glass-panel p-4 rounded-lg text-center">
-              <div class="text-sm text-gray-300">تعداد کوپن‌ها</div>
-              <div id="statCoupons" class="text-3xl font-bold mt-2 mono">—</div>
-            </div>
-            <div class="glass-panel p-4 rounded-lg text-center">
-              <div class="text-sm text-gray-300">تعداد کاربران (حدس از users collection)</div>
-              <div id="statUsers" class="text-3xl font-bold mt-2 mono">—</div>
+            <div>
+              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="showCouponCreate()">ایجاد کوپن جدید</button>
             </div>
           </div>
-        </div>
+
+          <div id="couponCreateArea" class="mt-6 hidden">
+            <div class="grid grid-cols-3 gap-3">
+              <input id="couponCode" placeholder="کد کوپن" class="glass-input col-span-1" />
+              <input id="couponDays" type="number" placeholder="تعداد روز - bonus_days" class="glass-input col-span-1" />
+              <input id="couponMaxUses" type="number" placeholder="max_uses (اختیاری)" class="glass-input col-span-1" />
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+              <input id="couponExpires" placeholder="expires_at (ISO, اختیاری)" class="glass-input w-1/2" />
+              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="createCoupon()">ایجاد</button>
+              <span id="couponCreateMsg" class="small-muted"></span>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <button class="glass-input px-4 py-2 rounded-lg" onclick="listCoupons()">لیست کوپن‌ها</button>
+          </div>
+
+          <div id="couponList" class="mt-4 space-y-2 small-muted"></div>
+        </section>
+
+        <!-- rates -->
+        <section id="tab-rates" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">نرخ‌ها</h2>
+              <p class="small-muted mt-1">فچ دستی نرخ‌ها و ذخیره در دیتابیس (admin فقط)</p>
+            </div>
+            <div>
+              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="fetchRates()">فچ و ذخیره نرخ‌ها</button>
+            </div>
+          </div>
+
+          <div id="ratesMsg" class="mt-4 small-muted">—</div>
+        </section>
+
+        <!-- logs -->
+        <section id="tab-logs" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">روت / لاگ سریع</h2>
+              <p class="small-muted mt-1">اطلاعات root, queue_size و debug endpoints</p>
+            </div>
+            <div>
+              <button class="glass-input px-4 py-2 rounded-lg" onclick="fetchRoot()">رفرش root</button>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <pre id="rootDump" class="mono small-muted p-4 rounded-lg bg-black/30 overflow-auto" style="max-height: 300px">—</pre>
+          </div>
+        </section>
       </section>
     </main>
   </div>
 
-  <!-- Coupon Modal -->
-  <div id="couponModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
-    <div class="w-full max-w-xl glass-panel p-6 rounded-lg">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium">ایجاد کوپن جدید</h3>
-        <button onclick="closeCouponModal()" class="text-gray-300 hover:text-white">بستن ✕</button>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="text-sm text-gray-300">کد کوپن</label>
-          <input id="couponCode" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="مثال: WELCOME50" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-sm text-gray-300">روز جایزه</label>
-            <input id="couponDays" type="number" min="1" class="glass-input mt-1 w-full px-3 py-2 rounded" value="30" />
-          </div>
-          <div>
-            <label class="text-sm text-gray-300">حداکثر استفاده (خالی = نامحدود)</label>
-            <input id="couponMax" type="number" min="1" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="مثلا: 100" />
-          </div>
-        </div>
-        <div>
-          <label class="text-sm text-gray-300">تاریخ انقضا (اختیاری، ISO)</label>
-          <input id="couponExpires" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="مثال: 2026-12-31T23:59:59" />
-        </div>
-
-        <div class="flex items-center gap-2 justify-start">
-          <button class="btn-primary px-4 py-2 rounded" onclick="createCoupon()">ایجاد</button>
-          <button class="glass-input px-4 py-2 rounded" onclick="closeCouponModal()">لغو</button>
-        </div>
-
-        <div id="couponMsg" class="text-sm text-red-400"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Login Modal -->
-  <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
-    <div class="w-full max-w-md glass-panel p-6 rounded-lg">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium">ورود ادمین</h3>
-        <button onclick="closeLoginModal()" class="text-gray-300 hover:text-white">بستن ✕</button>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="text-sm text-gray-300">نام کاربری</label>
-          <input id="loginUser" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="username" />
-        </div>
-        <div>
-          <label class="text-sm text-gray-300">رمز عبور</label>
-          <input id="loginPass" type="password" class="glass-input mt-1 w-full px-3 py-2 rounded" placeholder="password" />
-        </div>
-
-        <div class="flex items-center gap-2 justify-start">
-          <button class="btn-primary px-4 py-2 rounded" onclick="doLogin()">ورود</button>
-          <button class="glass-input px-4 py-2 rounded" onclick="closeLoginModal()">لغو</button>
-        </div>
-
-        <div id="loginMsg" class="text-sm text-red-400"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Small toast -->
-  <div id="toast" class="fixed left-1/2 -translate-x-1/2 bottom-6 z-50 hidden">
-    <div class="glass-panel px-4 py-2 rounded shadow text-sm">پیام</div>
-  </div>
-
   <script>
-    // ---------------- Config ----------------
-    // اگر بک‌اند شما روی دامنه/پورت دیگری است این مقدار را تغییر دهید.
-    // اگر خالی بگذارید فرض می‌شود فایل فرانت روی همان origin اجرا می‌شود.
-    let API_BASE = ""; // default: "" => same origin; to force local dev: "http://localhost:5001"
-    // convenience: اگر صفحه روی localhost باز شده و API_BASE خالی، پیش‌فرض از پورت 5001 استفاده کن
-    if (!API_BASE && (location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
-      API_BASE = `${location.protocol}//${location.hostname}:5001`;
-    }
-    document.getElementById('apiBase').textContent = API_BASE || '/';
+    // Configuration
+    const BACKEND = "https://two-api-iksq.onrender.com";
+    const AUTH_PAGE = "https://im-abi-oo.github.io/auth";
+    const PUBLIC_PANEL = "https://im-abi-oo.github.io/panel";
 
-    // Token storage (access + refresh)
-    let cachedToken = localStorage.getItem('two_admin_access') || '';
-    let refreshToken = localStorage.getItem('two_admin_refresh') || '';
-    let currentTab = 'transactions';
-    let cachedTx = [];
-    let cachedCoupons = [];
-    let validatingInterval = null;
-
-    function toast(msg, timeout=3000) {
-      const t = document.getElementById('toast');
-      t.firstElementChild.textContent = msg;
-      t.classList.remove('hidden');
-      clearTimeout(t._to);
-      t._to = setTimeout(()=> t.classList.add('hidden'), timeout);
+    // Utility: get token from localStorage in common keys
+    function getStoredToken() {
+      return localStorage.getItem("access_token") || localStorage.getItem("twomanga_access") || localStorage.getItem("twomanga_access_token") || null;
     }
 
-    function switchTab(tab) {
-      currentTab = tab;
-      document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
-      const el = document.getElementById('tab-' + tab);
-      if (el) el.classList.add('active');
+    // set header for fetch calls
+    function authHeaders() {
+      const token = getStoredToken();
+      if (!token) return {};
+      return { "Authorization": "Bearer " + token };
     }
 
-    // ---------------- API helpers ----------------
-    function setApiBaseFromInput(){
-      const v = (document.getElementById('apiBaseInput').value || '').trim();
-      if (!v) { toast('آدرس API را وارد کنید'); return; }
-      API_BASE = v.replace(/\/+$/,'');
-      document.getElementById('apiBase').textContent = API_BASE;
-      toast('API base تنظیم شد');
+    // redirect helpers
+    function redirectToAuth() { window.location.href = AUTH_PAGE; }
+    function redirectToPanel() { window.location.href = PUBLIC_PANEL; }
+
+    // UI utilities
+    function showTab(name) {
+      document.querySelectorAll("[id^='tab-']").forEach(el => {
+        if (el.id === "tab-" + name) el.classList.remove("hidden");
+        else el.classList.add("hidden");
+      });
+      // active nav
+      document.querySelectorAll("[data-tab]").forEach(btn => btn.classList.remove("active"));
+      const navBtn = document.querySelector(`[data-tab='${name}']`);
+      if (navBtn) navBtn.classList.add("active");
     }
 
-    function saveTokens(access, refresh) {
-      if (access) {
-        cachedToken = access;
-        localStorage.setItem('two_admin_access', access);
+    // on logout
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("twomanga_access");
+      localStorage.removeItem("twomanga_admin_token");
+      redirectToAuth();
+    });
+
+    // --- authentication & bootstrapping ---
+    async function bootstrap() {
+      const token = getStoredToken();
+      if (!token) {
+        // هیچ توکنی نیست => هدایت به auth
+        return redirectToAuth();
       }
-      if (refresh) {
-        refreshToken = refresh;
-        localStorage.setItem('two_admin_refresh', refresh);
-      }
-      updateTokenInput();
-    }
-
-    function clearTokens() {
-      cachedToken = '';
-      refreshToken = '';
-      localStorage.removeItem('two_admin_access');
-      localStorage.removeItem('two_admin_refresh');
-      updateTokenInput();
-      document.getElementById('statusIndicator').textContent = 'توکن پاک شد';
-      document.getElementById('meUser').textContent = '—';
-    }
-
-    function logout() {
-      if (confirm('خروج از پنل؟')) {
-        clearTokens();
-        toast('خروج انجام شد');
-      }
-    }
-
-    function updateTokenInput(){
-      document.getElementById('token').value = cachedToken || '';
-    }
-
-    // try refresh access token using refreshToken. returns true if refreshed.
-    async function tryRefresh() {
-      if (!refreshToken) return false;
       try {
-        const res = await fetch(API_BASE + '/auth/refresh', {
-          method: 'POST',
-          headers: { 'Authorization': 'Bearer ' + refreshToken }
+        const res = await fetch(BACKEND + "/auth/me", {
+          method: "GET",
+          headers: { ...authHeaders(), "Accept": "application/json" }
         });
+        if (res.status === 401 || res.status === 403) {
+          // توکن نامعتبر یا سشن نامعتبر: پاک و ریدایرکت
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("twomanga_access");
+          return redirectToAuth();
+        }
         if (!res.ok) {
-          // clear refresh if invalid
-          clearTokens();
-          return false;
-        }
-        const j = await res.json();
-        if (j.access_token) {
-          saveTokens(j.access_token, refreshToken);
-          return true;
-        }
-        return false;
-      } catch (e) {
-        console.error('refresh error', e);
-        return false;
-      }
-    }
-
-    // centralized fetch that attaches access token, attempts refresh on 401, and returns json or throws
-    async function apiFetch(path, opts = {}) {
-      const headers = Object.assign({}, opts.headers || {});
-      if (cachedToken) headers['Authorization'] = 'Bearer ' + cachedToken;
-      if (opts.body && !(opts.body instanceof FormData)) {
-        headers['Content-Type'] = 'application/json';
-      }
-      try {
-        const res = await fetch(API_BASE + path, {...opts, headers});
-        const contentType = res.headers.get('content-type') || '';
-        let json = null;
-        if (contentType.includes('application/json')) json = await res.json().catch(()=>null);
-        if (res.status === 401) {
-          // try refresh once
-          const refreshed = await tryRefresh();
-          if (refreshed) {
-            // retry original request with new token
-            const headers2 = Object.assign({}, opts.headers || {});
-            if (cachedToken) headers2['Authorization'] = 'Bearer ' + cachedToken;
-            if (opts.body && !(opts.body instanceof FormData)) headers2['Content-Type'] = 'application/json';
-            const retry = await fetch(API_BASE + path, {...opts, headers: headers2});
-            const ct2 = retry.headers.get('content-type') || '';
-            let json2 = null;
-            if (ct2.includes('application/json')) json2 = await retry.json().catch(()=>null);
-            if (!retry.ok) throw { status: retry.status, body: json2 };
-            return json2 ?? {};
-          }
-          throw { status: 401, body: json || {msg: 'unauthorized'} };
-        }
-        if (!res.ok) throw { status: res.status, body: json };
-        return json ?? {};
-      } catch (err) {
-        throw err;
-      }
-    }
-
-    // ---------------- Auth flows ----------------
-    function initLoad(){
-      // if user pasted token in input field, use it; otherwise if we have stored token use that.
-      const tokenInputVal = (document.getElementById('token').value || '').trim();
-      if (tokenInputVal) {
-        cachedToken = tokenInputVal;
-        // manual paste: we don't have refresh token; clear stored refresh
-        refreshToken = '';
-        localStorage.removeItem('two_admin_refresh');
-        localStorage.setItem('two_admin_access', cachedToken);
-      } else {
-        // use stored tokens (if any)
-        cachedToken = localStorage.getItem('two_admin_access') || cachedToken;
-        refreshToken = localStorage.getItem('two_admin_refresh') || refreshToken;
-      }
-      updateTokenInput();
-      if (!cachedToken && !refreshToken) {
-        toast('توکنی موجود نیست؛ لاگین کنید یا توکن را پیست کنید');
-        document.getElementById('statusIndicator').textContent = 'بدون توکن';
-        return;
-      }
-      document.getElementById('statusIndicator').textContent = 'توکن تنظیم شد';
-      // load admin data
-      validateToken()
-        .then(()=> {
-          loadTransactions();
-          loadCoupons();
-          loadPublicRates();
-          loadStats();
-        })
-        .catch(()=> {
-          // validateToken already handles messaging
-        });
-      // start periodic validation (every 60s)
-      if (!validatingInterval) validatingInterval = setInterval(() => validateToken().catch(()=>{}), 60 * 1000);
-      toast('توکن ذخیره شد');
-    }
-
-    async function validateToken() {
-      try {
-        const me = await apiFetch('/auth/me', { method: 'GET' });
-        const name = me.username || '—';
-        const role = me.role || 'user';
-        const daysLeft = me.days_left ?? '—';
-        document.getElementById('statusIndicator').textContent = `${role} — ${daysLeft} روز`;
-        document.getElementById('meUser').textContent = name;
-        return true;
-      } catch (err) {
-        console.warn('validateToken failed', err);
-        if (err && err.status === 401) {
-          document.getElementById('statusIndicator').textContent = 'توکن منقضی یا نامعتبر';
-          // try to refresh one more time (apiFetch already tries, but if validate called without token, attempt)
-          const refreshed = await tryRefresh();
-          if (refreshed) {
-            toast('توکن تازه شد');
-            return true;
-          }
-          // clear tokens if couldn't refresh
-          //clearTokens(); // keep token visible for manual action
-          throw err;
-        } else {
-          document.getElementById('statusIndicator').textContent = 'خطا در اعتبارسنجی';
-          throw err;
-        }
-      }
-    }
-
-    // login modal
-    function openLoginModal(){ document.getElementById('loginModal').classList.remove('hidden'); }
-    function closeLoginModal(){ document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginMsg').textContent=''; }
-
-    async function doLogin() {
-      const user = (document.getElementById('loginUser').value || '').trim();
-      const pass = (document.getElementById('loginPass').value || '').trim();
-      if (!user || !pass) { document.getElementById('loginMsg').textContent = 'نام کاربری و رمز را وارد کنید'; return; }
-      document.getElementById('loginMsg').textContent = '';
-      try {
-        const res = await fetch(API_BASE + '/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: user, password: pass })
-        });
-        if (!res.ok) {
+          // اگر سرور پاسخی داد اما ادمین نبود یا خطا داشت
+          // سعی کن پیغام بفرستی ولی اگر role غیر admin باشه هدایت به پنل عادی
           const j = await res.json().catch(()=>({}));
-          document.getElementById('loginMsg').textContent = j.msg || 'خطا در ورود';
+          if (j && j.role && j.role !== "admin") {
+            return redirectToPanel();
+          }
+          // سایر خطاها => ریدایرکت به auth
+          return redirectToAuth();
+        }
+        const body = await res.json();
+        // body میتواند { username, role, is_premium, ... }
+        document.getElementById("adminName").innerText = body.username || "admin";
+        document.getElementById("adminRole").innerText = body.role || "—";
+
+        if (body.role !== "admin") {
+          // اگر لاگین کرده ولی ادمین نیست => هدایت به panel عمومی
+          return redirectToPanel();
+        }
+
+        // بارگذاری اولیه
+        showTab("dashboard");
+        fetchRoot(); // root و queue
+        // bind other UI
+      } catch (err) {
+        console.error("bootstrap error", err);
+        // خطای شبکه یا مشابه => ریدایرکت به auth
+        return redirectToAuth();
+      }
+    }
+
+    // --- Root & ping & db-status ---
+    async function fetchRoot() {
+      setLoading("rootInfo", true);
+      try {
+        const res = await fetch(BACKEND + "/", { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (!res.ok) {
+          document.getElementById("rootDump").innerText = "خطا در واکشی root: " + res.status;
+        } else {
+          const j = await res.json();
+          document.getElementById("rootDump").innerText = JSON.stringify(j, null, 2);
+          document.getElementById("rootInfo").innerText = (j.server || "Two Manga API");
+          document.getElementById("rootQueue").innerText = "queue:" + (j.queue_size ?? "—");
+        }
+      } catch (e) {
+        document.getElementById("rootDump").innerText = "خطای شبکه هنگام واکشی root";
+      } finally {
+        setLoading("rootInfo", false);
+      }
+    }
+
+    async function pingServer() {
+      document.getElementById("pingLoader").innerHTML = '<span class="loader"></span>';
+      try {
+        const res = await fetch(BACKEND + "/debug/ping", { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (!res.ok) {
+          document.getElementById("pingResult").innerText = "پاسخ نامعتبر: " + res.status;
           return;
         }
         const j = await res.json();
-        // backend returns access_token and refresh_token
-        saveTokens(j.access_token, j.refresh_token);
-        document.getElementById('loginMsg').textContent = '';
-        closeLoginModal();
-        initLoad();
-        toast('ورود موفق');
+        document.getElementById("pingResult").innerText = (j.msg || "pong");
       } catch (e) {
-        console.error(e);
-        document.getElementById('loginMsg').textContent = 'خطا در ارتباط';
+        document.getElementById("pingResult").innerText = "خطای شبکه";
+      } finally {
+        document.getElementById("pingLoader").innerHTML = "";
       }
     }
 
-    // ---------------- Transactions ----------------
+    async function dbStatus() {
+      document.getElementById("dbResult").innerText = "در حال بارگذاری...";
+      try {
+        const res = await fetch(BACKEND + "/debug/db-status", { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (!res.ok) {
+          document.getElementById("dbResult").innerText = "خطا: " + res.status;
+          return;
+        }
+        const j = await res.json();
+        document.getElementById("dbResult").innerText = "available: " + (j.available ? "yes" : "no");
+      } catch (e) {
+        document.getElementById("dbResult").innerText = "خطای شبکه";
+      }
+    }
+
+    // --- transactions management ---
     async function loadTransactions() {
-      const container = document.getElementById('txList');
-      container.innerHTML = '<div class="text-gray-400">در حال بارگذاری...</div>';
-      const status = document.getElementById('statusFilter').value;
+      const container = document.getElementById("transactionsList");
+      container.innerHTML = '<div class="p-4 mono small-muted">در حال بارگذاری... <span class="loader inline-block"></span></div>';
+      const status = document.getElementById("filterStatus").value;
+      const qs = status ? "?status=" + encodeURIComponent(status) : "";
       try {
-        const q = status ? '?status=' + encodeURIComponent(status) : '';
-        const data = await apiFetch('/admin/transactions' + q);
-        cachedTx = data.transactions || [];
-        renderTransactions(cachedTx);
-      } catch (err) {
-        console.error(err);
-        container.innerHTML = '<div class="text-red-400">خطا در بارگذاری تراکنش‌ها.</div>';
-        if (err.body && err.body.msg) toast(err.body.msg, 4000);
+        const res = await fetch(BACKEND + "/admin/transactions" + qs, { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (res.status === 401 || res.status === 403) {
+          // توکن منقضی یا غیرمجاز
+          alert("احراز هویت ادمین ناموفق است. به صفحهٔ ورود هدایت می‌شوید.");
+          localStorage.removeItem("access_token");
+          redirectToAuth();
+          return;
+        }
+        if (!res.ok) {
+          container.innerHTML = '<div class="p-4 small-muted">خطا در دریافت تراکنش‌ها: ' + res.status + '</div>';
+          return;
+        }
+        const json = await res.json();
+        const items = json.transactions || [];
+        if (!items.length) {
+          container.innerHTML = '<div class="p-4 small-muted">تراکنشی موجود نیست.</div>';
+          return;
+        }
+        container.innerHTML = "";
+        for (const t of items) {
+          const card = document.createElement("div");
+          card.className = "p-4 plan-card glass-panel flex items-start justify-between gap-4";
+          const left = document.createElement("div");
+          left.innerHTML = `<div class="mono text-sm">#${t._id}</div>
+                            <div class="text-sm small-muted">${t.username || t.user_id} · ${t.status}</div>
+                            <div class="small-muted mt-2">tx: ${t.tx_hash || "—"} · days: ${t.days || 0}</div>
+                            <div class="small-muted">created: ${t.created_at || "—"}</div>`;
+          const right = document.createElement("div");
+          right.className = "flex items-center gap-2";
+          const approveBtn = document.createElement("button");
+          approveBtn.className = "btn-primary px-3 py-2 rounded-md";
+          approveBtn.innerText = "تأیید";
+          approveBtn.onclick = () => adminApprove(t._id, card);
+          const rejectBtn = document.createElement("button");
+          rejectBtn.className = "glass-input px-3 py-2 rounded-md";
+          rejectBtn.innerText = "رد";
+          rejectBtn.onclick = () => adminReject(t._id, card);
+          right.appendChild(approveBtn);
+          right.appendChild(rejectBtn);
+          card.appendChild(left);
+          card.appendChild(right);
+          container.appendChild(card);
+        }
+      } catch (e) {
+        container.innerHTML = '<div class="p-4 small-muted">خطای شبکه هنگام بارگذاری تراکنش‌ها</div>';
       }
     }
 
-    function renderTransactions(list) {
-      const container = document.getElementById('txList');
-      container.innerHTML = '';
-      if (!list || !list.length) {
-        container.innerHTML = '<div class="text-gray-400">تراکنشی برای نمایش وجود ندارد.</div>';
-        return;
-      }
-      list.forEach(tx => {
-        const card = document.createElement('div');
-        card.className = 'plan-card p-4 rounded-md hover-card glass-panel flex items-center justify-between';
-        card.innerHTML = `
-          <div class="flex items-start gap-4">
-            <div class="mono text-xs text-gray-300">${tx._id}</div>
-            <div>
-              <div class="font-medium">${tx.username || '—'}</div>
-              <div class="text-sm text-gray-400 mt-1">${tx.tx_hash ? 'hash: ' + tx.tx_hash : ''}</div>
-            </div>
-            <div class="text-sm text-gray-300 mr-4">روزها: <span class="font-semibold">${tx.days || 0}</span></div>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="text-sm text-gray-300">${tx.status}</div>
-            <div class="text-xs text-gray-400">${tx.created_at ? tx.created_at : ''}</div>
-            ${tx.status && tx.status.startsWith('pending') ? `
-              <button class="px-3 py-1 rounded bg-green-600/80 hover:bg-green-500 text-sm" onclick="approveTx('${tx._id}')">تایید</button>
-              <button class="px-3 py-1 rounded bg-red-600/80 hover:bg-red-500 text-sm" onclick="rejectTx('${tx._id}')">رد</button>
-            ` : ''}
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    async function approveTx(id) {
-      if (!confirm('آیا مطمئن هستید؟')) return;
+    async function adminApprove(txId, node) {
+      if (!confirm("آیا مطمئنی تراکنش رو تأیید می‌کنی؟")) return;
+      const url = BACKEND + "/admin/transactions/" + encodeURIComponent(txId) + "/approve";
       try {
-        await apiFetch('/admin/transactions/' + encodeURIComponent(id) + '/approve', { method: 'POST' });
-        toast('تراکنش تایید شد');
-        loadTransactions();
-        loadStats();
-      } catch (err) {
-        console.error(err);
-        toast('خطا در تایید');
+        node.querySelectorAll("button").forEach(b=>b.disabled=true);
+        const res = await fetch(url, { method: "POST", headers: { "Accept":"application/json", "Content-Type":"application/json", ...authHeaders() }});
+        if (res.ok) {
+          const j = await res.json();
+          alert("تأیید شد: " + (j.new_expiry || ""));
+          node.remove();
+        } else {
+          const txt = await res.text();
+          alert("خطا در تأیید: " + res.status + " " + txt);
+          node.querySelectorAll("button").forEach(b=>b.disabled=false);
+        }
+      } catch (e) {
+        alert("خطای شبکه در تأیید");
+        node.querySelectorAll("button").forEach(b=>b.disabled=false);
       }
     }
 
-    async function rejectTx(id) {
-      const reason = prompt('دلیل رد تراکنش را وارد کنید:') || '';
+    async function adminReject(txId, node) {
+      const reason = prompt("دلیل رد (اختیاری):", "");
+      const url = BACKEND + "/admin/transactions/" + encodeURIComponent(txId) + "/reject";
       try {
-        await apiFetch('/admin/transactions/' + encodeURIComponent(id) + '/reject', {
-          method: 'POST',
-          body: JSON.stringify({ reason })
-        });
-        toast('تراکنش رد شد');
-        loadTransactions();
-        loadStats();
-      } catch (err) {
-        console.error(err);
-        toast('خطا در رد تراکنش');
+        node.querySelectorAll("button").forEach(b=>b.disabled=true);
+        const res = await fetch(url, { method: "POST", headers: { "Accept":"application/json", "Content-Type":"application/json", ...authHeaders() }, body: JSON.stringify({ reason })});
+        if (res.ok) {
+          alert("تراکنش رد شد.");
+          node.remove();
+        } else {
+          const txt = await res.text();
+          alert("خطا در رد: " + res.status + " " + txt);
+          node.querySelectorAll("button").forEach(b=>b.disabled=false);
+        }
+      } catch (e) {
+        alert("خطای شبکه در رد تراکنش");
+        node.querySelectorAll("button").forEach(b=>b.disabled=false);
       }
     }
 
-    // ---------------- Coupons ----------------
-    function openCouponModal() { document.getElementById('couponModal').classList.remove('hidden'); }
-    function closeCouponModal() { document.getElementById('couponModal').classList.add('hidden'); document.getElementById('couponMsg').textContent = ''; }
+    // --- coupons ---
+    function showCouponCreate() {
+      const area = document.getElementById("couponCreateArea");
+      area.classList.toggle("hidden");
+    }
 
     async function createCoupon() {
-      const code = (document.getElementById('couponCode').value || '').trim();
-      const days = parseInt(document.getElementById('couponDays').value || '0', 10);
-      const max_uses_val = document.getElementById('couponMax').value;
-      const max_uses = max_uses_val ? parseInt(max_uses_val, 10) : undefined;
-      const expires_at = (document.getElementById('couponExpires').value || '').trim();
-
-      if (!code || !days) {
-        document.getElementById('couponMsg').textContent = 'کد و روز جایزه ضروری است';
+      const code = document.getElementById("couponCode").value.trim();
+      const bonus = parseInt(document.getElementById("couponDays").value || "0", 10);
+      const max_uses = document.getElementById("couponMaxUses").value;
+      const expires_at = document.getElementById("couponExpires").value.trim();
+      if (!code || !bonus || bonus <= 0) {
+        alert("کد و bonus_days معتبر وارد کن.");
         return;
       }
-
-      const payload = { code, bonus_days: days };
-      if (max_uses) payload.max_uses = max_uses;
+      const payload = { code, bonus_days: bonus };
+      if (max_uses) payload.max_uses = parseInt(max_uses,10);
       if (expires_at) payload.expires_at = expires_at;
-
+      document.getElementById("couponCreateMsg").innerText = "در حال ارسال...";
       try {
-        await apiFetch('/admin/coupons', { method: 'POST', body: JSON.stringify(payload) });
-        document.getElementById('couponMsg').textContent = '';
-        toast('کوپن ساخته شد');
-        closeCouponModal();
-        loadCoupons();
-        loadStats();
-      } catch (err) {
-        console.error(err);
-        const msg = (err.body && err.body.msg) ? err.body.msg : 'خطا در ایجاد کوپن';
-        document.getElementById('couponMsg').textContent = msg;
+        const res = await fetch(BACKEND + "/admin/coupons", {
+          method: "POST",
+          headers: { "Content-Type":"application/json", "Accept":"application/json", ...authHeaders() },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          document.getElementById("couponCreateMsg").innerText = "کوپن ساخته شد.";
+          document.getElementById("couponCode").value = "";
+          document.getElementById("couponDays").value = "";
+          document.getElementById("couponMaxUses").value = "";
+          document.getElementById("couponExpires").value = "";
+          listCoupons();
+        } else {
+          const txt = await res.text();
+          document.getElementById("couponCreateMsg").innerText = "خطا: " + res.status;
+          alert("خطا در ایجاد کوپن: " + res.status + " " + txt);
+        }
+      } catch (e) {
+        document.getElementById("couponCreateMsg").innerText = "خطای شبکه";
       }
     }
 
-    async function loadCoupons() {
-      const container = document.getElementById('couponsList');
-      container.innerHTML = '<div class="text-gray-400">در حال بارگذاری...</div>';
+    async function listCoupons() {
+      const place = document.getElementById("couponList");
+      place.innerHTML = '<div class="p-4 mono small-muted">در حال بارگذاری... <span class="loader inline-block"></span></div>';
       try {
-        const data = await apiFetch('/admin/coupons');
-        const cs = data.coupons || [];
-        cachedCoupons = cs;
-        if (!cs.length) {
-          container.innerHTML = '<div class="text-gray-400">کوپنی یافت نشد.</div>';
+        const res = await fetch(BACKEND + "/admin/coupons", { headers: { "Accept":"application/json", ...authHeaders() }});
+        if (!res.ok) {
+          place.innerHTML = '<div class="p-4 small-muted">خطا: ' + res.status + '</div>';
           return;
         }
-        container.innerHTML = '';
-        cs.forEach(c => {
-          const div = document.createElement('div');
-          div.className = 'p-3 glass-panel rounded flex items-center justify-between';
-          div.innerHTML = `
-            <div>
-              <div class="font-medium">${c.code}</div>
-              <div class="text-sm text-gray-400">روز جایزه: ${c.bonus_days} — استفاده: ${c.uses || 0}${c.max_uses ? ' / ' + c.max_uses : ''}</div>
-              <div class="text-xs text-gray-400 mt-1">${c.expires_at ? 'انقضا: ' + c.expires_at : ''}</div>
-            </div>
-          `;
-          container.appendChild(div);
-        });
-      } catch (err) {
-        console.error(err);
-        container.innerHTML = '<div class="text-red-400">خطا در بارگذاری کوپن‌ها.</div>';
-        if (err.body && err.body.msg) toast(err.body.msg, 4000);
+        const j = await res.json();
+        const coupons = j.coupons || [];
+        if (!coupons.length) {
+          place.innerHTML = '<div class="p-4 small-muted">کوپنی موجود نیست.</div>';
+          return;
+        }
+        place.innerHTML = "";
+        for (const c of coupons) {
+          const el = document.createElement("div");
+          el.className = "p-3 plan-card glass-panel flex items-center justify-between";
+          el.innerHTML = `<div>
+                            <div class="font-medium mono">${c.code}</div>
+                            <div class="small-muted">bonus_days: ${c.bonus_days} · uses: ${c.uses || 0} ${c.max_uses ? "· max: "+c.max_uses : ""}</div>
+                          </div>
+                          <div class="text-right small-muted">${c.expires_at ? c.expires_at : ""}</div>`;
+          place.appendChild(el);
+        }
+      } catch (e) {
+        place.innerHTML = '<div class="p-4 small-muted">خطای شبکه در واکشی کوپن‌ها</div>';
       }
     }
 
-    // ---------------- Rates ----------------
-    async function loadPublicRates() {
-      const empty = document.getElementById('ratesEmpty');
-      const content = document.getElementById('ratesContent');
-      empty.classList.remove('hidden'); content.classList.add('hidden');
+    // --- rates ---
+    async function fetchRates() {
+      const el = document.getElementById("ratesMsg");
+      el.innerText = "در حال فچ و ذخیره...";
       try {
-        const data = await apiFetch('/public/rates');
-        if (!data) throw new Error('no data');
-        document.getElementById('rateUSDT').textContent = data.USDT ?? '—';
-        document.getElementById('rateTRX').textContent = data.TRX ?? '—';
-        document.getElementById('rateTON').textContent = data.TON ?? '—';
-        document.getElementById('rateSOL').textContent = data.SOL ?? '—';
-        document.getElementById('ratesTs').textContent = data.ts ?? '—';
-        empty.classList.add('hidden'); content.classList.remove('hidden');
-        toast('نرخ عمومی بارگذاری شد');
-      } catch (err) {
-        console.error(err);
-        empty.textContent = 'خطا در بارگذاری نرخ عمومی.';
-        toast('خطا در بارگذاری نرخ عمومی');
+        const res = await fetch(BACKEND + "/admin/fetch-rates", { method: "POST", headers: { "Accept":"application/json", ...authHeaders() }});
+        if (res.ok) {
+          el.innerText = "نرخ‌ها با موفقیت فچ شدند.";
+        } else {
+          const txt = await res.text();
+          el.innerText = "خطا: " + res.status;
+          alert("خطا در فچ نرخ‌ها: " + res.status + " " + txt);
+        }
+      } catch (e) {
+        el.innerText = "خطای شبکه";
       }
     }
 
-    async function adminFetchRates() {
-      try {
-        await apiFetch('/admin/fetch-rates', { method: 'POST' });
-        toast('درخواست دریافت نرخ ارسال شد');
-        setTimeout(loadPublicRates, 1500);
-      } catch (err) {
-        console.error(err);
-        toast('خطا در درخواست دریافت نرخ');
-      }
+    // small helper to set a loader state on an element id
+    function setLoading(id, loading) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (loading) el.classList.add("opacity-60");
+      else el.classList.remove("opacity-60");
     }
 
-    // ---------------- Stats ----------------
-    async function loadStats() {
-      try {
-        const txData = await apiFetch('/admin/transactions');
-        const couponsData = await apiFetch('/admin/coupons');
-        const txCount = (txData.transactions || []).length;
-        const couponCount = (couponsData.coupons || []).length;
-        let usersCount = '—';
-        try {
-          const uniq = new Set((txData.transactions || []).map(t => t.username).filter(Boolean));
-          usersCount = uniq.size;
-        } catch(e){ usersCount = '—' }
-
-        document.getElementById('statTx').textContent = txCount;
-        document.getElementById('statCoupons').textContent = couponCount;
-        document.getElementById('statUsers').textContent = usersCount;
-        toast('آمار بارگذاری شد');
-      } catch (err) {
-        console.error(err);
-        toast('خطا در بارگذاری آمار');
-      }
-    }
-
-    // initial UI
-    switchTab('transactions');
-    updateTokenInput();
-
-    // if we have stored tokens try validate on load
-    (async function tryInitStored(){
-      cachedToken = localStorage.getItem('two_admin_access') || cachedToken;
-      refreshToken = localStorage.getItem('two_admin_refresh') || refreshToken;
-      updateTokenInput();
-      if (cachedToken || refreshToken) {
-        try {
-          await validateToken();
-          // do not automatically load everything; user might press بارگذاری
-        } catch(e){}
-        if (!validatingInterval) validatingInterval = setInterval(() => validateToken().catch(()=>{}), 60 * 1000);
-      }
+    // init
+    (function init() {
+      // set backend url in UI
+      document.getElementById("backendUrl").innerText = BACKEND;
+      // bootstrap (auth check -> show panel or redirect)
+      bootstrap();
+      // show default tab only after bootstrap succeeded and role admin
+      // keep event listeners for dynamic actions
+      // keyboard shortcut: R reload root
+      window.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r") {
+          fetchRoot();
+        }
+      });
     })();
-
   </script>
 </body>
 </html>

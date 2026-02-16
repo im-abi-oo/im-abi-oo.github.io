@@ -413,13 +413,40 @@
             }
 
             async actTx(id, action) {
-                if(!confirm(`آیا از ${action === 'approve' ? 'تایید' : 'رد کردن'} این تراکنش اطمینان دارید؟`)) return;
-                const res = await this.request(`/admin/transactions/${id}/${action}`, 'POST'); // or maybe Body logic based on Python
-                if(res && (res.status === 200 || res.status === 202)) {
-                    this.toast(`تراکنش ${action === 'approve' ? 'تایید' : 'رد'} شد`, 'success');
-                    this.loadTransactions(); // Refresh
-                }
-            }
+
+    let body = null;
+
+    // فقط وقتی Reject می‌کنیم
+    if (action === 'reject') {
+
+        const reason = prompt("دلیل رد تراکنش را وارد کنید:");
+
+        // اگه چیزی ننوشتی
+        if (!reason || reason.trim() === "") {
+            this.toast("رد بدون دلیل مجاز نیست", "err");
+            return;
+        }
+
+        body = {
+            reason: reason.trim()
+        };
+    }
+
+    // تایید نهایی
+    if (!confirm(`آیا مطمئن هستید؟`)) return;
+
+    const res = await this.request(
+        `/admin/transactions/${id}/${action}`,
+        'POST',
+        body
+    );
+
+    if (res && res.ok) {
+        this.toast("عملیات انجام شد", "success");
+        this.loadTransactions();
+    }
+}
+
 
             // Coupon Logic
             async listCoupons() {

@@ -3,11 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>مدیریت Two Manga — نسخه نهایی</title>
+  <title>پنل ادمین — Two Manga</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-
+  <!-- Tailwind config (provided by you) -->
   <script>
     tailwind = window.tailwind || {};
     tailwind.config = {
@@ -21,331 +19,715 @@
               accent: '#8b5cf6',
               glow: '#d946ef'
             }
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'spin-slow': 'spin 3s linear infinite',
+            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
           }
         }
       }
-    };
+    }
   </script>
 
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+
   <style>
-    body { background-color: #0f0f13; color: #e4e4e7; overflow-x: hidden; }
-    .glass { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(139, 92, 246, 0.15); }
-    .nav-link.active { background: rgba(139, 92, 246, 0.1); border-right: 4px solid #8b5cf6; color: #8b5cf6; }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    
-    #access-denied-screen { display: none; }
-    #initial-loader { position: fixed; inset: 0; z-index: 100; background: #0f0f13; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f0f13; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+    body {
+      background-color: #050505;
+      background-image:
+        radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.06) 0%, transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(217, 70, 239, 0.06) 0%, transparent 25%);
+      color: #f4f4f5;
+      overflow-x: hidden;
+      font-family: Vazirmatn, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    .glass-panel {
+      background: rgba(24, 24, 27, 0.62);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
+    }
+    .glass-input {
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: white;
+      transition: all 0.2s ease;
+      padding: .6rem .8rem;
+      border-radius: .5rem;
+    }
+    .glass-input:focus {
+      border-color: #8b5cf6;
+      box-shadow: 0 0 18px rgba(139, 92, 246, 0.16);
+      outline: none;
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #e879f9 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hover-card { transition: all 0.28s cubic-bezier(0.4,0,0.2,1); }
+    .hover-card:hover { transform: translateY(-6px); box-shadow: 0 26px 60px -12px rgba(139,92,246,0.14); border-color: rgba(139,92,246,0.28); }
+
+    .plan-card { position: relative; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); transition: all 0.28s ease; border-radius: 12px; }
+    .plan-card.active { background: linear-gradient(145deg, rgba(139,92,246,0.12), rgba(0,0,0,0)); border: 1px solid #8b5cf6; box-shadow: 0 0 30px rgba(139,92,246,0.12); }
+
+    .crypto-btn { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.18); transition: all 0.18s; padding: .5rem .75rem; border-radius: .6rem; }
+    .crypto-btn:hover { background: rgba(255,255,255,0.03); }
+    .crypto-btn.active { border-color: #d946ef; background: rgba(217,70,239,0.08); box-shadow: 0 0 12px rgba(217,70,239,0.12); }
+
+    .loader { border: 3px solid rgba(255,255,255,0.1); border-left-color: #8b5cf6; border-radius: 50%; width: 22px; height: 22px; animation: spin 1s linear infinite; display: inline-block; }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+
+    .btn-primary { background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%); background-size: 200% auto; transition: 0.45s; color: white; }
+    .btn-primary:hover { background-position: right center; box-shadow: 0 10px 40px rgba(139, 92, 246, 0.24); transform: translateY(-2px); }
+
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Helvetica Neue", monospace; }
+    .small-muted { color: rgba(255,255,255,0.5); font-size: 0.86rem; }
+    .pill { padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); }
+
+    /* access-denied overlay */
+    .access-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      padding: 24px;
+    }
+    .access-card {
+      max-width: 720px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 20px;
+      background: linear-gradient(180deg, rgba(24,24,27,0.88) 0%, rgba(24,24,27,0.75) 100%);
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+
   </style>
 </head>
-<body class="min-h-screen font-sans custom-scrollbar">
+<body>
 
-  <!-- Loading Screen -->
-  <div id="initial-loader">
-    <div class="w-16 h-16 border-4 border-brand-accent border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p class="text-gray-400 animate-pulse">در حال بررسی سطح دسترسی شما...</p>
-  </div>
-
-  <!-- Access Denied Screen (No Redirect) -->
-  <div id="access-denied-screen" class="fixed inset-0 z-[110] bg-brand-dark flex items-center justify-center p-6 text-center">
-    <div class="max-w-md w-full glass p-10 rounded-[2.5rem] border-red-500/30">
-      <div class="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">⚠️</div>
-      <h2 class="text-2xl font-black text-white mb-4">عدم دسترسی به پنل</h2>
-      <p id="denied-msg" class="text-gray-400 mb-8 leading-relaxed">متاسفیم، حساب کاربری شما سطح دسترسی "ادمین" ندارد و نمی‌توانید وارد این بخش شوید.</p>
-      <a href="/" class="inline-block w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl font-bold transition-all">برگشت به صفحه اصلی سایت</a>
-    </div>
-  </div>
-
-  <!-- UI Wrapper -->
-  <div id="app-ui" class="hidden flex flex-col md:flex-row min-h-screen">
-    
-    <!-- Sidebar -->
-    <aside class="w-full md:w-72 glass p-6 flex flex-col gap-8">
-      <div class="flex items-center gap-4 px-2">
-        <div class="w-12 h-12 bg-gradient-to-br from-brand-accent to-brand-glow rounded-2xl flex items-center justify-center shadow-lg">
-          <span class="text-2xl">⚡</span>
+  <div class="max-w-7xl mx-auto px-4 py-6" id="appRoot">
+    <header class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#d946ef] flex items-center justify-center shadow-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l4 2"/></svg>
         </div>
         <div>
-          <h1 class="text-lg font-black text-white">TWO MANGA</h1>
-          <p class="text-[10px] text-brand-accent font-bold tracking-widest uppercase">Admin System</p>
+          <div class="text-lg font-semibold">پنل ادمین — Two Manga</div>
+          <div class="small-muted">آدرس بک‌اند: <span id="backendUrl" class="mono">https://two-api-iksq.onrender.com</span></div>
         </div>
       </div>
 
-      <nav class="flex-1 space-y-2">
-        <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3 active">
-          <span class="opacity-70">📊</span> داشبورد مدیریتی
-        </button>
-        <button onclick="showTab('transactions')" id="nav-transactions" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3 relative">
-          <span class="opacity-70">💳</span> تراکنش‌ها
-          <span id="pendingBadge" class="hidden absolute left-3 top-4 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
-        <button onclick="showTab('rates')" id="nav-rates" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3">
-          <span class="opacity-70">💰</span> نرخ ارز و پلن‌ها
-        </button>
-        <button onclick="showTab('users')" id="nav-users" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3">
-          <span class="opacity-70">👥</span> مدیریت کاربران
-        </button>
-      </nav>
+      <div class="flex items-center gap-3">
+        <div class="text-right">
+          <div id="adminName" class="text-sm small-muted">بارگذاری...</div>
+          <div class="text-xs small-muted">سطح دسترسی: <span id="adminRole">—</span></div>
+        </div>
+        <button id="btnLogout" class="btn-primary px-4 py-2 rounded-lg shadow hover:shadow-lg">خروج</button>
+      </div>
+    </header>
 
-      <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
-        <div class="flex items-center gap-3 mb-4">
-          <div id="adminInitials" class="w-10 h-10 rounded-full bg-brand-accent/20 flex items-center justify-center font-bold text-brand-accent">?</div>
-          <div class="flex-1 min-w-0">
-            <p id="adminName" class="text-sm font-bold truncate">نام مدیر</p>
-            <p class="text-[10px] text-green-500">ادمین فعال</p>
+    <main class="grid grid-cols-12 gap-6">
+      <!-- left column (controls) -->
+      <aside class="col-span-3 glass-panel p-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="text-sm small-muted">نِویگِیشن</div>
+          <div class="text-xs small-muted">admin</div>
+        </div>
+
+        <nav class="flex flex-col gap-2">
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="dashboard" onclick="showTab('dashboard')">
+            داشبورد وضعیت
+            <div class="small-muted text-sm">ping / db-status / root</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="transactions" onclick="showTab('transactions')">
+            تراکنش‌ها
+            <div class="small-muted text-sm">مشاهده — تأیید — رد</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="coupons" onclick="showTab('coupons')">
+            کوپن‌ها
+            <div class="small-muted text-sm">ایجاد — لیست</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="rates" onclick="showTab('rates')">
+            نرخ‌ها (دستی)
+            <div class="small-muted text-sm">فچ و ذخیرهٔ نرخ</div>
+          </button>
+          <button class="hover-card text-right glass-panel p-3 plan-card" data-tab="logs" onclick="showTab('logs')">
+            لاگ‌ها / روت & queue
+            <div class="small-muted text-sm">وضعیت صف و لاگ‌های سریع</div>
+          </button>
+        </nav>
+      </aside>
+
+      <!-- main content -->
+      <section class="col-span-9 space-y-6">
+        <!-- dashboard -->
+        <section id="tab-dashboard" class="glass-panel p-6">
+          <div class="flex items-start justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">داشبورد سلامت</h2>
+              <p class="small-muted mt-1">در این صفحه می‌توانید وضعیت سلامت سرور، DB و front/back root را بررسی کنید.</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button id="btnPing" class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="pingServer()">
+                بررسی سلامت <span id="pingLoader" class="inline-block ml-2"></span>
+              </button>
+              <button id="btnDbStatus" class="glass-input px-4 py-2 rounded-lg" onclick="dbStatus()">
+                وضعیت DB
+              </button>
+            </div>
           </div>
-        </div>
-        <button onclick="logout()" class="w-full py-2 bg-red-500/10 text-red-500 rounded-lg text-xs font-bold hover:bg-red-500/20 transition-all">خروج</button>
-      </div>
-    </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-6 md:p-10 space-y-8 max-h-screen overflow-y-auto custom-scrollbar">
-      
-      <!-- Dashboard -->
-      <div id="tab-dashboard" class="tab-content active">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div class="glass p-8 rounded-[2rem]">
-            <p class="text-gray-400 text-sm">کل کاربران</p>
-            <h3 id="dash-users" class="text-4xl font-black mt-2">---</h3>
+          <div class="mt-6 grid grid-cols-3 gap-4">
+            <div class="p-4 plan-card glass-panel">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="small-muted">Queue / Root</div>
+                  <div id="rootInfo" class="text-lg font-medium mono">بارگذاری...</div>
+                </div>
+                <div id="rootQueue" class="pill">—</div>
+              </div>
+            </div>
+
+            <div class="p-4 plan-card glass-panel">
+              <div class="small-muted">Ping</div>
+              <div id="pingResult" class="text-lg font-medium mono mt-2">—</div>
+            </div>
+
+            <div class="p-4 plan-card glass-panel">
+              <div class="small-muted">DB Status</div>
+              <div id="dbResult" class="text-lg font-medium mono mt-2">—</div>
+            </div>
           </div>
-          <div class="glass p-8 rounded-[2rem]">
-            <p class="text-gray-400 text-sm">تراکنش‌های موفق</p>
-            <h3 id="dash-paid" class="text-4xl font-black mt-2 text-green-500">---</h3>
+        </section>
+
+        <!-- transactions -->
+        <section id="tab-transactions" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">مدیریت تراکنش‌ها</h2>
+              <p class="small-muted mt-1">لیست آخرین تراکنش‌ها — میتونی تأیید یا رد کنی.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="filterStatus" class="glass-input" onchange="loadTransactions()">
+                <option value="">همه</option>
+                <option value="pending">pending</option>
+                <option value="pending_verification">pending_verification</option>
+                <option value="approved">approved</option>
+                <option value="rejected">rejected</option>
+              </select>
+              <button class="glass-input px-4 py-2 rounded-lg" onclick="loadTransactions()">بارگذاری</button>
+            </div>
           </div>
-          <div class="glass p-8 rounded-[2rem]">
-            <p class="text-gray-400 text-sm">در انتظار تایید</p>
-            <h3 id="dash-pending" class="text-4xl font-black mt-2 text-yellow-500">---</h3>
+
+          <div id="transactionsList" class="mt-6 space-y-3">
+            <div class="small-muted">هیچ‌چیزی لود نشده — روی بارگذاری بزن.</div>
           </div>
-        </div>
-        <div class="glass p-8 rounded-[2rem]">
-            <h4 class="text-xl font-bold mb-6">وضعیت سرور</h4>
-            <p id="serverStatus" class="text-xs font-mono opacity-50">در حال چک...</p>
-        </div>
-      </div>
+        </section>
 
-      <!-- Transactions -->
-      <div id="tab-transactions" class="tab-content">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-black">تراکنش‌ها</h2>
-            <button onclick="loadTransactions()" class="px-5 py-2 bg-brand-accent rounded-xl text-sm font-bold">بروزرسانی لیست</button>
-        </div>
-        <div class="glass rounded-3xl overflow-hidden">
-          <table class="w-full text-right border-collapse">
-            <thead class="bg-white/5 text-gray-400 text-xs">
-              <tr>
-                <th class="p-5">کاربر</th>
-                <th class="p-5">مبلغ / زمان</th>
-                <th class="p-5">کد پیگیری</th>
-                <th class="p-5 text-center">عملیات</th>
-              </tr>
-            </thead>
-            <tbody id="tx-list" class="divide-y divide-white/5 text-sm"></tbody>
-          </table>
-        </div>
-      </div>
+        <!-- coupons -->
+        <section id="tab-coupons" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">کوپن‌ها</h2>
+              <p class="small-muted mt-1">ایجاد و مدیریت کوپن‌ها</p>
+            </div>
+            <div>
+              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="showCouponCreate()">ایجاد کوپن جدید</button>
+            </div>
+          </div>
 
-      <!-- Rates -->
-      <div id="tab-rates" class="tab-content">
-        <h2 class="text-3xl font-black mb-8">نرخ ارز</h2>
-        <div class="max-w-xl glass p-8 rounded-[2rem] space-y-6">
-            <p class="text-gray-400">سیستم به صورت خودکار قیمت دلار را از APIهای خارجی فچ کرده و بر اساس نرخ سود شما قیمت تمام پلن‌ها را در دیتابیس آپدیت می‌کند.</p>
-            <button id="rateBtn" onclick="updateRates()" class="w-full py-4 bg-brand-accent rounded-2xl font-bold shadow-lg shadow-brand-accent/30">شروع بروزرسانی نرخ ارز</button>
-            <div id="rateStatus" class="text-center text-sm font-bold"></div>
-        </div>
-      </div>
+          <div id="couponCreateArea" class="mt-6 hidden">
+            <div class="grid grid-cols-3 gap-3">
+              <input id="couponCode" placeholder="کد کوپن" class="glass-input col-span-1" />
+              <input id="couponDays" type="number" placeholder="تعداد روز - bonus_days" class="glass-input col-span-1" />
+              <input id="couponMaxUses" type="number" placeholder="max_uses (اختیاری)" class="glass-input col-span-1" />
+            </div>
+            <div class="mt-3 flex items-center gap-2">
+              <input id="couponExpires" placeholder="expires_at (ISO, اختیاری)" class="glass-input w-1/2" />
+              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="createCoupon()">ایجاد</button>
+              <span id="couponCreateMsg" class="small-muted"></span>
+            </div>
+          </div>
 
-      <!-- Users -->
-      <div id="tab-users" class="tab-content">
-        <h2 class="text-3xl font-black mb-8">کاربران</h2>
-        <div class="glass rounded-3xl overflow-hidden">
-          <table class="w-full text-right">
-            <thead class="bg-white/5 text-xs text-gray-400">
-              <tr>
-                <th class="p-5">نام کاربری</th>
-                <th class="p-5">نقش</th>
-                <th class="p-5">اعتبار اشتراک</th>
-                <th class="p-5">عملیات</th>
-              </tr>
-            </thead>
-            <tbody id="user-list" class="divide-y divide-white/5 text-sm"></tbody>
-          </table>
-        </div>
-      </div>
+          <div class="mt-6">
+            <button class="glass-input px-4 py-2 rounded-lg" onclick="listCoupons()">لیست کوپن‌ها</button>
+          </div>
 
+          <div id="couponList" class="mt-4 space-y-2 small-muted"></div>
+        </section>
+
+        <!-- rates -->
+        <section id="tab-rates" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">نرخ‌ها</h2>
+              <p class="small-muted mt-1">فچ دستی نرخ‌ها و ذخیره در دیتابیس (admin فقط)</p>
+            </div>
+            <div>
+              <button class="glass-input btn-primary px-4 py-2 rounded-lg" onclick="fetchRates()">فچ و ذخیره نرخ‌ها</button>
+            </div>
+          </div>
+
+          <div id="ratesMsg" class="mt-4 small-muted">—</div>
+        </section>
+
+        <!-- logs -->
+        <section id="tab-logs" class="glass-panel p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold text-gradient">روت / لاگ سریع</h2>
+              <p class="small-muted mt-1">اطلاعات root, queue_size و debug endpoints</p>
+            </div>
+            <div>
+              <button class="glass-input px-4 py-2 rounded-lg" onclick="fetchRoot()">رفرش root</button>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <pre id="rootDump" class="mono small-muted p-4 rounded-lg bg-black/30 overflow-auto" style="max-height: 300px">—</pre>
+          </div>
+        </section>
+      </section>
     </main>
   </div>
 
+  <!-- access denied overlay will be injected here by JS when needed -->
   <script>
-    const API_URL = "https://two-api-iksq.onrender.com";
-    
-    function getToken() { return localStorage.getItem("access_token"); }
-    function getHeaders() {
-      return {
-        "Authorization": "Bearer " + getToken(),
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      };
+    // Configuration
+    const BACKEND = "https://two-api-iksq.onrender.com";
+    const AUTH_PAGE = "https://im-abi-oo.github.io/auth";
+    const PUBLIC_PANEL = "https://im-abi-oo.github.io/panel";
+
+    // Utility: get token from localStorage in common keys
+    function getStoredToken() {
+      return localStorage.getItem("access_token") || localStorage.getItem("twomanga_access") || localStorage.getItem("twomanga_access_token") || null;
     }
 
-    // --- Bootstrap: Strict Check ---
-    async function bootstrap() {
-      const token = getToken();
-      if (!token) {
-          showError("شما وارد حساب خود نشده‌اید. ابتدا لاگین کنید.");
-          return;
-      }
+    // set header for fetch calls
+    function authHeaders() {
+      const token = getStoredToken();
+      if (!token) return {};
+      return { "Authorization": "Bearer " + token };
+    }
 
+    // redirect helpers (only used for explicit navigation buttons)
+    function redirectToAuth() { window.location.href = AUTH_PAGE; }
+    function redirectToPanel() { window.location.href = PUBLIC_PANEL; }
+
+    // UI utilities
+    function showTab(name) {
+      document.querySelectorAll("[id^='tab-']").forEach(el => {
+        if (el.id === "tab-" + name) el.classList.remove("hidden");
+        else el.classList.add("hidden");
+      });
+      // active nav
+      document.querySelectorAll("[data-tab]").forEach(btn => btn.classList.remove("active"));
+      const navBtn = document.querySelector(`[data-tab='${name}']`);
+      if (navBtn) navBtn.classList.add("active");
+    }
+
+    // show an access-denied / auth status overlay instead of auto-redirects
+    function showAccessOverlay(message, opts = {}) {
+      // opts: { auth: bool (show login), root: bool (show root), retry: bool (show retry fetch) }
+      // remove existing overlay if any
+      const existing = document.getElementById("accessOverlay");
+      if (existing) existing.remove();
+
+      const overlay = document.createElement("div");
+      overlay.id = "accessOverlay";
+      overlay.className = "access-overlay";
+      overlay.innerHTML = `
+        <div class="access-card glass-panel">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="text-xl font-semibold text-gradient">دسترسی / احراز هویت</h3>
+              <p class="small-muted mt-2" id="accessMsg">${escapeHtml(message)}</p>
+            </div>
+            <div>
+              <button id="accessCloseBtn" class="glass-input px-3 py-1 rounded-md">بستن</button>
+            </div>
+          </div>
+          <div class="mt-4 flex gap-3">
+            ${opts.root ? '<button id="accessRootBtn" class="btn-primary px-4 py-2 rounded-md">بازگشت به روت</button>' : ''}
+            ${opts.auth ? '<button id="accessLoginBtn" class="glass-input px-4 py-2 rounded-md">صفحهٔ ورود</button>' : ''}
+            ${opts.retry ? '<button id="accessRetryBtn" class="glass-input px-4 py-2 rounded-md">تلاش دوباره</button>' : ''}
+            <button id="accessClearTokenBtn" class="glass-input px-4 py-2 rounded-md">پاک‌سازی توکن‌ها</button>
+          </div>
+          <div class="mt-3 small-muted">اگر نیاز به دسترسی admin دارید، با اکانت مناسب وارد شوید یا از طریق روت ادامه دهید.</div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      // attach handlers
+      const closeBtn = document.getElementById("accessCloseBtn");
+      if (closeBtn) closeBtn.addEventListener("click", () => overlay.remove());
+
+      const rootBtn = document.getElementById("accessRootBtn");
+      if (rootBtn) rootBtn.addEventListener("click", () => { window.location.href = BACKEND + "/"; });
+
+      const loginBtn = document.getElementById("accessLoginBtn");
+      if (loginBtn) loginBtn.addEventListener("click", () => { window.location.href = AUTH_PAGE; });
+
+      const retryBtn = document.getElementById("accessRetryBtn");
+      if (retryBtn) retryBtn.addEventListener("click", () => {
+        overlay.remove();
+        bootstrap(); // try again
+      });
+
+      const clearBtn = document.getElementById("accessClearTokenBtn");
+      if (clearBtn) clearBtn.addEventListener("click", () => {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("twomanga_access");
+        localStorage.removeItem("twomanga_admin_token");
+        alert("توکن‌ها پاک شدند. در صورت نیاز مجدداً وارد شوید.");
+      });
+    }
+
+    // small escape helper for safety when injecting message
+    function escapeHtml(unsafe) {
+      if (!unsafe && unsafe !== 0) return '';
+      return String(unsafe)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    // on logout - keep it explicit (user clicked logout -> go to auth)
+    document.getElementById("btnLogout").addEventListener("click", () => {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("twomanga_access");
+      localStorage.removeItem("twomanga_admin_token");
+      redirectToAuth();
+    });
+
+    // --- authentication & bootstrapping ---
+    async function bootstrap() {
+      const token = getStoredToken();
+      if (!token) {
+        // no token -> show overlay with choices (no automatic redirect)
+        return showAccessOverlay("هیچ توکن ورود پیدا نشد. اگر می‌خواهید وارد شوید، به صفحهٔ ورود بروید یا به روت سرور بازگردید.", { auth: true, root: true });
+      }
       try {
-        // فچ کردن واقعی دیتای کاربر برای بررسی Role
-        const res = await fetch(`${API_URL}/auth/me`, {
+        const res = await fetch(BACKEND + "/auth/me", {
           method: "GET",
-          headers: getHeaders()
+          headers: { ...authHeaders(), "Accept": "application/json" }
         });
 
+        if (res.status === 401 || res.status === 403) {
+          // token invalid or session invalid -> show overlay (no auto redirect)
+          return showAccessOverlay("احراز هویت معتبر نیست یا سشن منقضی شده (401/403). می‌توانید وارد شوید یا به روت برگردید.", { auth: true, root: true });
+        }
+
         if (!res.ok) {
-           throw new Error("Invalid Token");
+          const j = await res.json().catch(()=>({}));
+          // if server says role and not admin -> present access denied
+          if (j && j.role && j.role !== "admin") {
+            return showAccessOverlay("شما دسترسی ادمین ندارید. با اکانت مناسب وارد شوید یا به روت برگردید.", { root: true });
+          }
+          // other errors -> show overlay with option to login
+          return showAccessOverlay("خطا در دریافت اطلاعات حساب. می‌توانید تلاش دوباره کنید یا به صفحهٔ ورود بروید.", { auth: true, retry: true });
         }
 
-        const user = await res.json();
+        const body = await res.json();
+        document.getElementById("adminName").innerText = body.username || "admin";
+        document.getElementById("adminRole").innerText = body.role || "—";
 
-        // بررسی نقش ادمین
-        if (user.role !== "admin") {
-          showError(`شما با نقش "${user.role}" وارد شده‌اید. دسترسی به پنل مدیریت فقط برای ادمین مجاز است.`);
-          return;
+        if (body.role !== "admin") {
+          // not admin -> show access denied overlay (no auto-redirect)
+          return showAccessOverlay("اکانت شما نقش admin ندارد. برای دسترسی لطفاً وارد اکانت admin شوید یا به روت بازگردید.", { root: true });
         }
 
-        // موفقیت آمیز - نمایش پنل
-        document.getElementById("adminName").innerText = user.username;
-        document.getElementById("adminInitials").innerText = user.username[0].toUpperCase();
-        document.getElementById("serverStatus").innerText = "متصل به: " + API_URL;
-        
-        document.getElementById("initial-loader").style.display = "none";
-        document.getElementById("app-ui").classList.remove("hidden");
-        
-        loadDashboard();
-
+        // success -> initialize UI
+        showTab("dashboard");
+        fetchRoot();
       } catch (err) {
-        showError("خطا در تایید هویت. لطفاً مجدداً وارد حساب خود شوید.");
+        console.error("bootstrap error", err);
+        return showAccessOverlay("خطای شبکه هنگام بررسی احراز هویت. می‌توانید تلاش دوباره کنید یا به صفحهٔ ورود بروید.", { auth: true, retry: true });
       }
     }
 
-    function showError(msg) {
-        document.getElementById("initial-loader").style.display = "none";
-        document.getElementById("denied-msg").innerText = msg;
-        document.getElementById("access-denied-screen").style.display = "flex";
+    // --- Root & ping & db-status ---
+    async function fetchRoot() {
+      setLoading("rootInfo", true);
+      try {
+        const res = await fetch(BACKEND + "/", { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (!res.ok) {
+          document.getElementById("rootDump").innerText = "خطا در واکشی root: " + res.status;
+        } else {
+          const j = await res.json();
+          document.getElementById("rootDump").innerText = JSON.stringify(j, null, 2);
+          document.getElementById("rootInfo").innerText = (j.server || "Two Manga API");
+          document.getElementById("rootQueue").innerText = "queue:" + (j.queue_size ?? "—");
+        }
+      } catch (e) {
+        document.getElementById("rootDump").innerText = "خطای شبکه هنگام واکشی root";
+      } finally {
+        setLoading("rootInfo", false);
+      }
     }
 
-    // --- Tab Management ---
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-      document.getElementById('tab-' + tabId).classList.add('active');
-      document.getElementById('nav-' + tabId).classList.add('active');
-      
-      if(tabId === 'dashboard') loadDashboard();
-      if(tabId === 'transactions') loadTransactions();
-      if(tabId === 'users') loadUsers();
+    async function pingServer() {
+      document.getElementById("pingLoader").innerHTML = '<span class="loader"></span>';
+      try {
+        const res = await fetch(BACKEND + "/debug/ping", { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (!res.ok) {
+          document.getElementById("pingResult").innerText = "پاسخ نامعتبر: " + res.status;
+          return;
+        }
+        const j = await res.json();
+        document.getElementById("pingResult").innerText = (j.msg || "pong");
+      } catch (e) {
+        document.getElementById("pingResult").innerText = "خطای شبکه";
+      } finally {
+        document.getElementById("pingLoader").innerHTML = "";
+      }
     }
 
-    // --- Dashboard ---
-    async function loadDashboard() {
-        try {
-            const uRes = await fetch(`${API_URL}/admin/users`, { headers: getHeaders() });
-            const tRes = await fetch(`${API_URL}/admin/transactions`, { headers: getHeaders() });
-            if(uRes.ok && tRes.ok) {
-                const ud = await uRes.json();
-                const td = await tRes.json();
-                document.getElementById("dash-users").innerText = ud.users.length;
-                document.getElementById("dash-paid").innerText = td.transactions.filter(x => x.status === 'paid').length;
-                const p = td.transactions.filter(x => x.status === 'pending').length;
-                document.getElementById("dash-pending").innerText = p;
-                
-                if(p > 0) document.getElementById("pendingBadge").classList.remove('hidden');
-            }
-        } catch (e) {}
+    async function dbStatus() {
+      document.getElementById("dbResult").innerText = "در حال بارگذاری...";
+      try {
+        const res = await fetch(BACKEND + "/debug/db-status", { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (!res.ok) {
+          document.getElementById("dbResult").innerText = "خطا: " + res.status;
+          return;
+        }
+        const j = await res.json();
+        document.getElementById("dbResult").innerText = "available: " + (j.available ? "yes" : "no");
+      } catch (e) {
+        document.getElementById("dbResult").innerText = "خطای شبکه";
+      }
     }
 
-    // --- Transactions ---
+    // --- transactions management ---
     async function loadTransactions() {
-        const list = document.getElementById("tx-list");
-        list.innerHTML = '<tr><td colspan="4" class="p-10 text-center opacity-50">در حال بارگذاری...</td></tr>';
-        try {
-            const res = await fetch(`${API_URL}/admin/transactions`, { headers: getHeaders() });
-            const data = await res.json();
-            if(res.ok) {
-                list.innerHTML = data.transactions.reverse().map(t => `
-                    <tr class="hover:bg-white/5 transition-all">
-                        <td class="p-5 font-bold">${t.username}</td>
-                        <td class="p-5">
-                            <div>${Number(t.amount).toLocaleString()} تومان</div>
-                            <div class="text-[10px] text-gray-500">${new Date(t.created_at).toLocaleString('fa-IR')}</div>
-                        </td>
-                        <td class="p-5 font-mono text-brand-accent">${t.ref_id || '---'}</td>
-                        <td class="p-5 text-center">
-                            ${t.status === 'pending' ? `
-                                <button onclick="txOp('${t._id}', 'approve')" class="px-3 py-1 bg-green-500/20 text-green-500 rounded-lg text-xs ml-2 hover:bg-green-500 hover:text-white transition-all">تایید</button>
-                                <button onclick="txOp('${t._id}', 'reject')" class="px-3 py-1 bg-red-500/20 text-red-500 rounded-lg text-xs hover:bg-red-500 hover:text-white transition-all">رد</button>
-                            ` : `<span class="text-[10px] font-bold uppercase ${t.status === 'paid' ? 'text-green-500' : 'text-red-500'}">${t.status}</span>`}
-                        </td>
-                    </tr>
-                `).join('');
-            }
-        } catch (e) { list.innerHTML = 'خطا در شبکه'; }
+      const container = document.getElementById("transactionsList");
+      container.innerHTML = '<div class="p-4 mono small-muted">در حال بارگذاری... <span class="loader inline-block"></span></div>';
+      const status = document.getElementById("filterStatus").value;
+      const qs = status ? "?status=" + encodeURIComponent(status) : "";
+      try {
+        const res = await fetch(BACKEND + "/admin/transactions" + qs, { headers: { "Accept": "application/json", ...authHeaders() }});
+        if (res.status === 401 || res.status === 403) {
+          // token expired/unauthorized -> show overlay (no auto redirect)
+          return showAccessOverlay("احراز هویت نامعتبر یا مجوز کافی ندارید (401/403).", { auth: true, root: true });
+        }
+        if (!res.ok) {
+          container.innerHTML = '<div class="p-4 small-muted">خطا در دریافت تراکنش‌ها: ' + res.status + '</div>';
+          return;
+        }
+        const json = await res.json();
+        const items = json.transactions || [];
+        if (!items.length) {
+          container.innerHTML = '<div class="p-4 small-muted">تراکنشی موجود نیست.</div>';
+          return;
+        }
+        container.innerHTML = "";
+        for (const t of items) {
+          const card = document.createElement("div");
+          card.className = "p-4 plan-card glass-panel flex items-start justify-between gap-4";
+          const left = document.createElement("div");
+          left.innerHTML = `<div class="mono text-sm">#${t._id}</div>
+                            <div class="text-sm small-muted">${t.username || t.user_id} · ${t.status}</div>
+                            <div class="small-muted mt-2">tx: ${t.tx_hash || "—"} · days: ${t.days || 0}</div>
+                            <div class="small-muted">created: ${t.created_at || "—"}</div>`;
+          const right = document.createElement("div");
+          right.className = "flex items-center gap-2";
+          const approveBtn = document.createElement("button");
+          approveBtn.className = "btn-primary px-3 py-2 rounded-md";
+          approveBtn.innerText = "تأیید";
+          approveBtn.onclick = () => adminApprove(t._id, card);
+          const rejectBtn = document.createElement("button");
+          rejectBtn.className = "glass-input px-3 py-2 rounded-md";
+          rejectBtn.innerText = "رد";
+          rejectBtn.onclick = () => adminReject(t._id, card);
+          right.appendChild(approveBtn);
+          right.appendChild(rejectBtn);
+          card.appendChild(left);
+          card.appendChild(right);
+          container.appendChild(card);
+        }
+      } catch (e) {
+        container.innerHTML = '<div class="p-4 small-muted">خطای شبکه هنگام بارگذاری تراکنش‌ها</div>';
+      }
     }
 
-    async function txOp(id, act) {
-        if(!confirm("مطمئن هستید؟")) return;
-        try {
-            const res = await fetch(`${API_URL}/admin/transactions/${id}/${act}`, { method: 'POST', headers: getHeaders() });
-            if(res.ok) { alert("انجام شد"); loadTransactions(); }
-        } catch (e) { alert("خطا"); }
+    async function adminApprove(txId, node) {
+      if (!confirm("آیا مطمئنی تراکنش رو تأیید می‌کنی؟")) return;
+      const url = BACKEND + "/admin/transactions/" + encodeURIComponent(txId) + "/approve";
+      try {
+        node.querySelectorAll("button").forEach(b=>b.disabled=true);
+        const res = await fetch(url, { method: "POST", headers: { "Accept":"application/json", "Content-Type":"application/json", ...authHeaders() }});
+        if (res.ok) {
+          const j = await res.json();
+          alert("تأیید شد: " + (j.new_expiry || ""));
+          node.remove();
+        } else {
+          const txt = await res.text();
+          alert("خطا در تأیید: " + res.status + " " + txt);
+          node.querySelectorAll("button").forEach(b=>b.disabled=false);
+        }
+      } catch (e) {
+        alert("خطای شبکه در تأیید");
+        node.querySelectorAll("button").forEach(b=>b.disabled=false);
+      }
     }
 
-    // --- Rates ---
-    async function updateRates() {
-        const btn = document.getElementById("rateBtn");
-        const st = document.getElementById("rateStatus");
-        btn.disabled = true;
-        st.innerText = "⏳ در حال انجام عملیات...";
-        try {
-            const res = await fetch(`${API_URL}/admin/fetch-rates`, { method: 'POST', headers: getHeaders() });
-            if(res.ok) { st.innerText = "✅ با موفقیت آپدیت شد."; }
-            else { st.innerText = "❌ خطا در سرور"; }
-        } catch (e) { st.innerText = "⚠️ خطای شبکه"; }
-        btn.disabled = false;
+    async function adminReject(txId, node) {
+      const reason = prompt("دلیل رد (اختیاری):", "");
+      const url = BACKEND + "/admin/transactions/" + encodeURIComponent(txId) + "/reject";
+      try {
+        node.querySelectorAll("button").forEach(b=>b.disabled=true);
+        const res = await fetch(url, { method: "POST", headers: { "Accept":"application/json", "Content-Type":"application/json", ...authHeaders() }, body: JSON.stringify({ reason })});
+        if (res.ok) {
+          alert("تراکنش رد شد.");
+          node.remove();
+        } else {
+          const txt = await res.text();
+          alert("خطا در رد: " + res.status + " " + txt);
+          node.querySelectorAll("button").forEach(b=>b.disabled=false);
+        }
+      } catch (e) {
+        alert("خطای شبکه در رد تراکنش");
+        node.querySelectorAll("button").forEach(b=>b.disabled=false);
+      }
     }
 
-    // --- Users ---
-    async function loadUsers() {
-        const list = document.getElementById("user-list");
-        try {
-            const res = await fetch(`${API_URL}/admin/users`, { headers: getHeaders() });
-            const data = await res.json();
-            if(res.ok) {
-                list.innerHTML = data.users.map(u => `
-                    <tr class="hover:bg-white/5">
-                        <td class="p-5 font-bold">${u.username}</td>
-                        <td class="p-5"><span class="px-2 py-0.5 bg-white/10 rounded-full text-[10px]">${u.role}</span></td>
-                        <td class="p-5 text-xs text-gray-400">${u.expiryDate ? new Date(u.expiryDate).toLocaleDateString('fa-IR') : '---'}</td>
-                        <td class="p-5"><button class="text-brand-accent text-xs">ویرایش</button></td>
-                    </tr>
-                `).join('');
-            }
-        } catch (e) {}
+    // --- coupons ---
+    function showCouponCreate() {
+      const area = document.getElementById("couponCreateArea");
+      area.classList.toggle("hidden");
     }
 
-    function logout() {
-        localStorage.clear();
-        window.location.href = "/auth/";
+    async function createCoupon() {
+      const code = document.getElementById("couponCode").value.trim();
+      const bonus = parseInt(document.getElementById("couponDays").value || "0", 10);
+      const max_uses = document.getElementById("couponMaxUses").value;
+      const expires_at = document.getElementById("couponExpires").value.trim();
+      if (!code || !bonus || bonus <= 0) {
+        alert("کد و bonus_days معتبر وارد کن.");
+        return;
+      }
+      const payload = { code, bonus_days: bonus };
+      if (max_uses) payload.max_uses = parseInt(max_uses,10);
+      if (expires_at) payload.expires_at = expires_at;
+      document.getElementById("couponCreateMsg").innerText = "در حال ارسال...";
+      try {
+        const res = await fetch(BACKEND + "/admin/coupons", {
+          method: "POST",
+          headers: { "Content-Type":"application/json", "Accept":"application/json", ...authHeaders() },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          document.getElementById("couponCreateMsg").innerText = "کوپن ساخته شد.";
+          document.getElementById("couponCode").value = "";
+          document.getElementById("couponDays").value = "";
+          document.getElementById("couponMaxUses").value = "";
+          document.getElementById("couponExpires").value = "";
+          listCoupons();
+        } else {
+          const txt = await res.text();
+          document.getElementById("couponCreateMsg").innerText = "خطا: " + res.status;
+          alert("خطا در ایجاد کوپن: " + res.status + " " + txt);
+        }
+      } catch (e) {
+        document.getElementById("couponCreateMsg").innerText = "خطای شبکه";
+      }
     }
 
-    // Start checking on load
-    window.onload = bootstrap;
+    async function listCoupons() {
+      const place = document.getElementById("couponList");
+      place.innerHTML = '<div class="p-4 mono small-muted">در حال بارگذاری... <span class="loader inline-block"></span></div>';
+      try {
+        const res = await fetch(BACKEND + "/admin/coupons", { headers: { "Accept":"application/json", ...authHeaders() }});
+        if (!res.ok) {
+          place.innerHTML = '<div class="p-4 small-muted">خطا: ' + res.status + '</div>';
+          return;
+        }
+        const j = await res.json();
+        const coupons = j.coupons || [];
+        if (!coupons.length) {
+          place.innerHTML = '<div class="p-4 small-muted">کوپنی موجود نیست.</div>';
+          return;
+        }
+        place.innerHTML = "";
+        for (const c of coupons) {
+          const el = document.createElement("div");
+          el.className = "p-3 plan-card glass-panel flex items-center justify-between";
+          el.innerHTML = `<div>
+                            <div class="font-medium mono">${c.code}</div>
+                            <div class="small-muted">bonus_days: ${c.bonus_days} · uses: ${c.uses || 0} ${c.max_uses ? "· max: "+c.max_uses : ""}</div>
+                          </div>
+                          <div class="text-right small-muted">${c.expires_at ? c.expires_at : ""}</div>`;
+          place.appendChild(el);
+        }
+      } catch (e) {
+        place.innerHTML = '<div class="p-4 small-muted">خطای شبکه در واکشی کوپن‌ها</div>';
+      }
+    }
+
+    // --- rates ---
+    async function fetchRates() {
+      const el = document.getElementById("ratesMsg");
+      el.innerText = "در حال فچ و ذخیره...";
+      try {
+        const res = await fetch(BACKEND + "/admin/fetch-rates", { method: "POST", headers: { "Accept":"application/json", ...authHeaders() }});
+        if (res.ok) {
+          el.innerText = "نرخ‌ها با موفقیت فچ شدند.";
+        } else {
+          const txt = await res.text();
+          el.innerText = "خطا: " + res.status;
+          alert("خطا در فچ نرخ‌ها: " + res.status + " " + txt);
+        }
+      } catch (e) {
+        el.innerText = "خطای شبکه";
+      }
+    }
+
+    // small helper to set a loader state on an element id
+    function setLoading(id, loading) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (loading) el.classList.add("opacity-60");
+      else el.classList.remove("opacity-60");
+    }
+
+    // init
+    (function init() {
+      // set backend url in UI
+      document.getElementById("backendUrl").innerText = BACKEND;
+      // bootstrap (auth check -> show panel or overlay)
+      bootstrap();
+      // keyboard shortcut: R reload root
+      window.addEventListener("keydown", (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r") {
+          fetchRoot();
+        }
+      });
+    })();
   </script>
 </body>
 </html>

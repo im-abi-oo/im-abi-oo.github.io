@@ -1,397 +1,675 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>دوست دخترخانگی | خواندن آنلاین</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0" />
+  <title>دوست دختر خانگی — Manga Reader</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet"/>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg: #050505;
+      --accent: #a855f7;
+      --panel: rgba(15, 15, 20, 0.96);
+      --manga-w: 800px;
+    }
+
+    * { 
+      box-sizing: border-box; 
+      scrollbar-width: none; 
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -webkit-touch-callout: none !important;
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
+    }
+    *::-webkit-scrollbar { display: none; }
+
+    html, body { height: 100%; width: 100%; }
+    body { 
+      background-color: var(--bg); 
+      color: #fff; 
+      font-family: 'Vazirmatn', sans-serif; 
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* --- فیلترهای اصلاح شده و قدرتمند --- */
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css" rel="stylesheet"/>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    /* برجسته‌ساز خطوط (اصلاح شده): رنگ را نگه می‌دارد، کنتراست را شدید می‌کند */
+    .f-lines { 
+      filter: contrast(1.6) saturate(1.2) brightness(1.05) !important; 
+    }
     
-    <style>
-        :root {
-            --bg-deep: #02000a;
-            --primary: #7c3aed; 
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-        }
-        
-        body { 
-            font-family: 'Vazir', sans-serif;
-            background-color: var(--bg-deep); 
-            color: #f4f4f5; 
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
+    /* سیاه و سفید: کنتراست بالا شبیه جوهر چاپ */
+    .f-bw { 
+      filter: grayscale(1) contrast(1.4) brightness(1.05) !important; 
+    }
+    
+    /* محافظ چشم: گرم‌تر */
+    .f-blue { 
+      filter: sepia(0.3) hue-rotate(-20deg) contrast(0.95) brightness(0.9) !important; 
+    }
 
-        .glass-header { 
-            background: rgba(2, 0, 10, 0.85);
-            backdrop-filter: blur(20px); 
-            border-bottom: 1px solid var(--border); 
-        }
+    /* ترکیب خطوط + سیاه سفید */
+    .f-lines.f-bw { 
+      filter: grayscale(1) contrast(2.0) brightness(1.1) !important; 
+    }
 
-        .chapter-row {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid transparent;
-        }
-        .chapter-row:hover {
-            background: var(--glass);
-            border-color: var(--border);
-            transform: translateX(-4px);
-        }
-        
-        /* Scrollbar */
-        .c-scroll::-webkit-scrollbar { width: 4px; }
-        .c-scroll::-webkit-scrollbar-track { background: transparent; }
-        .c-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-        .c-scroll::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    /* --- کیفیت‌ها (بسیار قوی‌تر) --- */
+    .q-sd { } /* اورجینال */
+    
+    /* HD: رنگ‌های زنده‌تر و کنتراست بهتر */
+    .q-hd { 
+      filter: contrast(1.15) saturate(1.4) brightness(1.03); 
+      image-rendering: -webkit-optimize-contrast; 
+    }
+    
+    /* UHD: نهایت شارپنس و رنگ (شبیه‌سازی HDR) */
+    .q-uhd { 
+      filter: contrast(1.25) saturate(1.6) brightness(1.08) drop-shadow(0 0 0.5px rgba(0,0,0,0.8)); 
+    }
 
-        /* Lock State Styling */
-        .is-locked {
-            opacity: 0.6;
-            position: relative;
-            cursor: not-allowed;
-            filter: grayscale(0.8);
-        }
-        .is-locked:hover { 
-            opacity: 0.8;
-            background: rgba(220, 38, 38, 0.05); 
-            border-color: rgba(220, 38, 38, 0.2);
-            transform: none;
-            filter: grayscale(0);
-        }
-        
-        /* Background Ambient */
-        .bg-orb {
-            position: fixed;
-            width: 600px; height: 600px; 
-            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%); 
-            filter: blur(80px); z-index: -1; pointer-events: none;
-        }
-    </style>
+    .glass { 
+      background: var(--panel); 
+      backdrop-filter: blur(16px); 
+      border: 1px solid rgba(255,255,255,0.08); 
+    }
+
+    /* کانتینر بدون فاصله */
+    #render-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding-top: 90px;
+      padding-bottom: 160px;
+      gap: 0; 
+      line-height: 0;
+      font-size: 0;
+    }
+    
+    .manga-page {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      max-width: var(--manga-w);
+      position: relative;
+      background: #000;
+      margin: 0;
+      padding: 0;
+      line-height: 0;
+      font-size: 0;
+    }
+
+    .manga-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      -webkit-user-drag: none;
+      vertical-align: top;
+      margin: 0;
+      padding: 0;
+      border: none;
+      transform: translateZ(0);
+    }
+
+    .ui-anim { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; }
+    .ui-hidden-t { transform: translateY(-120%); opacity: 0; }
+    .ui-hidden-b { transform: translateY(120%); opacity: 0; }
+
+    .btn-active {
+      background: var(--accent) !important;
+      color: white !important;
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+      border-color: var(--accent) !important;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      height: 6px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      direction: ltr;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .en { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col relative" data-slug="Domestic-Girlfriend-1234">
+<body oncontextmenu="return false;">
 
-    <div class="bg-orb top-[-200px] left-[-200px]"></div>
-    <div class="bg-orb bottom-[-200px] right-[-200px]" style="background: radial-gradient(circle, rgba(217, 70, 239, 0.1) 0%, transparent 70%);"></div>
+  <header id="ui-header" class="fixed top-0 inset-x-0 z-[100] p-3 md:p-4 ui-anim">
+    <div class="max-w-5xl mx-auto glass rounded-3xl px-4 py-3 flex items-center justify-between shadow-2xl">
+      <div class="flex items-center gap-4 md:gap-5">
+        <button onclick="goBack()" title="بازگشت" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+        <div class="flex flex-col justify-center">
+          <p id="current-title" class="text-sm md:text-base font-bold truncate max-w-[180px] md:max-w-xs text-white">دوست دختر خانگی</p>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-black text-purple-500 uppercase tracking-wider bg-purple-500/10 px-1.5 rounded">چپتر <span id="ch-num-disp" class="en">1</span></span>
+            <p id="current-title-en" class="text-[11px] text-zinc-400 en font-medium truncate max-w-[150px]">Domestic girlfriend</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex flex-col items-end px-4 border-l border-white/10">
+            <span class="text-[9px] text-zinc-500 font-bold uppercase">صفحه</span>
+            <div class="flex items-center gap-1 font-bold en text-sm">
+                <span id="p-current" class="text-purple-400">01</span>
+                <span class="text-zinc-600">/</span>
+                <span id="p-total" class="text-zinc-500">--</span>
+            </div>
+        </div>
+        <button onclick="event.stopPropagation(); togglePanel('panel-settings')" class="w-11 h-11 flex items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 border border-purple-500/30 hover:bg-purple-500/20 transition-all">
+          <i data-lucide="settings-2" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+  </header>
 
-    <nav class="sticky top-0 z-50 glass-header h-16 flex items-center justify-between px-4 md:px-8">
-        <a href="/" class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
-            <i data-lucide="arrow-right" class="w-5 group-hover:-translate-x-1 transition-transform"></i>
-            <span class="text-sm font-bold hidden md:inline">بازگشت به آرشیو</span>
-        </a>
+  <main id="scroller" class="w-full h-screen overflow-y-auto bg-black" onclick="toggleUI()">
+    <div id="render-area"></div>
+  </main>
+
+  <footer id="ui-footer" class="fixed bottom-0 inset-x-0 z-[100] p-6 ui-anim pointer-events-none">
+    <div class="max-w-xl mx-auto flex flex-col items-center gap-4">
+        <div class="w-full h-1.5 bg-gray-800/60 rounded-full overflow-hidden pointer-events-auto backdrop-blur-sm border border-white/5">
+            <div id="progress-bar" class="h-full bg-gradient-to-l from-purple-400 to-purple-600 transition-all duration-200 ease-out" style="width: 0%"></div>
+        </div>
         
-        <div class="font-black text-lg tracking-tight text-white">
-            <span class="text-accent">TWO</span>MANGA
-        </div>
-
-        <div id="user-area" class="min-w-[100px] flex justify-end">
-            <div class="w-20 h-8 bg-white/5 animate-pulse rounded-lg"></div>
-        </div>
-    </nav>
-
-    <header class="relative w-full pt-8 pb-12">
-    
-        <div class="absolute inset-0 h-[80%] overflow-hidden -z-10 mask-image-b">
-            <img src="https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg" class="w-full h-full object-cover blur-[80px] opacity-30 scale-125">
-            <div class="absolute inset-0 bg-gradient-to-b from-[#02000a]/20 via-[#02000a]/80 to-[#02000a]"></div>
-        </div>
-
-        <div class="max-w-6xl mx-auto px-4 md:px-8 flex flex-col md:flex-row gap-8 md:gap-12 items-start">
-            <div class="relative w-40 md:w-64 aspect-[2/3] rounded-2xl overflow-hidden shadow-2xl shadow-accent/20 border border-white/10 mx-auto md:mx-0 shrink-0 group">
-                <img src="https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg" class="w-full h-full object-cover" alt="دوست دخترخانگی">
-                <div class="absolute top-3 right-3 bg-accent text-white text-[10px] font-black px-2 py-1 rounded shadow-lg">Manga</div>
-            </div>
-
-            <div class="flex-1 w-full text-center md:text-right space-y-6">
-                
-                <div>
-                    <h1 class="text-3xl md:text-5xl font-black text-white mb-2 leading-tight">دوست دخترخانگی</h1>
-                    <h2 class="text-base text-gray-500 font-bold uppercase tracking-wider">Domestic Girlfriend</h2>
-                </div>
-
-                <div class="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 border-y border-white/5 py-5">
-    
-                    <div class="text-center md:text-right">
-                        <span class="block text-[10px] text-gray-500 font-bold mb-1">وضعیت</span>
-                        <span class="text-sm font-black text-emerald-400">دردست انتشار...</span>
-                    </div>
-    
-                    <div class="w-px bg-white/10"></div>
-                    <div class="text-center md:text-right">
-                        <span class="block text-[10px] text-gray-500 font-bold mb-1">نویسنده</span>
-                        <span class="text-sm font-black text-white">Chugong</span>
-                    </div>
-                    <div class="w-px bg-white/10"></div>
-                    <div class="text-center md:text-right">
-                        <span class="block text-[10px] text-gray-500 font-bold mb-1">تعداد چپتر</span>
-                        <span class="text-sm font-black text-white">1</span>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap justify-center md:justify-start gap-2">
-                    
-                    <a href="/#genres=مثلث عشقی" class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:border-accent hover:text-accent text-[11px] font-bold text-gray-400 transition-colors">
-                        مثلث عشقی
-                    </a>
-                    
-                    <a href="/#genres=عاشقانه" class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/5 hover:border-accent hover:text-accent text-[11px] font-bold text-gray-400 transition-colors">
-                        عاشقانه
-                    </a>
-                    
-                </div>
-
-                <p class="text-sm text-gray-400 leading-7 max-w-3xl mx-auto md:mx-0 text-justify bg-white/5 p-4 rounded-xl border border-white/5">
-                    نمی دانم
-                </p>
-
-                <div class="pt-2">
-                    <button id="main-cta" onclick="Logic.handleReadClick(83)" class="w-full md:w-auto bg-white text-black hover:bg-gray-200 px-8 py-3.5 rounded-xl font-black text-sm transition-all shadow-lg flex items-center justify-center gap-2">
-                        <i data-lucide="book-open" class="w-4 h-4"></i>
-                        شروع مطالعه (چپتر 83)
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-6xl mx-auto px-4 md:px-8 pb-20 w-full">
-        <div class="flex items-center justify-between mb-6 sticky top-20 z-30 bg-[#02000a]/90 backdrop-blur py-3 border-b border-white/5">
-            <h3 class="text-lg font-black text-white flex items-center gap-2">
-                <i data-lucide="list" class="w-5 text-accent"></i> لیست چپترها
-            </h3>
-            <div class="relative w-48">
-                <input type="text" id="chapterSearch" placeholder="جستجو..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:border-accent outline-none">
-            </div>
-        </div>
-
-        <div id="chapters-list" class="grid gap-2">
+        <div class="glass px-1 py-1.5 rounded-[2.5rem] flex items-center gap-0.5 shadow-2xl pointer-events-auto">
+            <button id="nav-next" class="w-12 h-12 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"><i data-lucide="chevron-right"></i></button>
+            <div class="h-6 w-px bg-white/10 mx-1"></div>
             
-            <div class="chapter-row flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 cursor-pointer group"
-                 data-num="83"
-                 data-limit="83">
-                
-                <div class="flex items-center gap-4">
-                    <span class="w-10 h-10 rounded-lg bg-black/40 flex items-center justify-center text-xs font-black text-gray-500 group-hover:text-accent transition-colors">
-                        #83
-                    </span>
-                    <div>
-                        <span class="block text-sm font-bold text-gray-200 group-hover:text-white">چپتر 83</span>
-                        <span class="text-[10px] text-gray-600">20 تصویر</span>
-                    </div>
-                </div>
+            <button id="btn-auto" onclick="event.stopPropagation(); toggleAutoScroll()" class="w-12 h-12 flex items-center justify-center rounded-full text-zinc-400 hover:text-purple-400 hover:bg-white/5 transition-colors">
+                <i data-lucide="play" id="play-icon" class="w-5 h-5 fill-current"></i>
+            </button>
+            <button onclick="event.stopPropagation(); togglePanel('panel-chapters')" class="w-12 h-12 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors">
+                <i data-lucide="list-start" class="w-5 h-5"></i>
+            </button>
+            <button onclick="event.stopPropagation(); toggleFullscreen()" class="w-12 h-12 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors">
+                <i data-lucide="maximize" class="w-5 h-5"></i>
+            </button>
+            <button onclick="event.stopPropagation(); scroller.scrollTo({top:0, behavior:'smooth'})" class="w-12 h-12 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors">
+                <i data-lucide="arrow-up-to-line" class="w-5 h-5"></i>
+            </button>
 
-                <div class="status-icon">
-                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                        <i data-lucide="loader" class="w-4 h-4 animate-spin text-gray-500"></i>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-    </main>
-
-    <div id="sub-modal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden items-center justify-center p-4">
-        <div class="bg-[#0f0f13] border border-white/10 w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl shadow-rose-500/10 transform scale-95 opacity-0 transition-all duration-300" id="sub-content">
-            <div class="h-36 bg-gradient-to-br from-rose-600 to-purple-900 flex flex-col items-center justify-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
-                <i data-lucide="crown" class="w-12 h-12 text-white fill-white mb-2 shadow-lg"></i>
-                <span class="text-white text-xs font-black tracking-widest uppercase bg-black/20 px-3 py-1 rounded-full">اشتراک ویژه</span>
-            </div>
-            <div class="p-8 text-center">
-                <h3 class="text-xl font-black text-white mb-4">نیاز به اشتراک تومانگا</h3>
-                <p class="text-sm text-gray-400 mb-8 leading-7">
-                    کاربر گرامی، برای دسترسی به آرشیو کامل و خواندن این اثر، نیاز به <span class="text-rose-400 font-bold">اشتراک فعال</span> دارید.
-                    <br><span class="text-[10px] opacity-70 mt-2 block">بدون اشتراک امکان مطالعه وجود ندارد.</span>
-                </p>
-                <div class="space-y-3">
-                    <a href="/panel" class="flex items-center justify-center gap-2 w-full py-4 bg-white text-black hover:bg-gray-200 font-black rounded-xl transition shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-                        <i data-lucide="credit-card" class="w-4 h-4"></i>
-                        خرید اشتراک آنی
-                    </a>
-                    <button onclick="Logic.closeModal()" class="block w-full py-3 text-gray-500 hover:text-white font-bold text-xs transition">
-                        فقط مشاهده جزئیات اثر
-                    </button>
-                </div>
-            </div>
+            <div class="h-6 w-px bg-white/10 mx-1"></div>
+            <button id="nav-prev" class="w-12 h-12 flex items-center justify-center rounded-full text-zinc-400 hover:text-white hover:bg-white/5 transition-colors"><i data-lucide="chevron-left"></i></button>
         </div>
     </div>
+  </footer>
 
-    <script>
-        const Logic = (() => {
-            const API_BASE = "https://two-api-iksq.onrender.com";
-            // فرض می‌کنیم لیمیت ۰ است، یعنی همه چیز قفل است مگر اینکه کاربر پریمیوم باشد
-            const UNLOCK_LIMIT = 83; 
-            
-            let userState = { 
-                loggedIn: false, 
-                premium: false, 
-                data: null 
-            };
-            let rows = [];
+  <div id="panel-settings" class="fixed inset-0 z-[500] hidden items-center justify-center p-4 bg-black/90 backdrop-blur-md transition-opacity" onclick="togglePanel('panel-settings')">
+    <div class="glass w-full max-w-sm p-6 rounded-[2rem] border border-white/10" onclick="event.stopPropagation()">
+      <div class="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+        <h3 class="text-lg font-bold flex items-center gap-2"><i data-lucide="sliders-horizontal" class="text-purple-500 w-5 h-5"></i> تنظیمات نمایش</h3>
+        <button onclick="togglePanel('panel-settings')" class="w-8 h-8 flex items-center justify-center bg-white/5 rounded-full hover:bg-white/10"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
 
-            async function init() {
-                lucide.createIcons();
-                rows = document.querySelectorAll('.chapter-row');
-                await checkAuth();
-                updateUI();
+      <div class="space-y-6">
+        <div class="space-y-5">
+            <div class="space-y-2">
+                <div class="flex justify-between text-[11px] font-bold text-zinc-400"><span>اندازه تصویر</span> <span id="val-w" class="text-purple-400 en">800px</span></div>
+                <input type="range" min="300" max="1600" step="50" id="range-w" class="w-full">
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-[11px] font-bold text-zinc-400"><span>سرعت اسکولر خودکار</span> <span id="val-s" class="text-purple-400 en">2.5x</span></div>
+                <input type="range" min="0.5" max="15" step="0.5" id="range-s" class="w-full">
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <span class="text-[10px] font-black text-zinc-500 uppercase">فیلترها (چندانتخابی)</span>
+            <div class="grid grid-cols-3 gap-2">
+                <button id="btn-f-lines" onclick="toggleFilter('lines')" class="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-white/5 text-[10px] font-bold border border-transparent transition-all hover:bg-white/10">
+                    <i data-lucide="pencil" class="w-4 h-4 mb-0.5"></i>اصلاح کننده (ازمایشی)
+                </button>
+                <button id="btn-f-bw" onclick="toggleFilter('bw')" class="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-white/5 text-[10px] font-bold border border-transparent transition-all hover:bg-white/10">
+                    <i data-lucide="moon" class="w-4 h-4 mb-0.5"></i>سیاه و سفید(مانگا مود)
+                </button>
+                <button id="btn-f-blue" onclick="toggleFilter('blue')" class="flex flex-col items-center gap-1.5 py-3 rounded-xl bg-white/5 text-[10px] font-bold border border-transparent transition-all hover:bg-white/10">
+                    <i data-lucide="eye" class="w-4 h-4 mb-0.5"></i>حالت شب
+                </button>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <span class="text-[10px] font-black text-zinc-500 uppercase">پردازش تصویر</span>
+            <div class="grid grid-cols-3 gap-2">
+                <button id="btn-q-sd" onclick="setQuality('sd')" class="py-2.5 rounded-lg bg-white/5 text-[11px] font-bold en border border-transparent transition-all">پیش فرض</button>
+                <button id="btn-q-hd" onclick="setQuality('hd')" class="py-2.5 rounded-lg bg-white/5 text-[11px] font-bold en border border-transparent transition-all">HD (پیشنهادی)</button>
+                <button id="btn-q-uhd" onclick="setQuality('uhd')" class="py-2.5 rounded-lg bg-white/5 text-[11px] font-bold en border border-transparent transition-all">UHD</button>
+            </div>
+        </div>
+
+        <button onclick="resetSettings()" class="w-full py-3 rounded-xl bg-red-500/5 text-red-400 text-xs font-bold border border-red-500/10 hover:bg-red-500/15 transition-all flex items-center justify-center gap-2">
+            <i data-lucide="rotate-ccw" class="w-3 h-3"></i> بازنشانی تنظیمات
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <aside id="panel-chapters" class="fixed inset-y-0 right-0 w-full md:w-80 glass z-[600] translate-x-full ui-anim flex flex-col md:rounded-r-none md:rounded-l-[2.5rem] border-l border-white/10 shadow-2xl">
+    <div class="p-6 border-b border-white/5">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold flex items-center gap-2"><i data-lucide="library" class="text-purple-500 w-5 h-5"></i> فهرست چپترها</h3>
+            <button onclick="togglePanel('panel-chapters')" class="w-8 h-8 flex items-center justify-center bg-white/5 rounded-full hover:bg-white/10"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+        <div class="relative">
+            <i data-lucide="search" class="absolute right-3 top-3 w-4 h-4 text-zinc-500"></i>
+            <input type="text" id="chapter-search" placeholder="شماره چپتر..." class="w-full bg-black/30 border border-white/10 rounded-xl py-2.5 pr-10 pl-4 text-sm outline-none focus:border-purple-500 transition-colors">
+        </div>
+    </div>
+    <div id="chapter-list" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
+  </aside>
+
+  <script id="manga-db" type="application/json">{"titleFa": "دوست دختر خانگی", "titleEn": "Domestic girlfriend", "baseUrl": "https://raw.githubusercontent.com/im-abi-oo/mioooo/main/oo/", "backUrl": "./", "chapters": [{"chapterNumber": 1, "imageCount": 20}, {"chapterNumber": 2, "imageCount": 20}], "unlockLimit": 2}</script>
+
+  <script>
+    const API_URL = "https://two-api-iksq.onrender.com";
+
+    // AUTH CHECK FUNCTION
+    async function checkAuth() {
+        const at = localStorage.getItem('at');
+        // اگه اصلا ورود نزده بود (توکن نداشت)
+        if(!at) {
+            window.location.href = '/auth';
+            return false;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/auth/me`, {
+                method: 'GET',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${at}`
+                }
+            });
+
+            // اگه 401 بود یعنی توکن فیک یا اکسپایر شده
+            if(res.status === 401 || res.status === 403) {
+                // شوتش کن به auth
+                window.location.href = '/auth';
+                return false;
+            }
+
+            const data = await res.json();
+
+            // اگه اشتراک داشت
+            if (data.days_left && data.days_left > 0) {
+                // ولش کن بخونه (محدودیت رو برمیداریم که راحت بخونه)
+                if(typeof DB !== 'undefined') DB.unlockLimit = 99999;
+                return true; 
+            } else {
+                // اشتراک نداشت -> شوتش کن مسیر روا ./
+                window.location.href = './';
+                return false;
+            }
+
+        } catch (error) {
+            console.error('Auth Check Error:', error);
+            // توی خطا برای احتیاط میفرستیم صفحه قبل تا دوباره تلاش کنه
+            window.location.href = './';
+            return false;
+        }
+    }
+
+    // DB
+    const DB = (function(){
+        try {
+            const el = document.getElementById('manga-db');
+            return JSON.parse(el.textContent);
+        } catch (e) {
+            console.error('DB Error:', e);
+            return { titleFa: '', titleEn: '', baseUrl: '', unlockLimit: 0, chapters: [] };
+        }
+    })();
+
+    let scroller = null;
+    let userSettings = JSON.parse(localStorage.getItem('manga_pro_v3')) || { 
+        width: 800, 
+        speed: 2.5, 
+        filter: { lines:false, bw:false, blue:false }, 
+        quality: 'sd' 
+    };
+    let currentCh = 1;
+    let isAuto = false, autoRaf = null, uiVisible = true;
+
+    function pad(n,l=2){ return String(n).padStart(l,'0'); }
+
+    // Init اصلاح شده با Auth
+    async function init(){
+        // اول احراز هویت میکنه، اگه اوکی نبود کدهای پایین اصلا اجرا نمیشن
+        const authorized = await checkAuth();
+        if(!authorized) return;
+
+        scroller = document.getElementById('scroller');
+        
+        // Initial Chapter
+        const hash = window.location.hash || '#ch-1';
+        let requested = parseInt(hash.replace('#ch-','')) || 1;
+        const available = DB.chapters.map(c=>c.chapterNumber).filter(n=>n<=DB.unlockLimit);
+        
+        if(available.length > 0 && !available.includes(requested)){
+            requested = Math.min(...available);
+        }
+        currentCh = requested;
+
+        // Title
+        const enTitleEl = document.getElementById('current-title-en');
+        if(enTitleEl) enTitleEl.textContent = DB.titleEn || '';
+
+        renderChapter(currentCh);
+        renderChapterList();
+        applySettings();
+        setupSecurity();
+        lucide.createIcons();
+
+        // Listeners
+        window.addEventListener('hashchange', onHashChange);
+        scroller.addEventListener('scroll', () => { requestAnimationFrame(updateProgress) }, { passive: true });
+        
+        document.getElementById('range-w').addEventListener('input', e => { 
+            userSettings.width = Number(e.target.value); 
+            applySettings(); 
+        });
+        document.getElementById('range-s').addEventListener('input', e => { 
+            userSettings.speed = Number(e.target.value); 
+            document.getElementById('val-s').textContent = userSettings.speed + 'x';
+            saveSettings();
+        });
+        document.getElementById('chapter-search').addEventListener('input', e => renderChapterList(e.target.value.trim()));
+        document.getElementById('nav-next').addEventListener('click', ()=>navChapter(1));
+        document.getElementById('nav-prev').addEventListener('click', ()=>navChapter(-1));
+    }
+
+    function goBack(){
+        if(DB.backUrl && DB.backUrl.length > 0){
+            window.location.href = DB.backUrl;
+            return;
+        }
+        window.location.href = './';
+    }
+
+    function onHashChange(){
+        const num = parseInt((window.location.hash||'#ch-1').replace('#ch-','')) || 1;
+        if(num === currentCh) return;
+        if(num > DB.unlockLimit){
+            window.location.hash = '#ch-' + currentCh;
+            return;
+        }
+        currentCh = num;
+        renderChapter(currentCh);
+    }
+
+    function renderChapter(num){
+        const chapter = DB.chapters.find(c=>c.chapterNumber === num);
+        if(!chapter) return;
+
+        document.getElementById('ch-num-disp').textContent = num;
+        
+        const area = document.getElementById('render-area');
+        while (area.firstChild) area.removeChild(area.firstChild);
+        
+        scroller.scrollTop = 0;
+        document.getElementById('p-total').textContent = pad(chapter.imageCount || 0, 2);
+
+        const fragment = document.createDocumentFragment();
+
+        for(let i=1; i <= (chapter.imageCount||0); i++){
+            const pageNum = String(i).padStart(3,'0');
+            const url = `${DB.baseUrl}${num}/${pageNum}.webp`;
+
+            const div = document.createElement('div');
+            div.className = 'manga-page';
+
+            const img = document.createElement('img');
+            img.className = 'manga-img';
+            img.alt = `Page ${i}`;
+            img.dataset.src = url;
+            img.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxIiBoZWlnaHQ9IjEiPjwvc3ZnPg==';
+            img.loading = 'lazy';
+
+            updateImgClass(img);
+
+            div.appendChild(img);
+            fragment.appendChild(div);
+
+            if(i <= 3) {
+                loadImage(img);
+            } else {
+                observer.observe(div);
+            }
+        }
+        area.appendChild(fragment);
+        updateProgress();
+    }
+
+    function loadImage(img){
+        if(!img.dataset.src) return;
+        img.src = img.dataset.src;
+        img.onload = () => img.style.opacity = '1';
+        img.removeAttribute('data-src');
+    }
+
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting){
+                const img = entry.target.querySelector('img');
+                if(img && img.dataset.src) loadImage(img);
                 
-                // جستجو
-                const searchInput = document.getElementById('chapterSearch');
-                if (searchInput) {
-                    searchInput.addEventListener('input', (e) => {
-                        const val = e.target.value;
-                        rows.forEach(r => {
-                            const num = r.dataset.num || '';
-                            r.style.display = num.includes(val) ? 'flex' : 'none';
-                        });
-                    });
+                const idx = Array.prototype.indexOf.call(entry.target.parentNode.children, entry.target) + 1;
+                document.getElementById('p-current').textContent = pad(idx, 2);
+                
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { rootMargin: '1000px 0px' });
+
+    function updateProgress(){
+        const s = scroller;
+        const progress = (s.scrollTop / (s.scrollHeight - s.clientHeight)) * 100;
+        document.getElementById('progress-bar').style.width = Math.min(100, Math.max(0, progress)) + '%';
+        
+        const center = s.scrollTop + (window.innerHeight/2);
+        const pages = document.getElementsByClassName('manga-page');
+        for(let i=0; i<pages.length; i++){
+            const el = pages[i];
+            if(el.offsetTop <= center && (el.offsetTop + el.offsetHeight) > center){
+                document.getElementById('p-current').textContent = pad(i+1, 2);
+                break;
+            }
+        }
+    }
+
+    function renderChapterList(query=''){
+        const list = document.getElementById('chapter-list');
+        list.innerHTML = '';
+        
+        let chapters = DB.chapters.filter(c => c.chapterNumber <= DB.unlockLimit);
+        chapters.sort((a,b) => b.chapterNumber - a.chapterNumber);
+
+        if(query){
+            const q = query.toLowerCase();
+            chapters = chapters.filter(c => String(c.chapterNumber).includes(q));
+        }
+
+        if(chapters.length === 0){
+            list.innerHTML = '<div class="text-center text-zinc-500 py-4 text-sm">موردی یافت نشد</div>';
+            return;
+        }
+
+        chapters.forEach(ch => {
+            const isActive = ch.chapterNumber === currentCh;
+            const btn = document.createElement('button');
+            btn.className = `w-full p-3 rounded-xl flex items-center justify-between text-sm transition-all mb-2 ${isActive 
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/40' 
+                : 'bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white'}`;
+            
+            btn.innerHTML = `
+                <span class="font-bold flex items-center gap-2"><i data-lucide="file-image" class="w-4 h-4 opacity-70"></i> <span class="en">Chapter ${ch.chapterNumber}</span></span>
+                <i data-lucide="${isActive ? 'check' : 'chevron-left'}" class="w-4 h-4"></i>
+            `;
+            btn.onclick = (e) => { 
+                e.stopPropagation(); 
+                if(!isActive) {
+                    window.location.hash = `#ch-${ch.chapterNumber}`; 
+                    togglePanel('panel-chapters');
                 }
+            };
+            list.appendChild(btn);
+        });
+        lucide.createIcons();
+    }
 
-                // اگر کاربر پریمیوم نیست، مودال را نشان بده (فقط در صورتی که محدودیت ۰ باشد)
-                if (!userState.premium && UNLOCK_LIMIT === 0) {
-                    setTimeout(() => openModal(), 1500);
-                }
+    function navChapter(dir){
+        const sorted = DB.chapters.map(c=>c.chapterNumber).filter(n=>n<=DB.unlockLimit).sort((a,b)=>a-b);
+        const currentIdx = sorted.indexOf(currentCh);
+        const nextCh = sorted[currentIdx + dir];
+        if(nextCh !== undefined) window.location.hash = `#ch-${nextCh}`;
+    }
+
+    function toggleFilter(key){
+        userSettings.filter[key] = !userSettings.filter[key];
+        applySettings();
+    }
+
+    function setQuality(q){
+        userSettings.quality = q;
+        applySettings();
+    }
+
+    function updateImgClass(img){
+        const classes = ['manga-img'];
+        if(userSettings.filter.lines) classes.push('f-lines');
+        if(userSettings.filter.bw) classes.push('f-bw');
+        if(userSettings.filter.blue) classes.push('f-blue');
+        
+        classes.push(userSettings.quality === 'sd' ? 'q-sd' : (userSettings.quality === 'hd' ? 'q-hd' : 'q-uhd'));
+        img.className = classes.join(' ');
+    }
+
+    function applySettings(){
+        document.documentElement.style.setProperty('--manga-w', userSettings.width + 'px');
+        document.getElementById('val-w').textContent = userSettings.width + 'px';
+        document.getElementById('range-w').value = userSettings.width;
+
+        const imgs = document.querySelectorAll('.manga-img');
+        imgs.forEach(updateImgClass);
+
+        ['lines','bw','blue'].forEach(f => {
+            const btn = document.getElementById(`btn-f-${f}`);
+            if(btn) btn.classList.toggle('btn-active', userSettings.filter[f]);
+        });
+        ['sd','hd','uhd'].forEach(q => {
+            const btn = document.getElementById(`btn-q-${q}`);
+            if(btn) btn.classList.toggle('btn-active', userSettings.quality === q);
+        });
+
+        saveSettings();
+    }
+
+    function saveSettings(){
+        localStorage.setItem('manga_pro_v3', JSON.stringify(userSettings));
+    }
+
+    function resetSettings(){
+        userSettings = { width: 800, speed: 2.5, filter: { lines:false, bw:false, blue:false }, quality:'sd' };
+        applySettings();
+        document.getElementById('range-s').value = 2.5;
+        document.getElementById('val-s').textContent = '2.5x';
+    }
+
+    function autoStep(){
+        if(!isAuto) return;
+        scroller.scrollBy({ top: userSettings.speed * 0.8, behavior: 'auto' });
+        autoRaf = requestAnimationFrame(autoStep);
+    }
+
+    function toggleAutoScroll(){
+        isAuto = !isAuto;
+        const btn = document.getElementById('btn-auto');
+        const icon = document.getElementById('play-icon');
+        
+        if(isAuto){
+            autoRaf = requestAnimationFrame(autoStep);
+            btn.classList.add('text-purple-400', 'bg-white/10');
+            icon.setAttribute('data-lucide', 'pause');
+            if(uiVisible) toggleUI();
+        } else {
+            cancelAnimationFrame(autoRaf);
+            btn.classList.remove('text-purple-400', 'bg-white/10');
+            icon.setAttribute('data-lucide', 'play');
+        }
+        lucide.createIcons();
+    }
+
+    // اصلاح شده: پشتیبانی قوی از تمام مرورگرها
+    function toggleFullscreen(){
+        const doc = window.document;
+        const docEl = doc.documentElement;
+
+        const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+        const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+        if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+            if(requestFullScreen) requestFullScreen.call(docEl);
+        } else {
+            if(cancelFullScreen) cancelFullScreen.call(doc);
+        }
+    }
+
+    function togglePanel(id){
+        const el = document.getElementById(id);
+        if(id === 'panel-chapters') el.classList.toggle('translate-x-full');
+        else {
+            if(el.classList.contains('hidden')){
+                el.classList.remove('hidden');
+                el.classList.add('flex');
+                setTimeout(()=>el.classList.remove('opacity-0'), 10);
+            } else {
+                el.classList.add('opacity-0');
+                setTimeout(()=>{ el.classList.add('hidden'); el.classList.remove('flex'); }, 300);
             }
+        }
+    }
 
-            async function checkAuth() {
-                const at = localStorage.getItem('at');
-                // Access Token
-                const userArea = document.getElementById('user-area');
-                if (!at) {
-                    // کاربر مهمان
-                    renderGuestBtn(userArea);
-                    return;
-                }
+    function toggleUI(){
+        if(isAuto) return;
+        uiVisible = !uiVisible;
+        document.getElementById('ui-header').classList.toggle('ui-hidden-t', !uiVisible);
+        document.getElementById('ui-footer').classList.toggle('ui-hidden-b', !uiVisible);
+        document.body.style.cursor = uiVisible ? 'default' : 'none';
+    }
 
-                try {
-                    const res = await fetch(`${API_BASE}/auth/me`, { 
-                        headers: { 'Authorization': `Bearer ${at}` } 
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        userState.loggedIn = true;
-                        // منطق اصلی: اگر روز باقی مانده داشت پریمیوم است
-                        userState.premium = data.days_left > 0;
-                        userState.data = data;
+    function setupSecurity(){
+        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if(e.key === 'F12' || (e.ctrlKey && ['u','s','p'].includes(e.key.toLowerCase()))) e.preventDefault();
+        });
+    }
 
-                        userArea.innerHTML = `
-                            <a href="/panel" class="flex items-center gap-2 bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-violet-500/30 hover:border-violet-500/60 px-4 py-2 rounded-xl transition group">
-                                <div class="flex flex-col text-right">
-                                    <span class="text-[10px] text-gray-400 font-bold">خوش آمدید</span>
-                                    <span class="text-xs font-black text-white max-w-[80px] truncate">${data.username}</span>
-                                </div>
-                                <div class="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-white shadow-lg shadow-violet-600/20">
-                                    <i data-lucide="user" class="w-4 h-4"></i>
-                                </div>
-                            </a>
-                        `;
-                        lucide.createIcons();
-                    } else {
-                        // توکن نامعتبر
-                        localStorage.removeItem('at');
-                        localStorage.removeItem('rt');
-                        renderGuestBtn(userArea);
-                    }
-                } catch (e) {
-                    console.error("Auth Error", e);
-                    renderGuestBtn(userArea);
-                }
-            }
-
-            function renderGuestBtn(container) {
-                container.innerHTML = `
-                    <a href="/auth/login" class="flex items-center gap-2 bg-white text-black hover:bg-gray-200 px-5 py-2.5 rounded-xl text-xs font-black transition shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-                        <span>ورود / ثبت‌نام</span>
-                        <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
-                    </a>`;
-                lucide.createIcons();
-            }
-
-            function updateUI() {
-                // FIX: گرفتن اسلاگ از بادی برای استفاده در لینک‌ها
-                const currentSlug = document.body.dataset.slug || '';
-                const container = document.getElementById('chapters-list');
-                const currentRows = container ? container.querySelectorAll('.chapter-row') : [];
-
-                currentRows.forEach(row => {
-                    const num = parseInt(row.dataset.num, 10) || 0;
-                    
-                    // اگر unlock_limit تعریف شده باشد، آن تعداد اول رایگان است (معمولا 0 است)
-                    const isFree = num <= UNLOCK_LIMIT;
-                    
-                    // کلون برای حذف ایونت‌های قبلی
-                    const newRow = row.cloneNode(true);
-                    row.parentNode.replaceChild(newRow, row);
-                    
-                    // اگر کاربر پریمیوم است یا چپتر رایگان است -> باز شود
-                    if (isFree || userState.premium) {
-                        newRow.classList.remove('is-locked');
-                        newRow.querySelector('.status-icon').innerHTML = `
-                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                                 <i data-lucide="play" class="w-3.5 h-3.5 fill-current ml-0.5"></i>
-                            </div>`;
-                        // لینک به ریدر — **فیکس‌شده**: استفاده از template literal با backticks
-                        newRow.onclick = () => {
-                            window.location.href = `/${currentSlug}/reader#ch-${num}`;
-                        };
-
-                    } else {
-                        // قفل
-                        newRow.classList.add('is-locked');
-                        newRow.querySelector('.status-icon').innerHTML = `
-                            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-500">
-                                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                            </div>`;
-                        
-                        // کلیک روی قفل -> باز کردن مودال
-                        newRow.onclick = () => openModal();
-                    }
-                });
-                // رفرش لیست برای سرچ
-                rows = document.querySelectorAll('.chapter-row');
-                lucide.createIcons();
-            }
-
-            // هندلر دکمه "شروع مطالعه" بالای صفحه
-            function handleReadClick(chNum) {
-                const slug = document.body.dataset.slug || '';
-                if (chNum <= UNLOCK_LIMIT || userState.premium) {
-                    // **فیکس‌شده**: لینک به ریدر با backticks
-                    window.location.href = `/${slug}/reader#ch-${chNum}`;
-                } else {
-                    openModal();
-                }
-            }
-
-            function openModal() {
-                const m = document.getElementById('sub-modal');
-                const c = document.getElementById('sub-content');
-                if (!m || !c) return;
-                m.classList.remove('hidden');
-                m.classList.add('flex');
-                setTimeout(() => {
-                    c.classList.remove('scale-95', 'opacity-0');
-                    c.classList.add('scale-100', 'opacity-100');
-                }, 10);
-            }
-
-            function closeModal() {
-                const m = document.getElementById('sub-modal');
-                const c = document.getElementById('sub-content');
-                if (!m || !c) return;
-                c.classList.remove('scale-100', 'opacity-100');
-                c.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => {
-                    m.classList.remove('flex');
-                    m.classList.add('hidden');
-                }, 300);
-            }
-
-            return { init, handleReadClick, closeModal, openModal };
-        })();
-        document.addEventListener('DOMContentLoaded', Logic.init);
-    </script>
+    window.onload = init;
+  </script>
 </body>
 </html>
+

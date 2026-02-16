@@ -82,80 +82,9 @@
       box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
       outline: none;
     }
-
-    .text-gradient {
-      background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #e879f9 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hover-card {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .hover-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px -5px rgba(139, 92, 246, 0.15);
-      border-color: rgba(139, 92, 246, 0.3);
-    }
-
-    .plan-card {
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.05);
-      background: rgba(255,255,255,0.03);
-      transition: all 0.3s ease;
-    }
-    .plan-card:hover { border-color: rgba(167, 139, 250, 0.5); }
-    .plan-card.active {
-      background: linear-gradient(145deg, rgba(139,92,246,0.2), rgba(0,0,0,0));
-      border: 1px solid #8b5cf6;
-      box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
-    }
-    .plan-card.active::before {
-      content: ''; position: absolute; top:0; right:0; width: 4px; height: 100%;
-      background: #8b5cf6; box-shadow: 0 0 10px #8b5cf6;
-    }
-
-    .crypto-btn { cursor: pointer; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); transition: all 0.2s; }
-    .crypto-btn:hover { background: rgba(255,255,255,0.05); }
-    .crypto-btn.active {
-      border-color: #d946ef;
-      background: rgba(217, 70, 239, 0.1);
-      box-shadow: 0 0 15px rgba(217, 70, 239, 0.15);
-    }
-
-    .loader {
-      border: 3px solid rgba(255,255,255,0.1);
-      border-left-color: #8b5cf6;
-      border-radius: 50%;
-      width: 24px; height: 24px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    .step-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
-    .step-content.active { display: block; opacity: 1; transform: translateY(0); }
-
-    .btn-primary {
-      background: linear-gradient(90deg, #7c3aed 0%, #d946ef 100%);
-      background-size: 200% auto;
-      transition: 0.5s;
-    }
-    .btn-primary:hover {
-      background-position: right center;
-      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
-    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen text-gray-200">
-
-  <!-- BACKGROUND SHAPES -->
-  <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
-    <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-violet-600/10 rounded-full blur-[100px] animate-pulse"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-fuchsia-600/10 rounded-full blur-[100px] animate-pulse" style="animation-delay: 2s;"></div>
-  </div>
 
   <!-- NAVBAR -->
   <div class="w-full flex justify-center sticky top-4 z-50 px-4">
@@ -165,11 +94,6 @@
           <span class="bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400">TWO</span>
           <span class="text-white">MANGA</span>
         </a>
-        <div class="hidden md:flex items-center gap-1 text-sm font-medium text-gray-400">
-          <a href="/" class="px-4 py-2 hover:text-white hover:bg-white/5 rounded-xl transition">خانه</a>
-          <a href="/faq" class="px-4 py-2 hover:text-white hover:bg-white/5 rounded-xl transition">سوالات</a>
-          <a href="/panel" class="px-4 py-2 text-white bg-white/10 rounded-xl transition shadow-inner">پنل کاربری</a>
-        </div>
       </div>
       <div>
         <button onclick="logout()" id="btn-logout" class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-red-200 bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 transition">
@@ -186,7 +110,6 @@
     <!-- HEADER SECTION -->
     <header class="glass-panel p-1 rounded-[2.5rem] overflow-hidden animate-fade-in-up">
       <div class="bg-gradient-to-r from-white/5 to-transparent p-8 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8 backdrop-blur-sm">
-
         <div class="flex items-center gap-6 w-full md:w-auto">
           <div class="relative group">
             <div class="absolute -inset-1 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-2xl blur opacity-40 group-hover:opacity-75 transition duration-500"></div>
@@ -197,29 +120,8 @@
           <div class="flex flex-col gap-1">
             <div class="text-xs text-violet-400 font-bold uppercase tracking-wider mb-1">خوش آمدید</div>
             <h1 id="user-name" class="text-3xl md:text-4xl font-black text-white leading-tight">...</h1>
-            <div class="flex items-center gap-2 mt-1">
-                <span id="user-role" class="text-sm text-gray-400">---</span>
-                <span id="role-badge" class="px-2 py-0.5 rounded text-[10px] bg-white/10 border border-white/5 text-gray-300 font-mono">STATUS</span>
-            </div>
           </div>
         </div>
-
-        <div class="w-full md:w-auto flex flex-row items-stretch gap-4 bg-[#0a0a0c]/50 p-2 rounded-2xl border border-white/5">
-            <div class="flex-1 px-6 py-3 flex flex-col justify-center items-end border-l border-white/10">
-                <div class="text-xs text-gray-400 font-medium mb-1">اعتبار باقی‌مانده</div>
-                <div class="flex items-baseline gap-1">
-                    <span id="user-days" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400">۰</span>
-                    <span class="text-xs text-gray-500 font-bold">روز</span>
-                </div>
-            </div>
-            <div class="flex items-center pr-2">
-                <button onclick="openPurchase()" class="btn-primary h-full px-8 rounded-xl font-bold text-white shadow-lg flex flex-col justify-center items-center gap-1 group">
-                    <span class="group-hover:translate-y-[-1px] transition">تمدید</span>
-                    <span class="text-[10px] opacity-70 font-light">اشتراک جدید</span>
-                </button>
-            </div>
-        </div>
-
       </div>
     </header>
 
@@ -228,7 +130,6 @@
 
       <!-- LEFT SIDEBAR -->
       <aside class="lg:col-span-4 space-y-6">
-        <!-- Gift Card -->
         <div class="glass-panel p-6 rounded-3xl hover-card flex flex-col h-full justify-between">
           <div>
             <div class="flex items-center gap-3 mb-4">
@@ -247,25 +148,6 @@
               بررسی و فعالسازی
             </button>
           </div>
-        </div>
-
-        <!-- Info / Stats -->
-        <div class="glass-panel p-6 rounded-3xl space-y-4">
-            <div class="flex items-center gap-3 mb-2">
-                <div class="p-2.5 rounded-lg bg-blue-500/10 text-blue-400">
-                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-                </div>
-                <h3 class="font-bold text-lg">خلاصه وضعیت</h3>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
-                    <div class="text-xs text-gray-500 mb-1">تعداد خرید</div>
-                    <div id="total-purchases" class="text-xl font-black text-white">0</div>
-                </div>
-                <a href="#" class="bg-sky-500/10 p-4 rounded-2xl text-center border border-sky-500/20 hover:bg-sky-500/20 transition flex flex-col items-center justify-center gap-2 group">
-                    <div class="text-sky-400 font-bold text-sm group-hover:scale-105 transition">پشتیبانی</div>
-                </a>
-            </div>
         </div>
       </aside>
 
@@ -319,515 +201,57 @@
     &copy; 2026 TWO MANGA. All rights reserved
   </footer>
 
-  <!-- PURCHASE MODAL -->
-  <div id="purchase-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closePurchase()"></div>
-
-    <div class="glass-panel relative w-full max-w-5xl rounded-[2rem] overflow-hidden flex flex-col max-h-[90vh] shadow-2xl animate-fade-in-up">
-
-        <div class="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-[#131316]">
-            <div class="flex items-center gap-3">
-                <div class="w-2 h-8 rounded-full bg-gradient-to-b from-violet-500 to-fuchsia-500"></div>
-                <div>
-                    <h3 class="text-xl font-bold text-white">تمدید اشتراک</h3>
-                    <div class="text-xs text-gray-400">مرحله <span id="step-number" class="text-violet-400 font-bold">۱</span> از ۳</div>
-                </div>
-            </div>
-            <button onclick="closePurchase()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-red-500/20 hover:text-red-400 transition">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-        </div>
-
-        <div class="p-6 md:p-10 overflow-y-auto flex-1 bg-gradient-to-br from-[#131316] to-[#0c0c0e]">
-
-            <!-- STEP 1: PLANS -->
-            <div id="step-1" class="step-content active">
-                <h4 class="text-lg font-bold mb-6 text-center">انتخاب پکیج</h4>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-
-                    <div id="p-1" class="plan-card rounded-2xl p-5 flex flex-col gap-3 group" onclick="selectPlan('1',59000,30,'Bronze')">
-                        <div class="flex justify-between items-start">
-                            <span class="text-sm font-bold text-gray-400 group-hover:text-white transition">۱ ماهه</span>
-                            <i data-lucide="zap" class="w-4 h-4 text-gray-600 group-hover:text-violet-400 transition"></i>
-                        </div>
-                        <div>
-                            <span class="text-3xl font-black text-white tracking-tighter">۵۹</span>
-                            <span class="text-xs text-gray-500">هزار تومان</span>
-                        </div>
-                    </div>
-
-                    <div id="p-2" class="plan-card active rounded-2xl p-5 flex flex-col gap-3 group relative" onclick="selectPlan('2',149000,90,'Silver')">
-                         <div class="absolute top-0 right-0 bg-violet-600 text-white text-[9px] font-black px-2 py-1 rounded-bl-xl">پیشنهاد ما</div>
-                        <div class="flex justify-between items-start mt-1">
-                            <span class="text-sm font-bold text-violet-300">۳ ماهه</span>
-                            <i data-lucide="star" class="w-4 h-4 text-violet-500"></i>
-                        </div>
-                        <div>
-                            <span class="text-3xl font-black text-white tracking-tighter">۱۴۹</span>
-                            <span class="text-xs text-gray-400">هزار تومان</span>
-                        </div>
-                    </div>
-
-                    <div id="p-3" class="plan-card rounded-2xl p-5 flex flex-col gap-3 group" onclick="selectPlan('3',279000,180,'Gold')">
-                        <div class="flex justify-between items-start">
-                            <span class="text-sm font-bold text-gray-400 group-hover:text-fuchsia-300 transition">۶ ماهه</span>
-                            <i data-lucide="award" class="w-4 h-4 text-gray-600 group-hover:text-fuchsia-500 transition"></i>
-                        </div>
-                        <div>
-                            <span class="text-3xl font-black text-white tracking-tighter">۲۷۹</span>
-                            <span class="text-xs text-gray-500">هزار تومان</span>
-                        </div>
-                    </div>
-
-                    <div id="p-4" class="plan-card rounded-2xl p-5 flex flex-col gap-3 group" onclick="selectPlan('4',499000,365,'Diamond')">
-                        <div class="flex justify-between items-start">
-                            <span class="text-sm font-bold text-gray-400 group-hover:text-rose-300 transition">۱ ساله</span>
-                            <i data-lucide="crown" class="w-4 h-4 text-gray-600 group-hover:text-rose-500 transition"></i>
-                        </div>
-                        <div>
-                            <span class="text-3xl font-black text-white tracking-tighter">۴۹۹</span>
-                            <span class="text-xs text-gray-500">هزار تومان</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="max-w-md mx-auto relative mb-10">
-                    <input id="coupon" class="w-full glass-input px-5 py-4 pl-12 rounded-xl text-center placeholder-gray-500 text-sm transition" placeholder="کد تخفیف (اختیاری)"/>
-                    <i data-lucide="tag" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                </div>
-            </div>
-
-            <!-- STEP 2: CRYPTO -->
-            <div id="step-2" class="step-content">
-                <div class="text-center mb-8">
-                    <h4 class="text-xl font-black mb-2">درگاه کریپتو</h4>
-                    <p class="text-sm text-gray-400 max-w-md mx-auto">ارز مورد نظر خود را انتخاب کنید. قیمت‌ها به صورت لحظه‌ای بروز می‌شوند.</p>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-                    <div id="c-TRX" class="crypto-btn rounded-xl p-4 flex flex-col items-center gap-2 group active" onclick="setCrypto('TRX')">
-                        <img src="https://cryptologos.cc/logos/tron-trx-logo.svg" class="w-8 h-8 group-hover:scale-110 transition"/>
-                        <div class="text-sm font-bold mt-1">TRX</div>
-                        <div id="price-TRX" class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-300">...</div>
-                    </div>
-                    <div id="c-USDT" class="crypto-btn rounded-xl p-4 flex flex-col items-center gap-2 group" onclick="setCrypto('USDT')">
-                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="w-8 h-8 group-hover:scale-110 transition"/>
-                        <div class="text-sm font-bold mt-1">USDT</div>
-                        <div id="price-USDT" class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-300">...</div>
-                    </div>
-                    <div id="c-TON" class="crypto-btn rounded-xl p-4 flex flex-col items-center gap-2 group" onclick="setCrypto('TON')">
-                        <img src="https://cryptologos.cc/logos/toncoin-ton-logo.svg" class="w-8 h-8 group-hover:scale-110 transition"/>
-                        <div class="text-sm font-bold mt-1">TON</div>
-                        <div id="price-TON" class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-300">...</div>
-                    </div>
-                    <div id="c-SOL" class="crypto-btn rounded-xl p-4 flex flex-col items-center gap-2 group" onclick="setCrypto('SOL')">
-                        <img src="https://cryptologos.cc/logos/solana-sol-logo.svg" class="w-8 h-8 group-hover:scale-110 transition"/>
-                        <div class="text-sm font-bold mt-1">SOL</div>
-                        <div id="price-SOL" class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-300">...</div>
-                    </div>
-                </div>
-
-                <div class="bg-black/30 border border-dashed border-white/20 p-5 rounded-xl flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <div class="text-left w-full overflow-hidden">
-                        <div class="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">Wallet Address (<span id="cur-sym" class="text-violet-400">TRX</span>)</div>
-                        <code id="wallet-addr" class="text-xs sm:text-sm font-mono text-gray-200 break-all select-all hover:text-white transition cursor-text">...</code>
-                    </div>
-                    <button onclick="copyAddr()" class="shrink-0 flex items-center gap-2 px-4 py-2 bg-violet-600/20 text-violet-300 hover:bg-violet-600 hover:text-white border border-violet-600/30 rounded-lg text-xs font-bold transition">
-                        <i data-lucide="copy" class="w-3 h-3"></i> کپی
-                    </button>
-                </div>
-            </div>
-
-            <!-- STEP 3: SUBMIT -->
-            <div id="step-3" class="step-content">
-                 <div class="flex flex-col items-center justify-center py-8">
-                    <div class="w-16 h-16 bg-gradient-to-tr from-green-500/20 to-emerald-500/20 rounded-full flex items-center justify-center mb-6 ring-1 ring-green-500/50">
-                        <i data-lucide="check-circle-2" class="w-8 h-8 text-green-400"></i>
-                    </div>
-                    <h4 class="text-xl font-bold mb-2">ثبت تراکنش</h4>
-                    <p class="text-sm text-gray-400 mb-8 text-center max-w-sm">لطفاً هش تراکنش (Transaction Hash) یا لینک پیگیری پرداخت را در کادر زیر وارد کنید.</p>
-
-                    <div class="w-full max-w-lg space-y-4">
-                        <div class="relative">
-                            <input id="tx-hash" class="glass-input w-full px-5 py-4 pl-12 rounded-xl text-center text-sm font-mono placeholder-gray-600" placeholder="e.g. 7f2c90..."/>
-                            <i data-lucide="hash" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                        </div>
-                        <button id="final-btn" onclick="submitPayment()" class="btn-primary w-full py-4 rounded-xl font-bold text-white shadow-lg text-lg flex justify-center items-center gap-2">
-                             ثبت نهایی و ارسال
-                        </button>
-                    </div>
-                 </div>
-            </div>
-
-        </div>
-
-        <div class="p-6 border-t border-white/5 bg-[#131316] flex gap-4">
-            <button onclick="step === 1 ? closePurchase() : prevStep()" class="flex-1 py-3.5 rounded-xl border border-white/10 text-gray-400 hover:bg-white/5 hover:text-white font-medium transition">
-                بازگشت
-            </button>
-
-            <div id="btn-next-wrapper" class="flex-1 flex">
-                 <button onclick="nextStep()" class="flex-1 py-3.5 rounded-xl bg-white text-black font-bold hover:bg-gray-200 transition">
-                    مرحله بعد
-                </button>
-            </div>
-        </div>
-    </div>
-  </div>
-
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-10 right-0 md:right-10 translate-y-20 opacity-0 transition-all duration-300 z-[200]">
-    <div class="bg-[#18181b] border-r-4 border-violet-500 text-white px-6 py-4 rounded-l-lg shadow-2xl flex items-center gap-4">
-        <i data-lucide="bell" class="w-5 h-5 text-violet-400"></i>
-        <span id="toast-msg" class="text-sm font-medium">پیغام سیستم</span>
-    </div>
-  </div>
-
   <script>
-  /*******************************
-   *   CONFIG - حتما تنظیم کن    *
-   *******************************/
-  const CONFIG = {
-    // اگر بک‌اندت روی یک دامنه/پورتی جداست مقدار زیر را عوض کن.
-    API_BASE: (window.__API_BASE__ || location.origin).replace(/\/$/, ""), // مثال: "https://two-api-iksq.onrender.com"
-    // آدرس صفحه لاگین (فرانت) که کاربر به آن ری‌دایرکت شود
-    LOGIN_URL: "/auth/login", // اگر صفحه لاگین فرانت متفاوت است این مقدار را ست کن (مثلاً "/login.html")
-    // آدرس‌های APIهای قیمتی (در صورت نداشتن کلید، می‌ماند همانند قالب)
-    API_USDT_TOMAN: "https://BrsApi.ir/Api/Market/Gold_Currency.php?key=YOUR_KEY",
-    API_NOBITEX_STATS: "https://apiv2.nobitex.ir/market/stats",
-    API_LOCAL_RATES: "/public/rates",
-    // آدرس کیف‌پول‌ها (در صورت تمایل از بک‌اند هم قابل ارائه‌ست؛ اینجا مقادیر پیش‌فرض هستند)
-    WALLETS: {
-      TRX: "T-YOUR-TRON-WALLET-ADDRESS",
-      USDT: "T-YOUR-USDT-TRC20-ADDRESS",
-      TON: "U-YOUR-TON-WALLET-ADDRESS",
-      SOL: "S-YOUR-SOLANA-WALLET-ADDRESS"
-    },
-    AUTO_RATE_REFRESH_SEC: 60
-  };
-
-  /*******************************
-   *   UI & State               *
-   *******************************/
-  let step = 1;
-  let order = { days: 90, priceToman: 149000, planName: "Silver", crypto: "TRX" };
-  let cryptoPrices = { TRX: null, USDT: null, TON: null, SOL: null };
-
-  /* helper: نمایش پیام */
-  function showToast(msg){
-    const t = document.getElementById('toast');
-    document.getElementById('toast-msg').innerText = msg;
-    t.classList.replace('opacity-0','opacity-100');
-    t.classList.replace('translate-y-20','translate-y-0');
-    setTimeout(()=>{ t.classList.replace('opacity-100','opacity-0'); t.classList.replace('translate-y-0','translate-y-20'); }, 3000);
-  }
-
-  /* ذخیره توکن‌ها */
-  function saveTokens(access, refresh){
-    if (access) localStorage.setItem('at', access);
-    if (refresh) localStorage.setItem('rt', refresh);
-  }
-  function clearTokens(){
-    localStorage.removeItem('at'); localStorage.removeItem('rt');
-  }
-
-  /* fetch wrapper با هدر Authorization و تلاش رفرش خودکار */
-  async function fetchWithAuth(url, opts = {}, attemptRefresh = true) {
-    opts.headers = opts.headers || {};
-    const token = localStorage.getItem('at');
-    if (token) opts.headers['Authorization'] = `Bearer ${token}`;
-    // default JSON headers
-    if (!opts.headers['Content-Type'] && !(opts.body instanceof FormData)) {
-      opts.headers['Content-Type'] = opts.headers['Content-Type'] || 'application/json';
+    // Functions for API calls, token management, and data fetching
+    async function logout() {
+      localStorage.removeItem('at'); 
+      localStorage.removeItem('rt');
+      window.location.href = '/auth/login';
     }
-    const full = url.startsWith('http') ? url : (CONFIG.API_BASE + url);
-    let res = await fetch(full, opts);
-    if (res.status === 401 && attemptRefresh) {
-      const refreshed = await refreshAccess();
-      if (refreshed) {
-        // retry once
-        return fetchWithAuth(url, opts, false);
-      } else {
-        // not refreshed -> force logout
-        clearTokens();
-        window.location.href = CONFIG.LOGIN_URL + '?next=' + encodeURIComponent(window.location.pathname + window.location.search);
-        throw new Error('unauthenticated');
+
+    async function applyGift() {
+      const code = document.getElementById('gift-input').value.trim();
+      if (!code) {
+        alert("لطفاً کد را وارد کنید");
+        return;
       }
-    }
-    return res;
-  }
-
-  /* تلاش برای رفرش کردن access token با refresh token */
-  async function refreshAccess(){
-    try {
-      const rt = localStorage.getItem('rt');
-      if (!rt) return false;
-      const url = CONFIG.API_BASE + '/auth/refresh';
-      // backend expects refresh token as Bearer in Authorization header (jwt_required(refresh=True))
-      const res = await fetch(url, { method: 'POST', headers: { 'Authorization': `Bearer ${rt}` }});
-      if (!res.ok) {
-        return false;
-      }
-      const d = await res.json();
-      if (d.access_token) {
-        saveTokens(d.access_token, null);
-        return true;
-      }
-      return false;
-    } catch (e) {
-      console.warn('refreshAccess failed', e);
-      return false;
-    }
-  }
-
-  /* فراخوانی نرخ‌ها با ری‌ترای ساده (استفاده در UI) */
-  async function fetchWithRetry(url, opts={}, retries=3) {
-    for (let i=0;i<retries;i++){
-      try {
-        const r = await fetch(url, opts);
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return await r.json();
-      } catch (err) {
-        if (i === retries - 1) throw err;
-        await new Promise(r => setTimeout(r, 350 * Math.pow(2, i)));
-      }
-    }
-  }
-
-  /* Rate fetching logic */
-  async function fetchExternalPrices(){
-    try {
-      let usdtToToman = null;
-      try {
-        const br = await fetchWithRetry(CONFIG.API_USDT_TOMAN);
-        if (br && typeof br === 'object') {
-          if (br.price) usdtToToman = Number(br.price);
-          else if (br.USDT?.price) usdtToToman = Number(br.USDT.price);
-          else if (Array.isArray(br)) {
-            const u = br.find(x => (x.symbol||"").toUpperCase() === "USDT");
-            if (u?.price) usdtToToman = Number(u.price);
-          }
-        }
-      } catch (err) { console.warn("brsapi fail", err); }
-
-      const symbolMap = { TRX: "trx", USDT: "usdt", TON: "ton", SOL: "sol" };
-      const stats = await Promise.all(Object.entries(symbolMap).map(async ([sym, code])=>{
-        try {
-          const url = `${CONFIG.API_NOBITEX_STATS}?srcCurrency=${encodeURIComponent(code)}&dstCurrency=rls`;
-          const r = await fetchWithRetry(url);
-          const s = r?.stats || {};
-          const k = Object.keys(s).find(k => k.startsWith(code));
-          const latest = k ? Number(s[k].latest) : null;
-          return { sym, latest };
-        } catch (e) { return { sym, latest: null }; }
-      }));
-
-      stats.forEach(s => {
-        if (s.latest) cryptoPrices[s.sym] = Math.round(s.latest / 10);
-      });
-
-      if ((!cryptoPrices.USDT || cryptoPrices.USDT === null) && usdtToToman) {
-        cryptoPrices.USDT = Math.round(usdtToToman);
-      }
-
-      if (![cryptoPrices.TRX, cryptoPrices.USDT, cryptoPrices.TON, cryptoPrices.SOL].some(Boolean)) {
-        try {
-          const local = await fetchWithRetry(CONFIG.API_LOCAL_RATES);
-          if (local) { cryptoPrices = { ...cryptoPrices, ...local }; showToast("نرخ‌های کش‌شده محلی"); }
-          else { showToast("خطا در دریافت نرخ‌ها"); }
-        } catch (e) { showToast("خطا در دریافت نرخ‌ها"); }
-      }
-      updateCryptoDisplay();
-    } catch (err) {
-      console.error("fetchExternalPrices error", err);
-      try {
-        const local = await fetchWithRetry(CONFIG.API_LOCAL_RATES);
-        if (local) { cryptoPrices = { ...cryptoPrices, ...local }; updateCryptoDisplay(); }
-      } catch (e) { showToast("خطا در دریافت نرخ‌ها"); }
-    }
-  }
-
-  function updateCryptoDisplay(){
-    const priceToman = order.priceToman;
-    const usdt = cryptoPrices.USDT || null;
-    ['TRX','USDT','TON','SOL'].forEach(sym=>{
-      const el = document.getElementById(`price-${sym}`);
-      if (!el) return;
-      if (sym === 'USDT') {
-        if (usdt) el.innerText = (priceToman / usdt).toFixed(2) + " USDT";
-        else el.innerText = "--";
-      } else {
-        const rate = cryptoPrices[sym];
-        if (rate && rate > 0) {
-          el.innerText = (priceToman / rate).toFixed(sym === 'TRX' ? 1 : 3) + " " + sym;
-        } else if (usdt) {
-          el.innerText = (priceToman / usdt).toFixed(3) + " USDT-eq";
-        } else el.innerText = "--";
-      }
-    });
-  }
-
-  /* Modal steps */
-  function openPurchase(){
-    if (!localStorage.getItem('at')) {
-      // اگر توکن نیست مستقیم ری‌دایرکت کن؛ در غیر این صورت مودال باز می‌شود و validateSession نیز اجرا خواهد شد
-      const cur = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.href = `${CONFIG.LOGIN_URL}?next=${cur}`; return;
-    }
-    document.getElementById('purchase-modal').classList.remove('hidden');
-    document.getElementById('purchase-modal').classList.add('flex');
-    step = 1; updateSteps();
-    fetchExternalPrices();
-  }
-  function closePurchase(){
-      document.getElementById('purchase-modal').classList.add('hidden');
-      document.getElementById('purchase-modal').classList.remove('flex');
-  }
-  function nextStep(){ step = Math.min(3, step + 1); updateSteps(); }
-  function prevStep(){ step = Math.max(1, step - 1); updateSteps(); }
-
-  function updateSteps(){
-    document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
-    const el = document.getElementById('step-' + step);
-    if (el) el.classList.add('active');
-
-    const btnNext = document.getElementById('btn-next-wrapper');
-    if(step === 3) btnNext.style.display = 'none';
-    else btnNext.style.display = 'flex';
-
-    document.getElementById('step-number').innerText = step;
-  }
-
-  function selectPlan(id, price, days, name){
-    order.days = days; order.priceToman = price; order.planName = name;
-    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
-    const card = document.getElementById('p-' + id); if (card) card.classList.add('active');
-    fetchExternalPrices();
-  }
-
-  function setCrypto(sym){
-    order.crypto = sym;
-    document.getElementById('cur-sym').innerText = sym;
-    document.getElementById('wallet-addr').innerText = CONFIG.WALLETS[sym] || '---';
-    document.querySelectorAll('.crypto-btn').forEach(b => b.classList.remove('active'));
-    const el = document.getElementById('c-' + sym); if (el) el.classList.add('active');
-  }
-
-  function copyAddr(){
-    const addr = document.getElementById('wallet-addr').innerText;
-    if (!addr || addr === '---') return showToast("آدرسی یافت نشد");
-    navigator.clipboard?.writeText(addr).then(()=> showToast("آدرس کپی شد")).catch(()=> showToast("کپی نشد"));
-  }
-
-  /* LOAD PROFILE + TX HISTORY */
-  async function loadProfile(){
-    const token = localStorage.getItem('at') || "";
-    if (!token) { return; }
-    try {
-      // ابتدا سعی می‌کنیم از /auth/me اطلاعات کامل بگیریم
-      const res = await fetchWithAuth('/auth/me', { method: 'GET' });
-      if (res.ok) {
-        const d = await res.json();
-        document.getElementById('user-name').innerText = d.username || 'کاربر';
-        document.getElementById('user-days').innerText = d.days_left || 0;
-        document.getElementById('role-badge').innerText = d.is_premium ? 'PREMIUM' : 'FREE';
-        document.getElementById('user-role').innerText = d.is_premium ? 'عضو ویژه' : 'کاربر عادی';
-        document.getElementById('total-purchases').innerText = d.total_purchases || 0;
-      } else {
-        // خطاها توسط fetchWithAuth مدیریت می‌شوند (تا حد امکان رفرش تلاش می‌شود)
-        console.warn("profile load failed", res.status);
-      }
-    } catch(e){ console.error(e); }
-
-    try {
-      const txRes = await fetchWithAuth('/user/transactions', { method: 'GET' });
-      if (txRes.ok) {
-        const txd = await txRes.json();
-        const arr = txd.transactions || [];
-        const tbody = document.getElementById('tx-history');
-        if (arr.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-gray-500 text-xs">تراکنشی یافت نشد</td></tr>`;
-        } else {
-          tbody.innerHTML = arr.map(tx=>{
-            const date = new Date(tx.created_at).toLocaleString('fa-IR');
-            const amount = tx.amount ? Number(tx.amount).toLocaleString() : '---';
-            const plan = tx.plan_name || (tx.days ? tx.days + ' روز' : '—');
-            let statusLabel = `<span class="px-2 py-1 rounded bg-orange-500/10 text-orange-400 text-xs font-bold border border-orange-500/20">بررسی</span>`;
-            if (['approved','confirmed'].includes(tx.status)) statusLabel = `<span class="px-2 py-1 rounded bg-green-500/10 text-green-400 text-xs font-bold border border-green-500/20">تایید شده</span>`;
-            if (tx.status === 'rejected') statusLabel = `<span class="px-2 py-1 rounded bg-red-500/10 text-red-400 text-xs font-bold border border-red-500/20">رد شده</span>`;
-            return `<tr class="border-b border-white/5 last:border-0 hover:bg-white/5 transition"><td class="py-3 px-2 text-gray-400">${date}</td><td class="py-3 px-2 font-medium text-white">${plan}</td><td class="py-3 px-2 text-gray-300">${amount}</td><td class="py-3 px-2 text-center">${statusLabel}</td></tr>`;
-          }).join('');
-        }
-      }
-    } catch(e){ console.warn('tx list fail', e); }
-  }
-
-  /* SUBMIT PAYMENT */
-  async function submitPayment(){
-    const hash = document.getElementById('tx-hash').value.trim();
-    const coupon = document.getElementById('coupon').value.trim();
-    const token = localStorage.getItem('at') || "";
-    if (!hash && !coupon) return showToast("وارد کردن هش تراکنش یا کد تخفیف الزامی است");
-
-    const btn = document.getElementById('final-btn'); btn.disabled = true;
-    const old = btn.innerHTML; btn.innerHTML = '<div class="loader"></div>';
-
-    try {
-      const body = { tx_hash: hash || null, coupon_code: coupon || null, days: order.days };
-      const res = await fetchWithAuth('/payment/submit', {
+      // Send gift code validation request to backend
+      const res = await fetch('/api/gift/validate', {
         method: 'POST',
-        body: JSON.stringify(body)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
       });
-      const d = await res.json();
-      if (res.ok) {
-        showToast("درخواست ثبت شد.");
-        setTimeout(()=> location.reload(), 1200);
-      } else { showToast(d.msg || "خطا در ثبت"); }
-    } catch (e) {
-      console.error(e);
-      showToast("خطای شبکه");
-    } finally {
-      btn.disabled = false; btn.innerHTML = old;
-    }
-  }
-
-  function applyGift(){
-    const val = document.getElementById('gift-input').value;
-    if(!val) return showToast("لطفاً کد را وارد کنید");
-    showToast("در حال بررسی کد...");
-    setTimeout(()=> showToast("کد نامعتبر است"), 1000);
-  }
-
-  function logout(){ clearTokens(); window.location.href = CONFIG.LOGIN_URL; }
-
-  /* در شروع صفحه وضعیت توکن رو بررسی کن و در صورت امکان رفرش کن */
-  async function validateSession(){
-    const token = localStorage.getItem('at');
-    if (!token) return false;
-    try {
-      const res = await fetch(CONFIG.API_BASE + '/auth/me', { method: 'GET', headers: { 'Authorization': `Bearer ${token}` }});
-      if (res.ok) return true;
-      if (res.status === 401) {
-        // سعی در رفرش
-        const ok = await refreshAccess();
-        return !!ok;
+      const result = await res.json();
+      if (result.success) {
+        alert("کد هدیه فعال شد!");
+      } else {
+        alert("کد هدیه نامعتبر است.");
       }
-      return false;
-    } catch (e) {
-      console.warn('validateSession error', e);
-      return false;
     }
-  }
 
-  window.onload = async () => {
-    lucide.createIcons();
-    // اگر توکن وجود داره سعی در اعتبارسنجی/رفرش کن و سپس پروفایل رو لود کن
-    await validateSession();
-    loadProfile();
-    setCrypto('TRX');
-    fetchExternalPrices();
-    setInterval(()=> fetchExternalPrices(), (CONFIG.AUTO_RATE_REFRESH_SEC || 60) * 1000);
-  };
+    async function fetchExternalPrices() {
+      // Function to fetch prices of cryptocurrency from backend
+      const response = await fetch('/api/crypto/prices');
+      const data = await response.json();
+      // Update UI with new data
+      updateCryptoDisplay(data);
+    }
+
+    function updateCryptoDisplay(data) {
+      // Update the price fields with fetched data
+      document.getElementById('price-TRX').innerText = data.trx ? `${data.trx} USDT` : 'Unavailable';
+      document.getElementById('price-USDT').innerText = data.usdt ? `${data.usdt} USDT` : 'Unavailable';
+      document.getElementById('price-TON').innerText = data.ton ? `${data.ton} USDT` : 'Unavailable';
+      document.getElementById('price-SOL').innerText = data.sol ? `${data.sol} USDT` : 'Unavailable';
+    }
+
+    window.onload = async () => {
+      const token = localStorage.getItem('at');
+      if (!token) {
+        window.location.href = '/auth/login';
+      }
+      await fetchExternalPrices();
+    };
   </script>
 </body>
 </html>

@@ -3,355 +3,647 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>پنل ادمین — Two Manga</title>
+  <title>پنل ادمین — Two Manga (Admin)</title>
 
+  <!-- Tailwind + font -->
   <script>
     tailwind = window.tailwind || {};
     tailwind.config = {
-      theme: { extend: { fontFamily: { sans: ['Vazirmatn','sans-serif'] } } }
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Vazirmatn','system-ui','-apple-system','Segoe UI','Roboto','Arial'] },
+          colors: {
+            brand: { dark: '#0f0f13', card: '#18181b', accent: '#8b5cf6', glow: '#d946ef' }
+          },
+          keyframes: {
+            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-8px)' } }
+          },
+          animation: { float: 'float 6s ease-in-out infinite' }
+        }
+      }
     }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
   <style>
-    body { background:#050505;color:#f4f4f5;font-family:Vazirmatn,system-ui; }
-    .glass { background: rgba(24,24,27,0.62); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.06); }
-    .loader{border:3px solid rgba(255,255,255,0.1);border-left-color:#8b5cf6;border-radius:50%;width:22px;height:22px;animation:spin 1s linear infinite}
-    @keyframes spin {to{transform:rotate(360deg)}}
-    .access-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:60;padding:20px}
-    .card{width:100%;max-width:760px;padding:18px;border-radius:12px}
-    .mono{font-family:ui-monospace,Roboto Mono,monospace}
-    .small-muted{color:rgba(255,255,255,0.6);font-size:0.9rem}
-    .hidden{display:none}
+    :root { --bg:#050505; --muted:rgba(255,255,255,0.55); --card:rgba(24,24,27,0.66); --accent1:#7c3aed; --accent2:#d946ef; }
+    html,body{height:100%}
+    body{
+      background:var(--bg);
+      color:#f5f5f7;
+      font-family:Vazirmatn, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:20px;
+    }
+    .glass{ background:var(--card); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border:1px solid rgba(255,255,255,0.04); border-radius:12px; }
+    .input{ background: rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.04); padding:.6rem .8rem; border-radius:.6rem; color:white; }
+    .btn-primary{ background:linear-gradient(90deg,var(--accent1),var(--accent2)); color:white; padding:.5rem .9rem; border-radius:.6rem; }
+    .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.06); padding:.45rem .7rem; border-radius:.6rem; color:var(--muted) }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; color:#e9e9ec }
+    .small-muted{ color:var(--muted); font-size:.95rem; }
+    .loader{ border:3px solid rgba(255,255,255,0.08); border-left-color:var(--accent1); border-radius:50%; width:18px; height:18px; animation:spin 1s linear infinite; display:inline-block; }
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+    .hidden{ display:none; }
+    /* overlay */
+    .overlay{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:60; padding:16px; }
+    .overlay-card{ width:100%; max-width:760px; padding:18px; border-radius:12px; }
+    .degraded{ background:linear-gradient(90deg,#f59e0b,#f97316); color:#071023; padding:6px 10px; border-radius:999px; font-weight:600; }
   </style>
 </head>
 <body>
-  <!-- App root (hidden until auth/me ok) -->
-  <div id="appRoot" class="max-w-7xl mx-auto px-4 py-6 hidden">
+  <!-- Top info -->
+  <div id="initialLoader" class="overlay">
+    <div class="overlay-card glass">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="loader" style="width:48px;height:48px;border-width:4px"></div>
+        <div>
+          <div class="text-lg font-semibold">در حال بررسی احراز هویت</div>
+          <div class="small-muted">درخواست به سرور ارسال می‌شود؛ لطفاً صبر کنید یا اگر می‌خواهید عملیات دستی انجام دهید پایین را بررسی کنید.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="accessOverlay" class="overlay hidden"></div>
+
+  <div id="app" class="max-w-7xl mx-auto hidden">
     <header class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#d946ef] flex items-center justify-center shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6l4 2"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none"><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/></svg>
         </div>
         <div>
           <div class="text-lg font-semibold">پنل ادمین — Two Manga</div>
-          <div class="small-muted">آدرس بک‌اند: <span id="backendUrl" class="mono">https://two-api-iksq.onrender.com</span></div>
+          <div class="small-muted">آدرس بک‌اند: <span id="backendUrl" class="mono"></span></div>
         </div>
       </div>
+
       <div class="flex items-center gap-3">
         <div class="text-right">
           <div id="adminName" class="text-sm small-muted">—</div>
           <div class="text-xs small-muted">سطح دسترسی: <span id="adminRole">—</span></div>
         </div>
-        <button id="btnLogout" class="px-4 py-2 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#d946ef]">خروج</button>
+        <div id="degradedBadge" class="degraded hidden">حالت تخریب</div>
+        <button id="logoutBtn" class="btn-primary">خروج</button>
       </div>
     </header>
 
     <main class="grid grid-cols-12 gap-6">
+      <!-- left -->
       <aside class="col-span-3 glass p-4 space-y-4">
-        <div class="small-muted">نِویگِیشن</div>
+        <div class="flex items-center justify-between">
+          <div class="small-muted">نویگیشن</div>
+          <div class="text-xs small-muted">admin</div>
+        </div>
+
         <nav class="flex flex-col gap-2">
-          <button class="p-3 plan-card" data-tab="dashboard" onclick="showTab('dashboard')">داشبورد</button>
-          <button class="p-3 plan-card" data-tab="transactions" onclick="showTab('transactions')">تراکنش‌ها</button>
-          <button class="p-3 plan-card" data-tab="coupons" onclick="showTab('coupons')">کوپن‌ها</button>
-          <button class="p-3 plan-card" data-tab="rates" onclick="showTab('rates')">نرخ‌ها</button>
-          <button class="p-3 plan-card" data-tab="logs" onclick="showTab('logs')">لاگ‌ها</button>
+          <button class="btn-ghost text-right" data-tab="dashboard" onclick="showTab('dashboard')">داشبورد وضعیت</button>
+          <button class="btn-ghost text-right" data-tab="transactions" onclick="showTab('transactions')">تراکنش‌ها</button>
+          <button class="btn-ghost text-right" data-tab="coupons" onclick="showTab('coupons')">کوپن‌ها</button>
+          <button class="btn-ghost text-right" data-tab="rates" onclick="showTab('rates')">نرخ‌ها</button>
+          <button class="btn-ghost text-right" data-tab="logs" onclick="showTab('logs')">روت / لاگ</button>
         </nav>
+
+        <div>
+          <div class="small-muted mb-2">توکن دستی (برای تست)</div>
+          <input id="manualToken" class="input w-full mono" placeholder="paste access token (اختیاری)" />
+          <div class="flex gap-2 mt-2">
+            <button id="setTokenBtn" class="btn-ghost w-1/2">ثبت توکن</button>
+            <button id="clearTokenBtn" class="btn-ghost w-1/2">پاک‌سازی توکن</button>
+          </div>
+        </div>
       </aside>
 
+      <!-- right -->
       <section class="col-span-9 space-y-6">
+        <!-- dashboard -->
         <section id="tab-dashboard" class="glass p-6">
-          <div class="flex justify-between items-start">
+          <div class="flex items-start justify-between">
             <div>
-              <h2 class="text-2xl">داشبورد سلامت</h2>
-              <p class="small-muted">وضعیت سرور، DB و queue</p>
+              <h2 class="text-2xl font-semibold">داشبورد سلامت</h2>
+              <p class="small-muted mt-1">Ping, DB status و root</p>
             </div>
-            <div class="flex gap-2">
-              <button id="btnPing" class="px-4 py-2 rounded bg-[#8b5cf6]" onclick="pingServer()">Ping <span id="pingLoader" class="ml-2"></span></button>
-              <button id="btnDb" class="px-4 py-2 rounded glass" onclick="dbStatus()">DB</button>
+            <div class="flex items-center gap-3">
+              <button id="btnPing" class="btn-primary px-4 py-2" onclick="ping()">
+                بررسی سلامت <span id="pingLoader"></span>
+              </button>
+              <button id="btnDb" class="btn-ghost px-4 py-2" onclick="dbStatus()">وضعیت DB</button>
             </div>
           </div>
+
           <div class="mt-6 grid grid-cols-3 gap-4">
-            <div class="p-4 glass">
+            <div class="glass p-4">
               <div class="small-muted">Queue / Root</div>
               <div id="rootInfo" class="mono mt-2">—</div>
             </div>
-            <div class="p-4 glass">
+            <div class="glass p-4">
               <div class="small-muted">Ping</div>
-              <div id="pingResult" class="mono mt-2">—</div>
+              <div id="pingRes" class="mono mt-2">—</div>
             </div>
-            <div class="p-4 glass">
-              <div class="small-muted">DB</div>
-              <div id="dbResult" class="mono mt-2">—</div>
+            <div class="glass p-4">
+              <div class="small-muted">DB Status</div>
+              <div id="dbRes" class="mono mt-2">—</div>
             </div>
           </div>
         </section>
 
         <!-- transactions -->
         <section id="tab-transactions" class="glass p-6 hidden">
-          <div class="flex justify-between items-center">
-            <h2 class="text-xl">تراکنش‌ها</h2>
-            <div><select id="filterStatus" class="glass" onchange="loadTransactions()"><option value="">همه</option><option>pending</option><option>approved</option></select><button class="ml-2" onclick="loadTransactions()">بارگذاری</button></div>
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold">مدیریت تراکنش‌ها</h2>
+              <p class="small-muted mt-1">عادی: لود — تأیید — رد</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <select id="txFilter" class="input">
+                <option value="">همه</option>
+                <option value="pending">pending</option>
+                <option value="approved">approved</option>
+                <option value="rejected">rejected</option>
+              </select>
+              <button class="btn-primary" onclick="loadTransactions()">بارگذاری</button>
+            </div>
           </div>
-          <div id="transactionsList" class="mt-4 small-muted">—</div>
+
+          <div id="txList" class="mt-6 space-y-3 small-muted">برای بارگذاری دکمه را بزن.</div>
         </section>
 
-        <!-- coupons, rates, logs (omitted for brevity in UI) -->
-        <section id="tab-coupons" class="glass p-6 hidden"><h2>کوپن‌ها</h2></section>
-        <section id="tab-rates" class="glass p-6 hidden"><h2>نرخ‌ها</h2></section>
-        <section id="tab-logs" class="glass p-6 hidden"><h2>لاگ‌ها</h2><pre id="rootDump" class="mono small-muted p-2">—</pre></section>
+        <!-- coupons -->
+        <section id="tab-coupons" class="glass p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold">کوپن‌ها</h2>
+              <p class="small-muted mt-1">ایجاد و مشاهده کوپن‌ها</p>
+            </div>
+            <div>
+              <button class="btn-primary" onclick="toggleCouponCreate()">ایجاد کوپن</button>
+            </div>
+          </div>
+
+          <div id="couponCreate" class="mt-4 hidden">
+            <div class="grid grid-cols-3 gap-3">
+              <input id="c_code" class="input" placeholder="کد" />
+              <input id="c_days" type="number" class="input" placeholder="bonus_days" />
+              <input id="c_max" type="number" class="input" placeholder="max_uses (اختیاری)" />
+            </div>
+            <div class="mt-3 flex gap-2">
+              <input id="c_exp" class="input w-1/2" placeholder="expires_at (ISO)" />
+              <button class="btn-primary" onclick="createCoupon()">ایجاد</button>
+            </div>
+            <div id="c_msg" class="small-muted mt-2"></div>
+          </div>
+
+          <div class="mt-4">
+            <button class="btn-ghost" onclick="listCoupons()">لیست کوپن‌ها</button>
+          </div>
+          <div id="couponList" class="mt-3 small-muted"></div>
+        </section>
+
+        <!-- rates -->
+        <section id="tab-rates" class="glass p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold">نرخ‌ها</h2>
+              <p class="small-muted mt-1">فچ و ذخیره نرخ‌ها</p>
+            </div>
+            <div>
+              <button class="btn-primary" onclick="fetchRates()">فچ نرخ‌ها</button>
+            </div>
+          </div>
+          <div id="ratesMsg" class="mt-3 small-muted">—</div>
+        </section>
+
+        <!-- logs -->
+        <section id="tab-logs" class="glass p-6 hidden">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-2xl font-semibold">روت / لاگ</h2>
+              <p class="small-muted mt-1">اطلاعات root و لاگ‌ها</p>
+            </div>
+            <div>
+              <button class="btn-ghost" onclick="fetchRoot()">رفرش root</button>
+            </div>
+          </div>
+          <pre id="rootDump" class="mono mt-3 small-muted p-3 glass" style="max-height:280px;overflow:auto">—</pre>
+        </section>
       </section>
     </main>
   </div>
 
-  <!-- blocking initial loader -->
-  <div id="initialLoader" class="access-overlay">
-    <div class="card glass">
-      <div style="display:flex;justify-content:center;"><div class="loader"></div></div>
-      <div class="mt-3 small-muted text-center">در حال بررسی احراز هویت... لطفاً صبر کنید.</div>
-    </div>
-  </div>
-
-  <!-- login overlay (shown when no valid tokens or refresh fails) -->
-  <div id="loginOverlay" class="access-overlay hidden">
-    <div class="card glass">
-      <h3 class="text-xl">ورود ادمین</h3>
-      <p class="small-muted mt-2">نام کاربری و رمز عبور ادمین را وارد کنید.</p>
-      <div class="mt-4 grid grid-cols-1 gap-2">
-        <input id="li_username" placeholder="username" class="p-2 glass" />
-        <input id="li_password" type="password" placeholder="password" class="p-2 glass" />
-        <div class="flex gap-2 mt-2">
-          <button id="li_btn" class="px-4 py-2 bg-[#7c3aed] rounded">ورود</button>
-          <button id="li_close" class="px-4 py-2 glass rounded">انصراف</button>
-        </div>
-        <div id="li_msg" class="small-muted mt-2"></div>
-      </div>
-    </div>
-  </div>
-
 <script>
-/* ---------- Config ---------- */
-const BACKEND = "https://two-api-iksq.onrender.com";
-const AUTH_LOGIN = BACKEND + "/auth/login";
-const AUTH_ME = BACKEND + "/auth/me";
-const AUTH_REFRESH = BACKEND + "/auth/refresh";
+/* ===========================================================
+   Config: اگر خواستی آدرس بک‌اند رو اینجا عوض کن
+   =========================================================== */
+const BACKEND = "https://two-api-iksq.onrender.com"; // <-- این رو عوض کن اگر بک‌اند فرق داره
+document.getElementById('backendUrl') && (document.getElementById('backendUrl').innerText = BACKEND);
 
-/* ---------- Token helpers ---------- */
-function setTokens(access, refresh) {
-  if (access) localStorage.setItem("access_token", access);
-  if (refresh) localStorage.setItem("refresh_token", refresh);
-}
-function clearTokens() {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
-}
-function getAccess() { return localStorage.getItem("access_token"); }
-function getRefresh() { return localStorage.getItem("refresh_token"); }
+/* =================== Local token helpers =================== */
+function setAccessToken(tok) { if (tok) localStorage.setItem('access_token', tok); }
+function setRefreshToken(tok) { if (tok) localStorage.setItem('refresh_token', tok); }
+function clearAllTokens(){ localStorage.removeItem('access_token'); localStorage.removeItem('refresh_token'); localStorage.removeItem('me_cache'); }
+function getAccess(){ return localStorage.getItem('access_token'); }
+function getRefresh(){ return localStorage.getItem('refresh_token'); }
 
-/* ---------- UI helpers ---------- */
-function show(el){ el.classList.remove("hidden"); }
-function hide(el){ el.classList.add("hidden"); }
-function showApp(){ hide(document.getElementById("initialLoader")); show(document.getElementById("appRoot")); }
-function showLoginOverlay(msg){ document.getElementById("li_msg").innerText = msg || ""; show(document.getElementById("loginOverlay")); }
-function hideLoginOverlay(){ hide(document.getElementById("loginOverlay")); }
+/* ================ Small UI helpers ================= */
+function show(el){ el.classList.remove('hidden'); el.style.display=''; }
+function hide(el){ el.classList.add('hidden'); el.style.display='none'; }
+function showApp(){ hide(document.getElementById('initialLoader')); show(document.getElementById('app')); }
+function setDegraded(on){ const d=document.getElementById('degradedBadge'); if(!d) return; if(on) d.classList.remove('hidden'); else d.classList.add('hidden'); }
 
-/* ---------- fetch wrapper with auth + refresh ---------- */
-async function fetchWithAuth(input, init = {}) {
-  init = Object.assign({ headers: {}, credentials: "include" }, init);
-  // attach access token if present
-  const token = getAccess();
-  if (token) init.headers["Authorization"] = "Bearer " + token;
-  init.headers["Accept"] = init.headers["Accept"] || "application/json";
+/* ================= fetchWithAuth =================
+   - ارسال Authorization اگر توکن هست
+   - اگر 401 برگشت: یک‌بار تلاش refresh می‌کنه (درصورت داشتن refresh token)
+   - اگر refresh هم شکست خورد: توکن‌ها رو خودکار پاک نمی‌کنه؛ به‌جاش overlay نشون می‌ده تا کاربر تصمیم بگیره.
+   - در مورد خطاهای شبکه/5xx: توکن‌ها پاک نمیشن و UI اجازهٔ retry یا استفاده از cached profile رو میده.
+*/
+async function fetchWithAuth(url, opts = {}) {
+  opts = Object.assign({ method: 'GET', headers: {}, credentials: 'include' }, opts);
+  const access = getAccess();
+  if (access) opts.headers['Authorization'] = 'Bearer ' + access;
+  opts.headers['Accept'] = opts.headers['Accept'] || 'application/json';
 
-  // do request
   let res;
   try {
-    res = await fetch(input, init);
+    res = await fetch(url, opts);
   } catch (err) {
-    // network / CORS
-    console.error("fetch error", err);
+    console.error('[fetchWithAuth] network error', err);
     throw err;
   }
 
-  // if unauthorized, try refresh once (only if refresh token exists)
+  // 401 handling: try refresh once if refresh token exists
   if (res.status === 401) {
     const refresh = getRefresh();
-    if (refresh) {
-      // try refresh
-      try {
-        const r = await fetch(AUTH_REFRESH, {
-          method: "POST",
-          headers: { "Authorization": "Bearer " + refresh, "Accept": "application/json" },
-          credentials: "include"
-        });
-        if (r.ok) {
-          const j = await r.json();
-          if (j.access_token) {
-            setTokens(j.access_token, refresh); // keep refresh
-            // retry original request with new access
-            init.headers["Authorization"] = "Bearer " + j.access_token;
-            return await fetch(input, init);
-          }
-        } else {
-          // refresh failed -> clear tokens and surface to caller
-          clearTokens();
-          return res; // original 401
-        }
-      } catch (e) {
-        console.error("refresh failed", e);
-        throw e;
+    if (!refresh) {
+      return res; // caller will handle (show overlay)
+    }
+    try {
+      const r = await fetch(BACKEND + '/auth/refresh', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + refresh, 'Accept': 'application/json' },
+        credentials: 'include'
+      });
+      if (!r.ok) {
+        // refresh failed -> do NOT auto-clear tokens; caller will see 401 and show overlay
+        return res;
       }
+      const jr = await r.json();
+      if (jr && jr.access_token) {
+        setAccessToken(jr.access_token);
+        // retry original
+        opts.headers['Authorization'] = 'Bearer ' + jr.access_token;
+        return await fetch(url, opts);
+      } else {
+        return res;
+      }
+    } catch (e) {
+      console.error('[fetchWithAuth] refresh network error', e);
+      return res;
     }
   }
+
   return res;
 }
 
-/* ---------- Boot / auth flow ---------- */
+/* ================= Access overlay UI ================= */
+function showOverlay(message, opts = {}) {
+  // opts: { auth:bool, root:bool, retry:bool, use_cache:bool, keep_tokens:bool }
+  const container = document.getElementById('accessOverlay');
+  container.innerHTML = '';
+  container.classList.remove('hidden');
+  container.style.display = 'flex';
+
+  const card = document.createElement('div');
+  card.className = 'overlay-card glass';
+  let html = `<div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <h3 style="font-weight:700;margin-bottom:6px">دسترسی / احراز هویت</h3>
+                  <div class="small-muted" id="overlayMsg">${escapeHtml(message)}</div>
+                </div>
+                <div><button id="overlayClose" class="btn-ghost">بستن</button></div>
+              </div>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">`;
+  if (opts.root) html += `<button id="optRoot" class="btn-primary">بازگشت به روت</button>`;
+  if (opts.auth) html += `<button id="optLogin" class="btn-ghost">صفحهٔ ورود</button>`;
+  if (opts.retry) html += `<button id="optRetry" class="btn-ghost">تلاش دوباره</button>`;
+  if (opts.use_cache) html += `<button id="optUseCache" class="btn-ghost">استفاده از جلسهٔ کش‌شده</button>`;
+  html += `<button id="optClear" class="btn-ghost">پاک‌سازی توکن‌ها</button>`;
+  html += `</div><div class="small-muted" style="margin-top:10px">اگر می‌خواهید کلاینت را نگه دارید، از گزینهٔ «استفاده از جلسهٔ کش‌شده» استفاده کنید.</div>`;
+  card.innerHTML = html;
+  container.appendChild(card);
+
+  document.getElementById('overlayClose').addEventListener('click', ()=>{ container.classList.add('hidden'); container.style.display='none'; });
+
+  const elRoot = document.getElementById('optRoot');
+  if (elRoot) elRoot.addEventListener('click', ()=> window.location.href = BACKEND + '/');
+
+  const elLogin = document.getElementById('optLogin');
+  if (elLogin) elLogin.addEventListener('click', ()=> window.location.href = "https://im-abi-oo.github.io/auth");
+
+  const elRetry = document.getElementById('optRetry');
+  if (elRetry) elRetry.addEventListener('click', ()=> { container.classList.add('hidden'); bootstrap(); });
+
+  const elUse = document.getElementById('optUseCache');
+  if (elUse) elUse.addEventListener('click', ()=> {
+    const cached = localStorage.getItem('me_cache');
+    if (!cached) { alert('جلسهٔ کش‌شده موجود نیست'); return; }
+    try {
+      const me = JSON.parse(cached);
+      if (!me || !me.username) { alert('کش نامعتبر است'); return; }
+      document.getElementById('adminName').innerText = me.username || 'admin';
+      document.getElementById('adminRole').innerText = me.role || 'user';
+      setDegraded(true);
+      container.classList.add('hidden');
+      showApp();
+    } catch (e) { console.error(e); alert('خطا در بارگذاری کش'); }
+  });
+
+  const elClear = document.getElementById('optClear');
+  if (elClear) elClear.addEventListener('click', ()=> {
+    clearAllTokens();
+    alert('توکن‌ها پاک شدند.');
+  });
+}
+
+function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+
+/* ================= bootstrap (auth/me) ================= */
 async function bootstrap() {
-  console.debug("[bootstrap] starting auth check");
-  // try auth/me regardless of presence of token
+  // show loader
+  document.getElementById('initialLoader').classList.remove('hidden');
   try {
-    const res = await fetchWithAuth(AUTH_ME, { method: "GET" });
-    console.debug("[bootstrap] /auth/me status", res.status);
-    if (res.ok) {
-      const body = await res.json();
-      // require server to say role=admin
-      if (body.role && body.role === "admin") {
-        document.getElementById("adminName").innerText = body.username || "admin";
-        document.getElementById("adminRole").innerText = body.role;
-        showApp();
-        // init default data
-        showTab("dashboard");
-        fetchRoot();
-        return;
-      } else {
-        clearTokens();
-        hide(document.getElementById("initialLoader"));
-        showLoginOverlay("اکانت شما ادمین نیست یا دسترسی لازم را ندارید.");
-        return;
-      }
-    } else {
-      // if 401 or 403 or other -> show login overlay with hint
-      hide(document.getElementById("initialLoader"));
-      if (res.status === 401 || res.status === 403) {
-        showLoginOverlay("برای دسترسی admin وارد شوید (401/403).");
-      } else {
-        // other errors: show retry + login
-        showLoginOverlay("خطا در بررسی احراز هویت. برای تلاش دوباره وارد شوید.");
-      }
+    const access = getAccess();
+    console.debug('[bootstrap] hasAccess:', !!access);
+
+    const res = await fetchWithAuth(BACKEND + '/auth/me', { method:'GET' });
+
+    console.debug('[bootstrap] /auth/me status', res.status);
+
+    if (res.status === 401 || res.status === 403) {
+      // force user to re-login (security). DO NOT auto-clear tokens here.
+      showOverlay('احراز هویت نامعتبر یا سشن منقضی شده (401/403). لطفاً وارد شوید یا به روت بازگردید.', { auth:true, root:true });
       return;
     }
+
+    if (!res.ok) {
+      // server error or network problem -> preserve tokens, allow retry or use cache
+      const j = await res.json().catch(()=>({}));
+      if (j && j.role && j.role !== 'admin') {
+        showOverlay('اکانت شما دسترسی admin ندارد. لطفاً با اکانت مناسب وارد شوید یا به روت بازگردید.', { root:true });
+        return;
+      }
+      showOverlay('خطا در دریافت اطلاعات کاربر. می‌توانید تلاش دوباره کنید یا از جلسهٔ کش‌شده استفاده کنید.', { retry:true, use_cache:true, auth:true });
+      return;
+    }
+
+    const body = await res.json();
+    if (!body || body.role !== 'admin') {
+      showOverlay('اکانت شما نقش admin ندارد. لطفاً با اکانت admin وارد شوید یا به روت بازگردید.', { root:true });
+      return;
+    }
+
+    // success: populate UI and cache me (but NOT tokens)
+    document.getElementById('adminName').innerText = body.username || 'admin';
+    document.getElementById('adminRole').innerText = body.role || '—';
+    try {
+      localStorage.setItem('me_cache', JSON.stringify({
+        username: body.username || null,
+        role: body.role || null,
+        expiryDate: body.expiryDate || null,
+        created_at: body.created_at || null,
+        ts: (new Date()).toISOString()
+      }));
+    } catch(e){ console.warn('me_cache store failed', e); }
+
+    // show app
+    setDegraded(false);
+    showApp();
+    showTab('dashboard');
+    fetchRoot();
   } catch (err) {
-    console.error("[bootstrap] error", err);
-    hide(document.getElementById("initialLoader"));
-    showLoginOverlay("خطای شبکه یا CORS هنگام بررسی احراز هویت. کنسول را چک کنید.");
+    console.error('[bootstrap] error', err);
+    showOverlay('خطای شبکه یا CORS هنگام بررسی احراز هویت. می‌توانید تلاش دوباره کنید یا از جلسهٔ کش‌شده استفاده کنید.', { retry:true, use_cache:true, auth:true });
+  } finally {
+    // hide initial loader only when app shown or overlay open
+    // leave it to showApp or overlay to hide
   }
 }
 
-/* ---------- Login form handling ---------- */
-document.getElementById("li_btn").addEventListener("click", async () => {
-  const u = document.getElementById("li_username").value.trim();
-  const p = document.getElementById("li_password").value;
-  if (!u || !p) { document.getElementById("li_msg").innerText = "نام کاربری/رمز معتبر وارد کنید."; return; }
-  document.getElementById("li_msg").innerText = "در حال ارسال...";
-  try {
-    const r = await fetch(AUTH_LOGIN, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ username: u, password: p })
-    });
-    if (!r.ok) {
-      const txt = await r.text().catch(()=>"");
-      document.getElementById("li_msg").innerText = "ورود ناموفق: " + r.status + " " + txt;
-      return;
-    }
-    const j = await r.json();
-    if (j.access_token && j.refresh_token) {
-      setTokens(j.access_token, j.refresh_token);
-      hideLoginOverlay();
-      // retry bootstrap
-      show(document.getElementById("initialLoader"));
-      await bootstrap();
-      return;
-    } else {
-      document.getElementById("li_msg").innerText = "پاسخ نامعتبر از سرور (توکن نیامد).";
-    }
-  } catch (e) {
-    console.error("login error", e);
-    document.getElementById("li_msg").innerText = "خطای شبکه در ورود.";
-  }
-});
-
-document.getElementById("li_close").addEventListener("click", () => {
-  hideLoginOverlay();
-  // keep app hidden; user must login or use root/back buttons if you add them later
-});
-
-/* ---------- Logout ---------- */
-document.getElementById("btnLogout").addEventListener("click", () => {
-  clearTokens();
-  // show login overlay
-  hide(document.getElementById("appRoot"));
-  show(document.getElementById("initialLoader"));
-  setTimeout(()=>{ hide(document.getElementById("initialLoader")); showLoginOverlay("شما خارج شدید. لطفاً مجدداً وارد شوید."); }, 400);
-});
-
-/* ---------- Basic UI helpers & API wrappers ---------- */
-function showTab(name){
-  document.querySelectorAll("[id^='tab-']").forEach(el => { if (el.id === "tab-"+name) el.classList.remove("hidden"); else el.classList.add("hidden"); });
-}
+/* =================== API actions (root, ping, db) =================== */
 async function fetchRoot(){
-  const el = document.getElementById("rootInfo");
-  el.innerText = "در حال بارگذاری...";
+  const el = document.getElementById('rootDump');
+  el.innerText = 'در حال بارگذاری...';
   try {
-    const r = await fetchWithAuth(BACKEND + "/", { method: "GET" });
-    if (!r.ok) { el.innerText = "خطا: " + r.status; return; }
-    const j = await r.json();
-    document.getElementById("rootDump").innerText = JSON.stringify(j,null,2);
-    el.innerText = j.server || "Two Manga API";
-    return j;
-  } catch(e){ el.innerText = "خطای شبکه"; console.error(e); }
-}
-async function pingServer(){
-  document.getElementById("pingLoader").innerHTML = '<span class="loader"></span>';
-  try {
-    const r = await fetchWithAuth(BACKEND + "/debug/ping", { method: "GET" });
-    if (r.ok){ const j = await r.json(); document.getElementById("pingResult").innerText = j.msg || "pong"; } else { document.getElementById("pingResult").innerText = "err " + r.status; }
-  } catch(e){ document.getElementById("pingResult").innerText = "خطا"; console.error(e); }
-  document.getElementById("pingLoader").innerHTML = "";
-}
-async function dbStatus(){
-  document.getElementById("dbResult").innerText = "loading...";
-  try {
-    const r = await fetchWithAuth(BACKEND + "/debug/db-status", { method: "GET" });
-    if (r.ok) { const j = await r.json(); document.getElementById("dbResult").innerText = "available: " + (j.available ? "yes":"no"); } else { document.getElementById("dbResult").innerText = "err " + r.status; }
-  } catch(e){ document.getElementById("dbResult").innerText = "خطا"; console.error(e); }
-}
-async function loadTransactions(){
-  const container = document.getElementById("transactionsList"); container.innerText = "loading...";
-  try {
-    const status = document.getElementById("filterStatus").value || "";
-    const qs = status ? "?status=" + encodeURIComponent(status) : "";
-    const r = await fetchWithAuth(BACKEND + "/admin/transactions" + qs, { method: "GET" });
-    if (r.status === 401 || r.status === 403) { clearTokens(); hide(document.getElementById("appRoot")); showLoginOverlay("مجدداً وارد شوید (401/403)."); return; }
-    if (!r.ok) { container.innerText = "خطا: " + r.status; return; }
-    const j = await r.json(); const items = j.transactions || [];
-    if (!items.length){ container.innerText = "تراکنشی نیست."; return; }
-    container.innerHTML = ""; items.forEach(t => {
-      const d = document.createElement("div"); d.className="p-3 glass mb-2";
-      d.innerHTML = `<div class="mono">#${t._id} · ${t.username} · ${t.status}</div>`;
-      container.appendChild(d);
-    });
-  } catch(e){ container.innerText = "خطا"; console.error(e); }
+    const res = await fetchWithAuth(BACKEND + '/', { method:'GET' });
+    if (!res.ok) { el.innerText = 'خطا: ' + res.status; return; }
+    const j = await res.json();
+    el.innerText = JSON.stringify(j, null, 2);
+    document.getElementById('rootInfo').innerText = (j.server || 'Two Manga API');
+  } catch (e) { el.innerText = 'خطای شبکه هنگام واکشی root'; }
 }
 
-/* ---------- Init ---------- */
-(function init(){
-  document.getElementById("backendUrl").innerText = BACKEND;
-  // start bootstrap (will call /auth/me via fetchWithAuth)
+async function ping(){
+  const ld = document.getElementById('pingLoader');
+  ld.innerHTML = '<span class="loader"></span>';
+  try {
+    const res = await fetchWithAuth(BACKEND + '/debug/ping', { method:'GET' });
+    if (!res.ok) { document.getElementById('pingRes').innerText = 'خطا: ' + res.status; return; }
+    const j = await res.json();
+    document.getElementById('pingRes').innerText = j.msg || 'pong';
+  } catch (e) { document.getElementById('pingRes').innerText = 'خطای شبکه'; }
+  ld.innerHTML = '';
+}
+
+async function dbStatus(){
+  document.getElementById('dbRes').innerText = 'در حال بارگذاری...';
+  try {
+    const res = await fetchWithAuth(BACKEND + '/debug/db-status', { method:'GET' });
+    if (!res.ok) { document.getElementById('dbRes').innerText = 'خطا: ' + res.status; return; }
+    const j = await res.json();
+    document.getElementById('dbRes').innerText = 'available: ' + (j.available ? 'yes' : 'no');
+  } catch(e){ document.getElementById('dbRes').innerText = 'خطای شبکه'; }
+}
+
+/* =================== Transactions (important fix) ===================
+   - اگر /admin/transactions برگشت 401 یا 403 => هیچ توکنی پاک نمیشه؛ overlay نمایش داده میشه و کاربر می‌تونه retry یا login بزنه.
+   - در سایر خطاها فقط پیغام داده میشه.
+*/
+async function loadTransactions(){
+  const list = document.getElementById('txList');
+  list.innerHTML = '<div class="mono small-muted p-3">در حال بارگذاری... <span class="loader"></span></div>';
+  const status = document.getElementById('txFilter').value;
+  const qs = status ? '?status='+encodeURIComponent(status) : '';
+  try {
+    const res = await fetchWithAuth(BACKEND + '/admin/transactions' + qs, { method:'GET' });
+    if (res.status === 401 || res.status === 403) {
+      // do NOT auto-clear tokens; show overlay and allow user to act
+      showOverlay('احراز هویت نامعتبر یا مجوز کافی ندارید (401/403). لطفاً لاگین کنید یا از جلسهٔ کش‌شده استفاده کنید.', { auth:true, use_cache:true, retry:true });
+      list.innerHTML = '<div class="small-muted p-3">نیاز به لاگین admin برای مشاهده تراکنش‌ها.</div>';
+      return;
+    }
+    if (!res.ok) {
+      list.innerHTML = '<div class="small-muted p-3">خطا در دریافت تراکنش‌ها: ' + res.status + '</div>';
+      return;
+    }
+    const j = await res.json();
+    const items = j.transactions || [];
+    if (!items.length) { list.innerHTML = '<div class="small-muted p-3">تراکنشی موجود نیست.</div>'; return; }
+    list.innerHTML = '';
+    for (const t of items) {
+      const card = document.createElement('div');
+      card.className = 'glass p-3 flex items-start justify-between';
+      card.innerHTML = `<div>
+                          <div class="mono">#${t._id}</div>
+                          <div class="small-muted">${t.username || t.user_id} · ${t.status}</div>
+                          <div class="small-muted">tx: ${t.tx_hash || '—'} · days: ${t.days || 0}</div>
+                          <div class="small-muted">created: ${t.created_at || '—'}</div>
+                        </div>
+                        <div class="flex gap-2">
+                          <button class="btn-primary" data-id="${t._id}" data-act="approve">تأیید</button>
+                          <button class="btn-ghost" data-id="${t._id}" data-act="reject">رد</button>
+                        </div>`;
+      list.appendChild(card);
+    }
+    // attach handlers (delegation)
+    list.querySelectorAll('button[data-act]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        const id = btn.getAttribute('data-id');
+        const act = btn.getAttribute('data-act');
+        if (act === 'approve') adminApprove(id, btn);
+        else adminReject(id, btn);
+      });
+    });
+  } catch (e) {
+    console.error('loadTransactions error', e);
+    list.innerHTML = '<div class="small-muted p-3">خطای شبکه هنگام بارگذاری تراکنش‌ها</div>';
+  }
+}
+
+async function adminApprove(txId, btnEl){
+  if (!confirm('آیا مطمئنی تأیید می‌کنی؟')) return;
+  btnEl.disabled = true;
+  try {
+    const res = await fetchWithAuth(BACKEND + '/admin/transactions/' + encodeURIComponent(txId) + '/approve', { method:'POST', headers:{ 'Content-Type':'application/json' } });
+    if (res.status === 401 || res.status === 403) {
+      showOverlay('احراز هویت یا مجوز ندارید (401/403).', { auth:true, use_cache:true });
+      btnEl.disabled = false;
+      return;
+    }
+    if (!res.ok) {
+      const txt = await res.text().catch(()=> '');
+      alert('خطا در تأیید: ' + res.status + ' ' + txt);
+      btnEl.disabled = false;
+      return;
+    }
+    const j = await res.json();
+    alert('تأیید شد: ' + (j.new_expiry || ''));
+    loadTransactions(); // refresh
+  } catch (e) {
+    alert('خطای شبکه در تأیید');
+    btnEl.disabled = false;
+  }
+}
+
+async function adminReject(txId, btnEl){
+  const reason = prompt('دلیل رد (اختیاری):','');
+  btnEl.disabled = true;
+  try {
+    const res = await fetchWithAuth(BACKEND + '/admin/transactions/' + encodeURIComponent(txId) + '/reject', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ reason }) });
+    if (res.status === 401 || res.status === 403) {
+      showOverlay('احراز هویت یا مجوز ندارید (401/403).', { auth:true, use_cache:true });
+      btnEl.disabled = false;
+      return;
+    }
+    if (!res.ok) {
+      const txt = await res.text().catch(()=> '');
+      alert('خطا در رد: ' + res.status + ' ' + txt);
+      btnEl.disabled = false;
+      return;
+    }
+    alert('تراکنش رد شد.');
+    loadTransactions();
+  } catch (e) {
+    alert('خطای شبکه در رد تراکنش');
+    btnEl.disabled = false;
+  }
+}
+
+/* ============ Coupons / Rates (similar pattern) ============ */
+function toggleCouponCreate(){ document.getElementById('couponCreate').classList.toggle('hidden'); }
+async function createCoupon(){
+  const code = document.getElementById('c_code').value.trim();
+  const days = parseInt(document.getElementById('c_days').value || '0',10);
+  const max = document.getElementById('c_max').value;
+  const exp = document.getElementById('c_exp').value.trim();
+  const msg = document.getElementById('c_msg');
+  if (!code || !days) { alert('کد و days معتبر وارد کن'); return; }
+  msg.innerText = 'در حال ارسال...';
+  try {
+    const res = await fetchWithAuth(BACKEND + '/admin/coupons', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ code, bonus_days: days, max_uses: max || undefined, expires_at: exp || undefined }) });
+    if (res.status === 401 || res.status === 403) { showOverlay('نیاز به دسترسی admin دارید (401/403).', { auth:true, use_cache:true }); msg.innerText=''; return; }
+    if (!res.ok) { const txt=await res.text().catch(()=> ''); msg.innerText='خطا'; alert('خطا: '+res.status+' '+txt); return; }
+    msg.innerText = 'کوپن ایجاد شد';
+    listCoupons();
+  } catch(e){ msg.innerText='خطای شبکه'; }
+}
+async function listCoupons(){
+  const p = document.getElementById('couponList'); p.innerHTML='در حال بارگذاری...';
+  try {
+    const res = await fetchWithAuth(BACKEND + '/admin/coupons', { method:'GET' });
+    if (!res.ok){ p.innerText='خطا: '+res.status; return; }
+    const j = await res.json(); const arr = j.coupons||[];
+    p.innerHTML = arr.length ? '' : '<div class="small-muted">کوپنی نیست</div>';
+    arr.forEach(c=>{
+      const el = document.createElement('div'); el.className='glass p-2 flex justify-between';
+      el.innerHTML = `<div><div class="mono">${c.code}</div><div class="small-muted">bonus_days:${c.bonus_days} · uses:${c.uses||0}</div></div><div class="small-muted">${c.expires_at||''}</div>`;
+      p.appendChild(el);
+    });
+  } catch(e){ p.innerText='خطای شبکه'; }
+}
+
+async function fetchRates(){
+  const m = document.getElementById('ratesMsg'); m.innerText='در حال فچ...';
+  try {
+    const res = await fetchWithAuth(BACKEND + '/admin/fetch-rates', { method:'POST' });
+    if (!res.ok){ m.innerText='خطا: ' + res.status; return; }
+    m.innerText = 'نرخ‌ها فچ شد';
+  } catch(e){ m.innerText='خطای شبکه'; }
+}
+
+/* =================== manual token controls & logout ================== */
+document.getElementById('setTokenBtn').addEventListener('click', ()=>{
+  const v = document.getElementById('manualToken').value.trim();
+  if (!v){ alert('توکن خالی'); return; }
+  setAccessToken(v); alert('توکن access ذخیره شد'); bootstrap();
+});
+document.getElementById('clearTokenBtn').addEventListener('click', ()=>{
+  clearAllTokens(); alert('توکن‌ها پاک شدند'); });
+
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  clearAllTokens();
+  document.getElementById('app').style.display='none';
+  showOverlay('خروج انجام شد. در صورت نیاز مجدداً وارد شوید.', { auth:true });
+});
+
+/* ================ small UI helpers ================ */
+function showTab(name){
+  document.querySelectorAll('section[id^="tab-"], section[id^="tab-"] ~ *').forEach(s=>{});
+  document.querySelectorAll('[id^="tab-"]').forEach(el=>{ if(el.id==='tab-'+name) el.classList.remove('hidden'); else el.classList.add('hidden'); });
+}
+
+/* ================= init ================= */
+window.addEventListener('DOMContentLoaded', ()=>{
+  // start bootstrap
   bootstrap();
-})();
+});
+
+/* ================= export for debugging (optional) ================ */
+window._twoMangaDebug = {
+  fetchWithAuth,
+  bootstrap,
+  loadTransactions,
+  fetchRoot
+};
 </script>
 </body>
 </html>

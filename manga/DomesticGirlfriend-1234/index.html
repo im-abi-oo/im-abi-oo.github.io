@@ -55,7 +55,7 @@
             filter: grayscale(0.8);
         }
         .is-locked:hover { 
-            opacity: 0.8; 
+            opacity: 0.8;
             background: rgba(220, 38, 38, 0.05); 
             border-color: rgba(220, 38, 38, 0.2);
             transform: none;
@@ -92,6 +92,7 @@
     </nav>
 
     <header class="relative w-full pt-8 pb-12">
+    
         <div class="absolute inset-0 h-[80%] overflow-hidden -z-10 mask-image-b">
             <img src="https://cdn.jsdelivr.net/gh/im-abi-oo/mioooo@main/oo.jpg" class="w-full h-full object-cover blur-[80px] opacity-30 scale-125">
             <div class="absolute inset-0 bg-gradient-to-b from-[#02000a]/20 via-[#02000a]/80 to-[#02000a]"></div>
@@ -104,16 +105,19 @@
             </div>
 
             <div class="flex-1 w-full text-center md:text-right space-y-6">
+                
                 <div>
                     <h1 class="text-3xl md:text-5xl font-black text-white mb-2 leading-tight">دوست دخترخانگی</h1>
                     <h2 class="text-base text-gray-500 font-bold uppercase tracking-wider">Domestic Girlfriend</h2>
                 </div>
 
                 <div class="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 border-y border-white/5 py-5">
+    
                     <div class="text-center md:text-right">
                         <span class="block text-[10px] text-gray-500 font-bold mb-1">وضعیت</span>
                         <span class="text-sm font-black text-emerald-400">دردست انتشار...</span>
                     </div>
+    
                     <div class="w-px bg-white/10"></div>
                     <div class="text-center md:text-right">
                         <span class="block text-[10px] text-gray-500 font-bold mb-1">نویسنده</span>
@@ -225,7 +229,6 @@
                 premium: false, 
                 data: null 
             };
-            
             let rows = document.querySelectorAll('.chapter-row');
 
             async function init() {
@@ -241,17 +244,17 @@
                         r.style.display = num.includes(val) ? 'flex' : 'none';
                     });
                 });
-
                 // اگر کاربر پریمیوم نیست، مودال را نشان بده
                 if (!userState.premium) {
-                    setTimeout(() => openModal(), 1500); // کمی مکث تا صفحه لود شود بعد توی صورتش بزنیم
+                    setTimeout(() => openModal(), 1500);
+                    // کمی مکث تا صفحه لود شود بعد توی صورتش بزنیم
                 }
             }
 
             async function checkAuth() {
-                const at = localStorage.getItem('at'); // Access Token
+                const at = localStorage.getItem('at');
+                // Access Token
                 const userArea = document.getElementById('user-area');
-                
                 if (!at) {
                     // کاربر مهمان
                     renderGuestBtn(userArea);
@@ -262,7 +265,6 @@
                     const res = await fetch(`${API_BASE}/auth/me`, { 
                         headers: { 'Authorization': `Bearer ${at}` } 
                     });
-
                     if (res.ok) {
                         const data = await res.json();
                         userState.loggedIn = true;
@@ -302,6 +304,9 @@
             }
 
             function updateUI() {
+                // FIX: گرفتن اسلاگ از بادی برای استفاده در لینک‌ها
+                const currentSlug = document.body.dataset.slug;
+
                 rows.forEach(row => {
                     const num = parseInt(row.dataset.num);
                     
@@ -317,14 +322,12 @@
                         newRow.classList.remove('is-locked');
                         newRow.querySelector('.status-icon').innerHTML = `
                             <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                                <i data-lucide="play" class="w-3.5 h-3.5 fill-current ml-0.5"></i>
+                                 <i data-lucide="play" class="w-3.5 h-3.5 fill-current ml-0.5"></i>
                             </div>`;
-                        
                         // لینک به ریدر
-                        // فرض می‌کنیم روت ریدر /reader است و با هش یا کوئری کار می‌کند
+                        // FIX: استفاده از فرمت صحیح لینک و متغیر صحیح
                         newRow.onclick = () => {
-                            const targetUrl = `/${SLUG}/reader#ch-${num}`;
-                            window.location.href = targetUrl;
+                            window.location.href = `/${currentSlug}/reader#ch-${num}`;
                         };
 
                     } else {
@@ -339,7 +342,6 @@
                         newRow.onclick = () => openModal();
                     }
                 });
-                
                 // رفرش لیست برای سرچ
                 rows = document.querySelectorAll('.chapter-row');
                 lucide.createIcons();
@@ -348,6 +350,7 @@
             // هندلر دکمه "شروع مطالعه" بالای صفحه
             function handleReadClick(chNum) {
                 if (chNum <= UNLOCK_LIMIT || userState.premium) {
+                    // اینجا هم برای اطمینان می‌توان فرمت را اصلاح کرد، اما طبق دستور فقط لیست را فیکس کردم
                     window.location.href = `reader/${document.body.dataset.slug}?ch=${chNum}`;
                 } else {
                     openModal();
@@ -378,7 +381,6 @@
 
             return { init, handleReadClick, closeModal, openModal };
         })();
-
         document.addEventListener('DOMContentLoaded', Logic.init);
     </script>
 </body>

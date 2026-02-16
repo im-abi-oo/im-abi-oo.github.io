@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>پنل مدیریت جامع — Two Manga</title>
+  <title>مدیریت Two Manga — نسخه نهایی</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
@@ -21,14 +21,6 @@
               accent: '#8b5cf6',
               glow: '#d946ef'
             }
-          },
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'fade-in': 'fadeIn 0.3s ease-out forwards',
-          },
-          keyframes: {
-            float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
-            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } }
           }
         }
       }
@@ -36,7 +28,7 @@
   </script>
 
   <style>
-    body { background-color: #0f0f13; color: #e4e4e7; scroll-behavior: smooth; }
+    body { background-color: #0f0f13; color: #e4e4e7; overflow-x: hidden; }
     .glass { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(139, 92, 246, 0.15); }
     .nav-link.active { background: rgba(139, 92, 246, 0.1); border-right: 4px solid #8b5cf6; color: #8b5cf6; }
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
@@ -44,190 +36,143 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
     .tab-content { display: none; }
     .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    #access-denied-screen { display: none; }
     #initial-loader { position: fixed; inset: 0; z-index: 100; background: #0f0f13; display: flex; flex-direction: column; align-items: center; justify-content: center; }
   </style>
 </head>
 <body class="min-h-screen font-sans custom-scrollbar">
 
-  <!-- Full Screen Auth Check Loader -->
+  <!-- Loading Screen -->
   <div id="initial-loader">
-    <div class="relative w-20 h-20 mb-6">
-      <div class="absolute inset-0 border-4 border-brand-accent/20 rounded-full"></div>
-      <div class="absolute inset-0 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
-    </div>
-    <h2 class="text-xl font-bold text-white mb-2">در حال تایید هویت ادمین...</h2>
-    <p class="text-gray-500 text-sm">اتصال به https://two-api-iksq.onrender.com</p>
+    <div class="w-16 h-16 border-4 border-brand-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+    <p class="text-gray-400 animate-pulse">در حال بررسی سطح دسترسی شما...</p>
   </div>
 
-  <div id="app-ui" class="opacity-0 transition-opacity duration-500 flex flex-col md:flex-row min-h-screen">
+  <!-- Access Denied Screen (No Redirect) -->
+  <div id="access-denied-screen" class="fixed inset-0 z-[110] bg-brand-dark flex items-center justify-center p-6 text-center">
+    <div class="max-w-md w-full glass p-10 rounded-[2.5rem] border-red-500/30">
+      <div class="w-20 h-20 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">⚠️</div>
+      <h2 class="text-2xl font-black text-white mb-4">عدم دسترسی به پنل</h2>
+      <p id="denied-msg" class="text-gray-400 mb-8 leading-relaxed">متاسفیم، حساب کاربری شما سطح دسترسی "ادمین" ندارد و نمی‌توانید وارد این بخش شوید.</p>
+      <a href="/" class="inline-block w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl font-bold transition-all">برگشت به صفحه اصلی سایت</a>
+    </div>
+  </div>
+
+  <!-- UI Wrapper -->
+  <div id="app-ui" class="hidden flex flex-col md:flex-row min-h-screen">
     
     <!-- Sidebar -->
-    <aside class="w-full md:w-72 glass p-6 flex flex-col gap-8 z-20">
+    <aside class="w-full md:w-72 glass p-6 flex flex-col gap-8">
       <div class="flex items-center gap-4 px-2">
-        <div class="w-12 h-12 bg-gradient-to-br from-brand-accent to-brand-glow rounded-2xl flex items-center justify-center shadow-lg shadow-brand-accent/30">
+        <div class="w-12 h-12 bg-gradient-to-br from-brand-accent to-brand-glow rounded-2xl flex items-center justify-center shadow-lg">
           <span class="text-2xl">⚡</span>
         </div>
         <div>
           <h1 class="text-lg font-black text-white">TWO MANGA</h1>
-          <p class="text-[10px] text-brand-accent tracking-widest font-bold">ADMIN PANEL v2.0</p>
+          <p class="text-[10px] text-brand-accent font-bold tracking-widest uppercase">Admin System</p>
         </div>
       </div>
 
-      <nav class="flex-1 space-y-1">
-        <p class="text-[10px] text-gray-500 font-bold px-4 mb-2 uppercase">اصلی</p>
-        <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3">
+      <nav class="flex-1 space-y-2">
+        <button onclick="showTab('dashboard')" id="nav-dashboard" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3 active">
           <span class="opacity-70">📊</span> داشبورد مدیریتی
         </button>
-        
-        <p class="text-[10px] text-gray-500 font-bold px-4 mb-2 mt-6 uppercase">مالی و فروش</p>
-        <button onclick="showTab('transactions')" id="nav-transactions" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3 relative">
+        <button onclick="showTab('transactions')" id="nav-transactions" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3 relative">
           <span class="opacity-70">💳</span> تراکنش‌ها
-          <span id="pendingBadge" class="hidden absolute left-3 top-4 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+          <span id="pendingBadge" class="hidden absolute left-3 top-4 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
-        <button onclick="showTab('rates')" id="nav-rates" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3">
-          <span class="opacity-70">💰</span> تنظیمات نرخ ارز
+        <button onclick="showTab('rates')" id="nav-rates" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3">
+          <span class="opacity-70">💰</span> نرخ ارز و پلن‌ها
         </button>
-
-        <p class="text-[10px] text-gray-500 font-bold px-4 mb-2 mt-6 uppercase">کاربران</p>
-        <button onclick="showTab('users')" id="nav-users" class="nav-link w-full text-right p-3.5 rounded-xl transition-all hover:bg-white/5 flex items-center gap-3">
+        <button onclick="showTab('users')" id="nav-users" class="nav-link w-full text-right p-3.5 rounded-xl transition-all flex items-center gap-3">
           <span class="opacity-70">👥</span> مدیریت کاربران
         </button>
       </nav>
 
-      <div class="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-brand-accent/20 flex items-center justify-center text-brand-accent text-sm font-bold" id="adminInitial">A</div>
+      <div class="p-4 rounded-2xl bg-white/5 border border-white/10">
+        <div class="flex items-center gap-3 mb-4">
+          <div id="adminInitials" class="w-10 h-10 rounded-full bg-brand-accent/20 flex items-center justify-center font-bold text-brand-accent">?</div>
           <div class="flex-1 min-w-0">
-            <p id="adminUserDisplay" class="text-sm font-bold truncate text-white"></p>
-            <p class="text-[10px] text-gray-400">سطح: مدیر ارشد</p>
+            <p id="adminName" class="text-sm font-bold truncate">نام مدیر</p>
+            <p class="text-[10px] text-green-500">ادمین فعال</p>
           </div>
         </div>
-        <button onclick="logout()" class="w-full py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-xs font-bold transition-colors">
-          خروج از سیستم
-        </button>
+        <button onclick="logout()" class="w-full py-2 bg-red-500/10 text-red-500 rounded-lg text-xs font-bold hover:bg-red-500/20 transition-all">خروج</button>
       </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-4 md:p-8 space-y-8 max-h-screen overflow-y-auto custom-scrollbar">
+    <main class="flex-1 p-6 md:p-10 space-y-8 max-h-screen overflow-y-auto custom-scrollbar">
       
-      <!-- Dashboard Tab -->
-      <div id="tab-dashboard" class="tab-content">
-        <header class="mb-8">
-          <h2 class="text-3xl font-black text-white">داشبورد</h2>
-          <p class="text-gray-500 mt-1">خلاصه وضعیت سیستم در یک نگاه</p>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div class="glass p-6 rounded-3xl relative overflow-hidden group">
-            <div class="absolute -right-4 -top-4 w-20 h-20 bg-brand-accent/10 rounded-full blur-2xl group-hover:bg-brand-accent/20 transition-all"></div>
-            <p class="text-gray-400 text-sm">کاربران کل</p>
-            <h3 id="stat-total-users" class="text-3xl font-black mt-2 text-white">---</h3>
+      <!-- Dashboard -->
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <div class="glass p-8 rounded-[2rem]">
+            <p class="text-gray-400 text-sm">کل کاربران</p>
+            <h3 id="dash-users" class="text-4xl font-black mt-2">---</h3>
           </div>
-          <div class="glass p-6 rounded-3xl relative overflow-hidden group">
-            <div class="absolute -right-4 -top-4 w-20 h-20 bg-green-500/10 rounded-full blur-2xl group-hover:bg-green-500/20 transition-all"></div>
+          <div class="glass p-8 rounded-[2rem]">
             <p class="text-gray-400 text-sm">تراکنش‌های موفق</p>
-            <h3 id="stat-total-paid" class="text-3xl font-black mt-2 text-white">---</h3>
+            <h3 id="dash-paid" class="text-4xl font-black mt-2 text-green-500">---</h3>
           </div>
-          <div class="glass p-6 rounded-3xl relative overflow-hidden group">
-            <div class="absolute -right-4 -top-4 w-20 h-20 bg-yellow-500/10 rounded-full blur-2xl group-hover:bg-yellow-500/20 transition-all"></div>
-            <p class="text-gray-400 text-sm">تراکنش‌های در انتظار</p>
-            <h3 id="stat-pending-tx" class="text-3xl font-black mt-2 text-white">---</h3>
-          </div>
-          <div class="glass p-6 rounded-3xl border-brand-accent/30 shadow-lg shadow-brand-accent/5">
-            <p class="text-brand-accent text-sm font-bold">وضعیت API</p>
-            <div class="flex items-center gap-2 mt-2">
-              <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-              <span id="backendUrl" class="text-xs font-mono opacity-60"></span>
-            </div>
+          <div class="glass p-8 rounded-[2rem]">
+            <p class="text-gray-400 text-sm">در انتظار تایید</p>
+            <h3 id="dash-pending" class="text-4xl font-black mt-2 text-yellow-500">---</h3>
           </div>
         </div>
-
-        <div class="mt-8 glass p-8 rounded-3xl">
-          <div class="flex justify-between items-center mb-6">
-            <h4 class="text-xl font-bold">آخرین تراکنش‌های سیستم</h4>
-            <button onclick="loadDashboardStats()" class="text-brand-accent text-sm hover:underline">بروزرسانی</button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-right">
-              <thead>
-                <tr class="text-gray-500 text-sm border-b border-white/5">
-                  <th class="pb-4 pr-4">کاربر</th>
-                  <th class="pb-4">مبلغ (تومان)</th>
-                  <th class="pb-4">نوع اشتراک</th>
-                  <th class="pb-4">وضعیت</th>
-                </tr>
-              </thead>
-              <tbody id="dashboard-tx-table"></tbody>
-            </table>
-          </div>
+        <div class="glass p-8 rounded-[2rem]">
+            <h4 class="text-xl font-bold mb-6">وضعیت سرور</h4>
+            <p id="serverStatus" class="text-xs font-mono opacity-50">در حال چک...</p>
         </div>
       </div>
 
-      <!-- Transactions Tab -->
+      <!-- Transactions -->
       <div id="tab-transactions" class="tab-content">
-        <header class="mb-8 flex justify-between items-end">
-          <div>
-            <h2 class="text-3xl font-black text-white">تراکنش‌ها</h2>
-            <p class="text-gray-500 mt-1">تایید یا رد پرداخت‌های کاربران</p>
-          </div>
-          <button onclick="loadTransactions()" class="px-6 py-2 bg-brand-accent rounded-xl font-bold text-sm">رفرش لیست</button>
-        </header>
-
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-black">تراکنش‌ها</h2>
+            <button onclick="loadTransactions()" class="px-5 py-2 bg-brand-accent rounded-xl text-sm font-bold">بروزرسانی لیست</button>
+        </div>
         <div class="glass rounded-3xl overflow-hidden">
           <table class="w-full text-right border-collapse">
-            <thead class="bg-white/5 text-gray-400 text-sm font-bold">
+            <thead class="bg-white/5 text-gray-400 text-xs">
               <tr>
-                <th class="p-5">کاربر / زمان</th>
+                <th class="p-5">کاربر</th>
+                <th class="p-5">مبلغ / زمان</th>
                 <th class="p-5">کد پیگیری</th>
-                <th class="p-5">مبلغ / پلن</th>
                 <th class="p-5 text-center">عملیات</th>
               </tr>
             </thead>
-            <tbody id="transactions-list" class="divide-y divide-white/5"></tbody>
+            <tbody id="tx-list" class="divide-y divide-white/5 text-sm"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- Rates Tab -->
+      <!-- Rates -->
       <div id="tab-rates" class="tab-content">
-        <h2 class="text-3xl font-black text-white mb-8">تنظیمات نرخ ارز</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div class="glass p-8 rounded-3xl space-y-6">
-            <h4 class="text-xl font-bold text-brand-accent flex items-center gap-2">
-              <span>🔄</span> آپدیت اتوماتیک
-            </h4>
-            <p class="text-gray-400 text-sm leading-relaxed">با فشردن دکمه زیر، سیستم از طریق API قیمت لحظه‌ای را دریافت کرده و قیمت تمام اشتراک‌ها را آپدیت می‌کند.</p>
-            <button id="btnFetchRates" onclick="fetchRates()" class="w-full py-4 bg-gradient-to-r from-brand-accent to-brand-glow rounded-2xl font-black text-white shadow-xl shadow-brand-accent/20 transition-all hover:scale-[1.02] active:scale-95">
-              فچ و بروزرسانی قیمت‌ها
-            </button>
-            <p id="ratesMsg" class="text-center text-xs text-gray-500 font-mono"></p>
-          </div>
-
-          <div class="glass p-8 rounded-3xl flex items-center justify-center border-dashed border-2 border-white/10 text-gray-500">
-             بخش تغییر دستی قیمت پلن‌ها در آپدیت بعدی فعال می‌شود.
-          </div>
+        <h2 class="text-3xl font-black mb-8">نرخ ارز</h2>
+        <div class="max-w-xl glass p-8 rounded-[2rem] space-y-6">
+            <p class="text-gray-400">سیستم به صورت خودکار قیمت دلار را از APIهای خارجی فچ کرده و بر اساس نرخ سود شما قیمت تمام پلن‌ها را در دیتابیس آپدیت می‌کند.</p>
+            <button id="rateBtn" onclick="updateRates()" class="w-full py-4 bg-brand-accent rounded-2xl font-bold shadow-lg shadow-brand-accent/30">شروع بروزرسانی نرخ ارز</button>
+            <div id="rateStatus" class="text-center text-sm font-bold"></div>
         </div>
       </div>
 
-      <!-- Users Tab -->
+      <!-- Users -->
       <div id="tab-users" class="tab-content">
-        <h2 class="text-3xl font-black text-white mb-8">مدیریت کاربران</h2>
+        <h2 class="text-3xl font-black mb-8">کاربران</h2>
         <div class="glass rounded-3xl overflow-hidden">
-          <div class="p-6 border-b border-white/5 flex gap-4">
-            <input type="text" id="userSearchInput" placeholder="جستجوی نام کاربری..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-brand-accent transition-all">
-            <button onclick="loadUsers()" class="px-6 py-2 bg-white/10 rounded-xl hover:bg-white/20 transition-all text-sm font-bold">جستجو</button>
-          </div>
           <table class="w-full text-right">
-            <thead class="bg-white/5 text-gray-400 text-sm font-bold">
+            <thead class="bg-white/5 text-xs text-gray-400">
               <tr>
                 <th class="p-5">نام کاربری</th>
-                <th class="p-5">وضعیت نقش</th>
-                <th class="p-5">تاریخ انقضا</th>
-                <th class="p-5 text-center">عملیات</th>
+                <th class="p-5">نقش</th>
+                <th class="p-5">اعتبار اشتراک</th>
+                <th class="p-5">عملیات</th>
               </tr>
             </thead>
-            <tbody id="users-list" class="divide-y divide-white/5"></tbody>
+            <tbody id="user-list" class="divide-y divide-white/5 text-sm"></tbody>
           </table>
         </div>
       </div>
@@ -236,251 +181,170 @@
   </div>
 
   <script>
-    // تنظیم آدرس دقیق بک‌ند
-    const BACKEND = "https://two-api-iksq.onrender.com";
-    const AUTH_PAGE = "/auth/";
-    const USER_PANEL = "/panel/";
-
-    function getStoredToken() { return localStorage.getItem("access_token"); }
-
-    function authHeaders() {
+    const API_URL = "https://two-api-iksq.onrender.com";
+    
+    function getToken() { return localStorage.getItem("access_token"); }
+    function getHeaders() {
       return {
-        "Authorization": "Bearer " + getStoredToken(),
+        "Authorization": "Bearer " + getToken(),
         "Content-Type": "application/json",
         "Accept": "application/json"
       };
     }
 
-    // --- Core: Bootstrap & Strict Role Check ---
+    // --- Bootstrap: Strict Check ---
     async function bootstrap() {
-      const token = getStoredToken();
+      const token = getToken();
       if (!token) {
-        window.location.href = AUTH_PAGE;
-        return;
+          showError("شما وارد حساب خود نشده‌اید. ابتدا لاگین کنید.");
+          return;
       }
 
       try {
-        // درخواست مستقیم به روت /auth/me برای گرفتن دیتای واقعی کاربر
-        const res = await fetch(`${BACKEND}/auth/me`, {
+        // فچ کردن واقعی دیتای کاربر برای بررسی Role
+        const res = await fetch(`${API_URL}/auth/me`, {
           method: "GET",
-          headers: authHeaders()
+          headers: getHeaders()
         });
 
         if (!res.ok) {
-           throw new Error("Token Invalid or Expired");
+           throw new Error("Invalid Token");
         }
 
-        const userData = await res.json();
+        const user = await res.json();
 
-        // چک کردن نقش (Role) - فقط ادمین اجازه ورود دارد
-        if (userData.role !== "admin") {
-          console.warn("Access Denied: User is not an admin", userData);
-          alert("خطا: شما دسترسی مدیریت ندارید.");
-          window.location.href = USER_PANEL; // هدایت به پنل کاربری معمولی
+        // بررسی نقش ادمین
+        if (user.role !== "admin") {
+          showError(`شما با نقش "${user.role}" وارد شده‌اید. دسترسی به پنل مدیریت فقط برای ادمین مجاز است.`);
           return;
         }
 
-        // نمایش اطلاعات ادمین در سایدبار
-        document.getElementById("adminUserDisplay").innerText = userData.username;
-        document.getElementById("adminInitial").innerText = userData.username[0].toUpperCase();
-        document.getElementById("backendUrl").innerText = BACKEND;
+        // موفقیت آمیز - نمایش پنل
+        document.getElementById("adminName").innerText = user.username;
+        document.getElementById("adminInitials").innerText = user.username[0].toUpperCase();
+        document.getElementById("serverStatus").innerText = "متصل به: " + API_URL;
         
-        // مخفی کردن لودر و نمایش UI اصلی
-        const loader = document.getElementById("initial-loader");
-        loader.classList.add("opacity-0");
-        setTimeout(() => {
-          loader.style.display = "none";
-          document.getElementById("app-ui").classList.remove("opacity-0");
-        }, 500);
-
-        // اجرای دیتای اولیه
-        showTab('dashboard');
+        document.getElementById("initial-loader").style.display = "none";
+        document.getElementById("app-ui").classList.remove("hidden");
+        
+        loadDashboard();
 
       } catch (err) {
-        console.error("Auth Fail:", err);
-        localStorage.removeItem("access_token");
-        window.location.href = AUTH_PAGE;
+        showError("خطا در تایید هویت. لطفاً مجدداً وارد حساب خود شوید.");
       }
     }
 
-    // --- Navigation ---
+    function showError(msg) {
+        document.getElementById("initial-loader").style.display = "none";
+        document.getElementById("denied-msg").innerText = msg;
+        document.getElementById("access-denied-screen").style.display = "flex";
+    }
+
+    // --- Tab Management ---
     function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-      
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
       document.getElementById('tab-' + tabId).classList.add('active');
       document.getElementById('nav-' + tabId).classList.add('active');
-
+      
+      if(tabId === 'dashboard') loadDashboard();
       if(tabId === 'transactions') loadTransactions();
       if(tabId === 'users') loadUsers();
-      if(tabId === 'dashboard') loadDashboardStats();
     }
 
-    // --- Dashboard Stats ---
-    async function loadDashboardStats() {
-      try {
-        const res = await fetch(`${BACKEND}/admin/users`, { headers: authHeaders() });
-        const usersData = await res.json();
-        
-        const txRes = await fetch(`${BACKEND}/admin/transactions`, { headers: authHeaders() });
-        const txData = await txRes.json();
-
-        if (res.ok && txRes.ok) {
-          const users = usersData.users || [];
-          const txs = txData.transactions || [];
-          
-          document.getElementById("stat-total-users").innerText = users.length;
-          document.getElementById("stat-total-paid").innerText = txs.filter(t => t.status === 'paid').length;
-          const pendingCount = txs.filter(t => t.status === 'pending').length;
-          document.getElementById("stat-pending-tx").innerText = pendingCount;
-          
-          const badge = document.getElementById("pendingBadge");
-          if(pendingCount > 0) badge.classList.remove('hidden');
-          else badge.classList.add('hidden');
-
-          const tbody = document.getElementById("dashboard-tx-table");
-          tbody.innerHTML = txs.slice(0, 5).map(t => `
-            <tr class="text-sm border-b border-white/5 hover:bg-white/5 transition-colors">
-              <td class="py-4 pr-4 font-bold text-white">${t.username}</td>
-              <td class="py-4">${Number(t.amount).toLocaleString()}</td>
-              <td class="py-4 text-xs text-gray-400">${t.plan_id}</td>
-              <td class="py-4">
-                <span class="px-2 py-1 rounded-full text-[10px] ${t.status === 'paid' ? 'bg-green-500/20 text-green-500' : 'bg-yellow-500/20 text-yellow-500'}">
-                  ${t.status === 'paid' ? 'تایید شده' : 'در انتظار'}
-                </span>
-              </td>
-            </tr>
-          `).join('');
-        }
-      } catch (err) { console.error(err); }
+    // --- Dashboard ---
+    async function loadDashboard() {
+        try {
+            const uRes = await fetch(`${API_URL}/admin/users`, { headers: getHeaders() });
+            const tRes = await fetch(`${API_URL}/admin/transactions`, { headers: getHeaders() });
+            if(uRes.ok && tRes.ok) {
+                const ud = await uRes.json();
+                const td = await tRes.json();
+                document.getElementById("dash-users").innerText = ud.users.length;
+                document.getElementById("dash-paid").innerText = td.transactions.filter(x => x.status === 'paid').length;
+                const p = td.transactions.filter(x => x.status === 'pending').length;
+                document.getElementById("dash-pending").innerText = p;
+                
+                if(p > 0) document.getElementById("pendingBadge").classList.remove('hidden');
+            }
+        } catch (e) {}
     }
 
-    // --- Transactions Management ---
+    // --- Transactions ---
     async function loadTransactions() {
-      const tbody = document.getElementById("transactions-list");
-      tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center animate-pulse">در حال لود...</td></tr>';
-      
-      try {
-        const res = await fetch(`${BACKEND}/admin/transactions`, { headers: authHeaders() });
-        const data = await res.json();
-        
-        if (res.ok) {
-          const list = data.transactions || [];
-          if(list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center opacity-40">تراکنشی یافت نشد.</td></tr>';
-            return;
-          }
-          
-          tbody.innerHTML = list.reverse().map(t => `
-            <tr class="hover:bg-white/[0.02] transition-colors">
-              <td class="p-5">
-                <div class="font-bold text-white">${t.username}</div>
-                <div class="text-[10px] text-gray-500 mt-1">${new Date(t.created_at).toLocaleString('fa-IR')}</div>
-              </td>
-              <td class="p-5 font-mono text-xs text-brand-accent">${t.ref_id || 'N/A'}</td>
-              <td class="p-5">
-                <div class="text-sm">${Number(t.amount).toLocaleString()} تومان</div>
-                <div class="text-[10px] text-gray-500">${t.plan_id}</div>
-              </td>
-              <td class="p-5">
-                ${t.status === 'pending' ? `
-                  <div class="flex justify-center gap-2">
-                    <button onclick="updateTx('${t._id}', 'approve')" class="px-4 py-1.5 bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white rounded-lg text-xs font-bold transition-all">تایید</button>
-                    <button onclick="updateTx('${t._id}', 'reject')" class="px-4 py-1.5 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-lg text-xs font-bold transition-all">رد</button>
-                  </div>
-                ` : `
-                  <div class="text-center text-[10px] uppercase font-bold ${t.status === 'paid' ? 'text-green-500' : 'text-red-500'}">
-                    ${t.status === 'paid' ? 'پرداخت شده' : 'رد شده'}
-                  </div>
-                `}
-              </td>
-            </tr>
-          `).join('');
-        }
-      } catch (err) { tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-red-500">خطای شبکه</td></tr>'; }
+        const list = document.getElementById("tx-list");
+        list.innerHTML = '<tr><td colspan="4" class="p-10 text-center opacity-50">در حال بارگذاری...</td></tr>';
+        try {
+            const res = await fetch(`${API_URL}/admin/transactions`, { headers: getHeaders() });
+            const data = await res.json();
+            if(res.ok) {
+                list.innerHTML = data.transactions.reverse().map(t => `
+                    <tr class="hover:bg-white/5 transition-all">
+                        <td class="p-5 font-bold">${t.username}</td>
+                        <td class="p-5">
+                            <div>${Number(t.amount).toLocaleString()} تومان</div>
+                            <div class="text-[10px] text-gray-500">${new Date(t.created_at).toLocaleString('fa-IR')}</div>
+                        </td>
+                        <td class="p-5 font-mono text-brand-accent">${t.ref_id || '---'}</td>
+                        <td class="p-5 text-center">
+                            ${t.status === 'pending' ? `
+                                <button onclick="txOp('${t._id}', 'approve')" class="px-3 py-1 bg-green-500/20 text-green-500 rounded-lg text-xs ml-2 hover:bg-green-500 hover:text-white transition-all">تایید</button>
+                                <button onclick="txOp('${t._id}', 'reject')" class="px-3 py-1 bg-red-500/20 text-red-500 rounded-lg text-xs hover:bg-red-500 hover:text-white transition-all">رد</button>
+                            ` : `<span class="text-[10px] font-bold uppercase ${t.status === 'paid' ? 'text-green-500' : 'text-red-500'}">${t.status}</span>`}
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (e) { list.innerHTML = 'خطا در شبکه'; }
     }
 
-    async function updateTx(txId, action) {
-      if(!confirm("آیا از انجام این عملیات روی تراکنش مطمئن هستید؟")) return;
-      try {
-        const res = await fetch(`${BACKEND}/admin/transactions/${txId}/${action}`, {
-          method: "POST",
-          headers: authHeaders()
-        });
-        if(res.ok) {
-          alert("عملیات با موفقیت انجام شد.");
-          loadTransactions();
-          loadDashboardStats();
-        } else {
-          const err = await res.json();
-          alert("خطا: " + err.msg);
-        }
-      } catch (err) { alert("خطای سرور"); }
+    async function txOp(id, act) {
+        if(!confirm("مطمئن هستید؟")) return;
+        try {
+            const res = await fetch(`${API_URL}/admin/transactions/${id}/${act}`, { method: 'POST', headers: getHeaders() });
+            if(res.ok) { alert("انجام شد"); loadTransactions(); }
+        } catch (e) { alert("خطا"); }
     }
 
     // --- Rates ---
-    async function fetchRates() {
-      const btn = document.getElementById("btnFetchRates");
-      const msg = document.getElementById("ratesMsg");
-      btn.disabled = true;
-      msg.innerText = "⏳ در حال استعلام قیمت و آپدیت پلن‌ها...";
-      
-      try {
-        const res = await fetch(`${BACKEND}/admin/fetch-rates`, {
-          method: "POST",
-          headers: authHeaders()
-        });
-        if(res.ok) {
-          msg.className = "text-center text-xs text-green-500 font-bold";
-          msg.innerText = "✅ نرخ‌ها با موفقیت آپدیت شدند.";
-          setTimeout(() => { msg.innerText = ""; btn.disabled = false; }, 3000);
-        } else {
-          msg.innerText = "❌ خطا در آپدیت نرخ‌ها";
-          btn.disabled = false;
-        }
-      } catch (e) {
-        msg.innerText = "⚠️ خطای شبکه";
+    async function updateRates() {
+        const btn = document.getElementById("rateBtn");
+        const st = document.getElementById("rateStatus");
+        btn.disabled = true;
+        st.innerText = "⏳ در حال انجام عملیات...";
+        try {
+            const res = await fetch(`${API_URL}/admin/fetch-rates`, { method: 'POST', headers: getHeaders() });
+            if(res.ok) { st.innerText = "✅ با موفقیت آپدیت شد."; }
+            else { st.innerText = "❌ خطا در سرور"; }
+        } catch (e) { st.innerText = "⚠️ خطای شبکه"; }
         btn.disabled = false;
-      }
     }
 
     // --- Users ---
     async function loadUsers() {
-      const tbody = document.getElementById("users-list");
-      tbody.innerHTML = '<tr><td colspan="4" class="p-10 text-center animate-pulse">در حال فچ کاربران...</td></tr>';
-      try {
-        const res = await fetch(`${BACKEND}/admin/users`, { headers: authHeaders() });
-        const data = await res.json();
-        if(res.ok) {
-          let list = data.users || [];
-          const search = document.getElementById("userSearchInput").value.toLowerCase();
-          if(search) list = list.filter(u => u.username.toLowerCase().includes(search));
-
-          tbody.innerHTML = list.map(u => `
-            <tr class="hover:bg-white/[0.02]">
-              <td class="p-5 font-bold text-white">${u.username}</td>
-              <td class="p-5">
-                <span class="px-2 py-0.5 rounded-full text-[10px] ${u.role === 'admin' ? 'bg-brand-accent/20 text-brand-accent' : 'bg-white/10 text-gray-400'}">
-                  ${u.role}
-                </span>
-              </td>
-              <td class="p-5 text-sm text-gray-500 font-mono">${u.expiryDate ? new Date(u.expiryDate).toLocaleDateString('fa-IR') : 'دائم / نامشخص'}</td>
-              <td class="p-5 text-center">
-                <button class="text-xs text-brand-accent hover:underline">ویرایش دسترسی</button>
-              </td>
-            </tr>
-          `).join('');
-        }
-      } catch (err) { tbody.innerHTML = '<tr><td colspan="4" class="p-5 text-red-500 text-center">خطا</td></tr>'; }
+        const list = document.getElementById("user-list");
+        try {
+            const res = await fetch(`${API_URL}/admin/users`, { headers: getHeaders() });
+            const data = await res.json();
+            if(res.ok) {
+                list.innerHTML = data.users.map(u => `
+                    <tr class="hover:bg-white/5">
+                        <td class="p-5 font-bold">${u.username}</td>
+                        <td class="p-5"><span class="px-2 py-0.5 bg-white/10 rounded-full text-[10px]">${u.role}</span></td>
+                        <td class="p-5 text-xs text-gray-400">${u.expiryDate ? new Date(u.expiryDate).toLocaleDateString('fa-IR') : '---'}</td>
+                        <td class="p-5"><button class="text-brand-accent text-xs">ویرایش</button></td>
+                    </tr>
+                `).join('');
+            }
+        } catch (e) {}
     }
 
     function logout() {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      window.location.href = AUTH_PAGE;
+        localStorage.clear();
+        window.location.href = "/auth/";
     }
 
-    // شروع فرآیند احراز هویت
+    // Start checking on load
     window.onload = bootstrap;
   </script>
 </body>

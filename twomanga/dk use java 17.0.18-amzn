@@ -1,0 +1,101 @@
+================================================================================
+Available Java Versions for Linux 64bit
+================================================================================
+ Vendor        | Use | Version      | Dist    | Status     | Identifier
+--------------------------------------------------------------------------------
+ Corretto      |     | 25.0.2       | amzn    |            | 25.0.2-amzn         
+               |     | 25.0.1       | amzn    |            | 25.0.1-amzn         
+               |     | 24.0.2       | amzn    |            | 24.0.2-amzn         
+               |     | 23.0.2       | amzn    |            | 23.0.2-amzn         
+               |     | 21.0.10      | amzn    |            | 21.0.10-amzn        
+               |     | 21.0.9       | amzn    |            | 21.0.9-amzn         
+               |     | 17.0.18      | amzn    |            | 17.0.18-amzn        
+               |     | 17.0.17      | amzn    |            | 17.0.17-amzn        
+               |     | 11.0.30      | amzn    |            | 11.0.30-amzn        
+               |     | 11.0.29      | amzn    |            | 11.0.29-amzn        
+               |     | 8.0.472      | amzn    |            | 8.0.472-amzn        
+ Dragonwell    |     | 21.0.9       | albba   |            | 21.0.9-albba        
+               |     | 21.0.8       | albba   |            | 21.0.8-albba        
+               |     | 17.0.18      | albba   |            | 17.0.18-albba       
+               |     | 17.0.17      | albba   |            | 17.0.17-albba       
+               |     | 17.0.16      | albba   |            | 17.0.16-albba       
+               |     | 11.0.29      | albba   |            | 11.0.29-albba       
+               |     | 11.0.28      | albba   |            | 11.0.28-albba       
+               |     | 8.0.472      | albba   |            | 8.0.472-albba       
+               |     | 8.0.462      | albba   |            | 8.0.462-albba       
+ Gluon         |     | 22.1.0.1.r17 | gln     |            | 22.1.0.1.r17-gln    
+               |     | 22.1.0.1.r11 | gln     |            | 22.1.0.1.r11-gln    
+ GraalVM CE    |     | 25.0.2       | graalce |            | 25.0.2-graalce      
+               |     | 25.0.1       | graalce |            | 25.0.1-graalce      
+               |     | 24.0.2       | graalce |            | 24.0.2-graalce      
+               |     | 23.0.2       | graalce |            | 23.0.2-graalce      
+               |     | 21.0.2       | graalce |            | 21.0.2-graalce      
+               |     | 17.0.9       | graalce |            | 17.0.9-graalce      
+ GraalVM Oracle|     | 26.ea.13     | graal   |            | 26.ea.13-graal      
+               |     | 25.0.2       | graal   |            | 25.0.2-graal        
+               |     | 25.0.1       | graal   |            | 25.0.1-graal        
+               |     | 24.0.2       | graal   |            | 24.0.2-graal        
+               |     | 23.0.2       | graal   |            | 23.0.2-graal        
+               |     | 21.0.10      | graal   |            | 21.0.10-graal       
+               |     | 21.0.9       | graal   |            | 21.0.9-graal        
+               |     | 17.0.12      | graal   |            | 17.0.12-graal       
+ Huawei        |     | 21.0.9       | bisheng |            | 21.0.9-bisheng      
+               |     | 21.0.8       | bisheng |            | 21.0.8-bisheng      
+               |     | 17.0.17      | bisheng |            | 17.0.17-bisheng     
+               |     | 17.0.16      | bisheng |            | 17.0.16-bisheng     
+               |     | 11.0.29      | bisheng |            | 11.0.29-bisheng     
+               |     | 11.0.28      | bisheng |            | 11.0.28-bisheng     
+               |     | 8.0.472      | bisheng |            | 8.0.472-bisheng     
+               |     | 8.0.462      | bisheng |            | 8.0.462-bisheng     
+ Java.net      |     | 27.ea.9      | open    |            | 27.ea.9-open        
+               |     | 27.ea.8      | open    |            | 27.ea.8-open        
+               |     | 27.ea.7      | open    |            | 27.ea.7-open        
+               |     | 27.ea.6      | open    |            | 27.ea.6-open        
+               |     | 27.ea.5      | open    |            | 27.ea.5-open        
+               |     | 27.ea.4      | open    |            | 27.ea.4-open        
+               |     | 27.ea.3      | open    |            | 27.ea.3-open        
+               |     | 27.ea.2      | open    |            | 27.ea.2-open        
+               |     | 26.ea.35     | open    |            | 26.ea.35-open       
+               |     | 26.ea.34     | open    |            | 26.ea.34-open       
+               |     | 26.ea.33     | open    |            | 26.ea.33-open       
+               |     | 26.ea.32     | open    |            | 26.ea.32-open       
+               |     | 26.ea.31     | open    |            | 26.ea.31-open       
+               |     | 26.ea.30     | open    |            | 26.ea.30-open       
+               |     | 26.ea.29     | open    |            | 26.ea.29-open       
+               |     | 26.ea.28     | open    |            | 26.ea.28-open       
+               |     | 26.ea.27     | open    |            | 26.ea.27-open       
+               |     | 26.ea.25     | open    |            | 26.ea.25-open       
+               |     | 26.ea.24     | open    |            | 26.ea.24-open       
+               |     | 25.0.2       | open    |            | 25.0.2-open         
+               |     | 25.0.1       | open    |            | 25.0.1-open         
+               |     | 24.0.2       | open    |            | 24.0.2-open         
+               |     | 23.0.1       | open    |            | 23.0.1-open         
+               |     | 21.0.2       | open    |            | 21.0.2-open         
+ JetBrains     |     | 25.0.2       | jbr     |            | 25.0.2-jbr          
+               |     | 21.0.10      | jbr     |            | 21.0.10-jbr         
+               |     | 21.0.9       | jbr     |            | 21.0.9-jbr          
+               |     | 17.0.14      | jbr     |            | 17.0.14-jbr         
+               |     | 11.0.14.1    | jbr     |            | 11.0.14.1-jbr       
+ Liberica      |     | 25.0.2.fx    | librca  |            | 25.0.2.fx-librca    
+               |     | 25.0.2       | librca  |            | 25.0.2-librca       
+               |     | 25.0.1.fx    | librca  |            | 25.0.1.fx-librca    
+               |     | 25.0.1       | librca  |            | 25.0.1-librca       
+               |     | 24.0.2.fx    | librca  |            | 24.0.2.fx-librca    
+               |     | 24.0.2       | librca  |            | 24.0.2-librca       
+               |     | 23.0.2.fx    | librca  |            | 23.0.2.fx-librca    
+               |     | 23.0.2       | librca  |            | 23.0.2-librca       
+               |     | 21.0.10.crac | librca  |            | 21.0.10.crac-librca 
+               |     | 21.0.10.fx   | librca  |            | 21.0.10.fx-librca   
+               |     | 21.0.10      | librca  |            | 21.0.10-librca      
+               |     | 21.0.9.crac  | librca  |            | 21.0.9.crac-librca  
+               |     | 21.0.9.fx    | librca  |            | 21.0.9.fx-librca    
+               |     | 21.0.9       | librca  |            | 21.0.9-librca       
+               |     | 17.0.18.crac | librca  |            | 17.0.18.crac-librca 
+               |     | 17.0.18.fx   | librca  |            | 17.0.18.fx-librca   
+               |     | 17.0.18      | librca  |            | 17.0.18-librca      
+               |     | 17.0.17.crac | librca  |            | 17.0.17.crac-librca 
+               |     | 17.0.17.fx   | librca  |            | 17.0.17.fx-librca   
+               |     | 17.0.17      | librca  |            | 17.0.17-librca      
+               |     | 11.0.30.fx   | librca  |            | 11.0.30.fx-librca   
+               |     | 11.0.30      | librca  |            | 11.0.30-librca      
+               |     | 11.0.29.fx   | librca  |

@@ -39,6 +39,7 @@ dependencies:
   screen_protector: ^1.5.1
   url_launcher: ^6.3.2
   wakelock_plus: ^1.4.0
+  app_links: ^7.0.0
 
 dev_dependencies:
   flutter_test:
